@@ -38,6 +38,7 @@ def create_app():
     # Start the scheduler
     scheduler.start()
 
+
     return app
 
 # Make sure these are accessible when imported from app
