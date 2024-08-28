@@ -1,4 +1,7 @@
-from app import create_app, engine, Session
+
+
+
+from app import create_app, Session, engine
 from app.models import Base, GridSubstation, Feeder, PowerPlant, HydroPlant, ForecastLocation, ForecastingProvider, SolarForecastData, WindForecastData, HydroForecastData, FeederOutage
 from datetime import datetime, timedelta
 import random
@@ -13,6 +16,8 @@ def init_db():
     session = Session()
 
     try:
+
+
         # Add Grid Substations
         substations = [
             GridSubstation(substation_name="Anuradhapura", latitude=8.3114, longitude=80.4037),
@@ -128,3 +133,7 @@ def init_db():
 
 if __name__ == '__main__':
     init_db()
+
+
+
+    
