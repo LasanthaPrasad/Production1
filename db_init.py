@@ -1,22 +1,7 @@
-import os
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from app import create_app, engine, Session
 from app.models import Base, GridSubstation, Feeder, PowerPlant, HydroPlant, ForecastLocation, ForecastingProvider, SolarForecastData, WindForecastData, HydroForecastData, FeederOutage
 from datetime import datetime, timedelta
 import random
-
-# Get the DATABASE_URL from the environment
-database_url = os.environ.get('DATABASE_URL', 'sqlite:///app.db')
-
-# Ensure the URL starts with postgresql:// instead of postgres:// for SQLAlchemy 1.4+
-if database_url.startswith("postgres://"):
-    database_url = database_url.replace("postgres://", "postgresql://", 1)
-
-# Create the SQLAlchemy engine
-engine = create_engine(database_url)
-
-# Create a sessionmaker
-Session = sessionmaker(bind=engine)
 
 def init_db():
     # Create all tables
@@ -92,7 +77,7 @@ def init_db():
 
         # Add Forecasting Providers
         providers = [
-            ForecastingProvider(provider_name="Solcast", api_key="solcast_api_key_here", api_endpoint="https://api.solcast.com.au", service_type="Solar"),
+            ForecastingProvider(provider_name="Solcast", api_key="kAVziMj4__x-RQ9Ab67-TBwv2ry_Z9uY", api_endpoint="https://api.solcast.com.au", service_type="Solar"),
             ForecastingProvider(provider_name="OpenWeatherMap", api_key="openweathermap_api_key_here", api_endpoint="https://api.openweathermap.org/data/2.5/forecast", service_type="Wind"),
             ForecastingProvider(provider_name="Weatherbit", api_key="weatherbit_api_key_here", api_endpoint="https://api.weatherbit.io/v2.0/forecast/daily", service_type="Hydro")
         ]
