@@ -10,9 +10,16 @@ app = create_app()
 
 def init_db():
     with app.app_context():
-        # Clear existing data
+        # Drop all tables
         db.drop_all()
+        
+        # Create all tables
         db.create_all()
+        
+        # Commit the changes
+        db.session.commit()
+        
+        print("Database tables created successfully.")
 
         # Add Grid Substations
         substations = [
@@ -20,8 +27,8 @@ def init_db():
             GridSubstation(substation_name="Biyagama", latitude=6.9428, longitude=80.0139),
             GridSubstation(substation_name="Colombo", latitude=6.9271, longitude=79.8612),
             GridSubstation(substation_name="Hambantota", latitude=6.1240, longitude=81.1185),
-            GridSubstation(substation_name="Kotugoda", latitude=7.1114, longitude=79.9277),
-            GridSubstation(substation_name="Norochcholai", latitude=8.0262, longitude=79.7452)
+            GridSubstation(substation_name="Vavuniya", latitude=8.7514, longitude=80.4970),
+            GridSubstation(substation_name="Kilinochchi", latitude=9.3803, longitude=80.4036)
         ]
         db.session.add_all(substations)
         db.session.commit()
@@ -32,8 +39,8 @@ def init_db():
             Feeder(feeder_number="BIY-F1", feeder_status="Active", grid_substation_id=2),
             Feeder(feeder_number="COL-F1", feeder_status="Active", grid_substation_id=3),
             Feeder(feeder_number="HAM-F1", feeder_status="Active", grid_substation_id=4),
-            Feeder(feeder_number="KOT-F1", feeder_status="Active", grid_substation_id=5),
-            Feeder(feeder_number="NOR-F1", feeder_status="Active", grid_substation_id=6)
+            Feeder(feeder_number="VAV-F1", feeder_status="Active", grid_substation_id=5),
+            Feeder(feeder_number="KIL-F1", feeder_status="Active", grid_substation_id=6)
         ]
         db.session.add_all(feeders)
         db.session.commit()
@@ -49,9 +56,9 @@ def init_db():
             PowerPlant(plant_name="Samanalawewa", plant_type="Hydro", latitude=6.5667, longitude=80.7333,
                        installed_capacity_mw=120, connected_grid_substation_id=3, connected_feeder_id=3),
             PowerPlant(plant_name="Puttalam Wind Farm", plant_type="Wind", latitude=8.0388, longitude=79.8417,
-                       installed_capacity_mw=100, connected_grid_substation_id=6, connected_feeder_id=6),
+                       installed_capacity_mw=100, connected_grid_substation_id=5, connected_feeder_id=5),
             PowerPlant(plant_name="Soorya Bala Sangramaya", plant_type="Solar", latitude=6.9271, longitude=79.8612,
-                       installed_capacity_mw=50, connected_grid_substation_id=5, connected_feeder_id=5)
+                       installed_capacity_mw=50, connected_grid_substation_id=6, connected_feeder_id=6)
         ]
         db.session.add_all(plants)
         db.session.commit()
@@ -78,7 +85,7 @@ def init_db():
 
         # Add Forecasting Providers
         providers = [
-            ForecastingProvider(provider_name="Solcast", api_key="kAVziMj4__x-RQ9Ab67-TBwv2ry_Z9uY", api_endpoint="https://api.solcast.com.au", service_type="Solar"),
+            ForecastingProvider(provider_name="Solcast", api_key="solcast_api_key_here", api_endpoint="https://api.solcast.com.au", service_type="Solar"),
             ForecastingProvider(provider_name="OpenWeatherMap", api_key="openweathermap_api_key_here", api_endpoint="https://api.openweathermap.org/data/2.5/forecast", service_type="Wind"),
             ForecastingProvider(provider_name="Weatherbit", api_key="weatherbit_api_key_here", api_endpoint="https://api.weatherbit.io/v2.0/forecast/daily", service_type="Hydro")
         ]
