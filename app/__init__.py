@@ -22,3 +22,4 @@ def create_app():
     scheduler.start()
 
     return app
+
