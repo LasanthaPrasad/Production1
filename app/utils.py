@@ -1,7 +1,7 @@
 import requests
 from datetime import datetime, timedelta
 import math
-from app.models import PowerPlant, ForecastingProvider, SolarForecastData, WindForecastData, HydroForecastData, HydroPlant
+from app.models import PowerPlant, ForecastingProvider, SolarForecastData, WindForecastData, HydroForecastData, HydroPlant, GridSubstation
 from app import db
 
 def fetch_solar_forecast(app):
