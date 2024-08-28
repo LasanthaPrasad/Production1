@@ -1,123 +1,136 @@
 import requests
 from datetime import datetime, timedelta
 import math
+from app import Session
 from app.models import PowerPlant, ForecastingProvider, SolarForecastData, WindForecastData, HydroForecastData, HydroPlant, GridSubstation
-from app import db
+
 
 def fetch_solar_forecast(app):
     with app.app_context():
-        solcast_provider = ForecastingProvider.query.filter_by(provider_name="Solcast", service_type="Solar").first()
-        if not solcast_provider:
-            print("Solcast provider not found")
-            return
+        session = Session()
+        try:
+            solcast_provider = session.query(ForecastingProvider).filter_by(provider_name="Solcast", service_type="Solar").first()
+            if not solcast_provider:
+                print("Solcast provider not found")
+                return
 
-        solar_plants = PowerPlant.query.filter_by(plant_type='Solar').all()
-        for plant in solar_plants:
-            response = requests.get(
-                f"{solcast_provider.api_endpoint}/radiation/forecasts",
-                params={
-                    'latitude': plant.latitude,
-                    'longitude': plant.longitude,
-                    'api_key': solcast_provider.api_key,
-                    'format': 'json'
-                }
-            )
-            if response.status_code == 200:
-                data = response.json()
-                for forecast in data.get('forecasts', []):
-                    solar_forecast = SolarForecastData(
-                        plant_id=plant.plant_id,
-                        provider_id=solcast_provider.provider_id,
-                        latitude=plant.latitude,
-                        longitude=plant.longitude,
-                        ghi=forecast.get('ghi', 0),
-                        dni=forecast.get('dni', 0),
-                        dhi=forecast.get('dhi', 0),
-                        air_temp=forecast.get('air_temp', 0),
-                        cloud_opacity=forecast.get('cloud_opacity', 0),
-                        forecast_timestamp=datetime.fromisoformat(forecast['period_end'])
-                    )
-                    db.session.add(solar_forecast)
-                
-                db.session.commit()
-                update_plant_forecast(plant, data['forecasts'])
-            else:
-                print(f"Error fetching Solcast data for plant {plant.plant_name}: {response.status_code}")
+            solar_plants = session.query(PowerPlant).filter_by(plant_type='Solar').all()
+            for plant in solar_plants:
+                response = requests.get(
+                    solcast_provider.api_endpoint,
+                    params={
+                        'latitude': plant.latitude,
+                        'longitude': plant.longitude,
+                        'api_key': solcast_provider.api_key,
+                        'format': 'json'
+                    }
+                )
+                if response.status_code == 200:
+                    data = response.json()
+                    for forecast in data.get('forecasts', []):
+                        solar_forecast = SolarForecastData(
+                            plant_id=plant.plant_id,
+                            provider_id=solcast_provider.provider_id,
+                            latitude=plant.latitude,
+                            longitude=plant.longitude,
+                            ghi=forecast.get('ghi', 0),
+                            dni=forecast.get('dni', 0),
+                            dhi=forecast.get('dhi', 0),
+                            air_temp=forecast.get('air_temp', 0),
+                            cloud_opacity=forecast.get('cloud_opacity', 0),
+                            forecast_timestamp=datetime.fromisoformat(forecast['period_end'])
+                        )
+                        session.add(solar_forecast)
+                    
+                    session.commit()
+                    update_plant_forecast(session, plant, data['forecasts'])
+                else:
+                    print(f"Error fetching Solcast data for plant {plant.plant_name}: {response.status_code}")
+        finally:
+            session.close()
 
 def fetch_wind_forecast(app):
     with app.app_context():
-        wind_provider = ForecastingProvider.query.filter_by(service_type="Wind").first()
-        if not wind_provider:
-            print("Wind forecast provider not found")
-            return
+        session = Session()
+        try:
+            wind_provider = session.query(ForecastingProvider).filter_by(service_type="Wind").first()
+            if not wind_provider:
+                print("Wind forecast provider not found")
+                return
 
-        wind_plants = PowerPlant.query.filter_by(plant_type='Wind').all()
-        for plant in wind_plants:
-            response = requests.get(
-                wind_provider.api_endpoint,
-                params={
-                    'lat': plant.latitude,
-                    'lon': plant.longitude,
-                    'key': wind_provider.api_key,
-                }
-            )
-            if response.status_code == 200:
-                data = response.json()
-                for i, forecast in enumerate(data.get('hourly', {}).get('windspeed_10m', [])):
-                    timestamp = datetime.utcnow() + timedelta(hours=i)
-                    wind_forecast = WindForecastData(
-                        plant_id=plant.plant_id,
-                        provider_id=wind_provider.provider_id,
-                        latitude=plant.latitude,
-                        longitude=plant.longitude,
-                        wind_speed=forecast,
-                        wind_direction=data['hourly']['winddirection_10m'][i],
-                        forecast_timestamp=timestamp
-                    )
-                    db.session.add(wind_forecast)
-                
-                db.session.commit()
-                update_plant_forecast(plant, data['hourly']['windspeed_10m'])
-            else:
-                print(f"Error fetching wind data for plant {plant.plant_name}: {response.status_code}")
+            wind_plants = session.query(PowerPlant).filter_by(plant_type='Wind').all()
+            for plant in wind_plants:
+                response = requests.get(
+                    wind_provider.api_endpoint,
+                    params={
+                        'lat': plant.latitude,
+                        'lon': plant.longitude,
+                        'key': wind_provider.api_key,
+                    }
+                )
+                if response.status_code == 200:
+                    data = response.json()
+                    for i, forecast in enumerate(data.get('hourly', {}).get('windspeed_10m', [])):
+                        timestamp = datetime.utcnow() + timedelta(hours=i)
+                        wind_forecast = WindForecastData(
+                            plant_id=plant.plant_id,
+                            provider_id=wind_provider.provider_id,
+                            latitude=plant.latitude,
+                            longitude=plant.longitude,
+                            wind_speed=forecast,
+                            wind_direction=data['hourly']['winddirection_10m'][i],
+                            forecast_timestamp=timestamp
+                        )
+                        session.add(wind_forecast)
+                    
+                    session.commit()
+                    update_plant_forecast(session, plant, data['hourly']['windspeed_10m'])
+                else:
+                    print(f"Error fetching wind data for plant {plant.plant_name}: {response.status_code}")
+        finally:
+            session.close()
 
 def fetch_hydro_forecast(app):
     with app.app_context():
-        hydro_provider = ForecastingProvider.query.filter_by(service_type="Hydro").first()
-        if not hydro_provider:
-            print("Hydro forecast provider not found")
-            return
+        session = Session()
+        try:
+            hydro_provider = session.query(ForecastingProvider).filter_by(service_type="Hydro").first()
+            if not hydro_provider:
+                print("Hydro forecast provider not found")
+                return
 
-        hydro_plants = PowerPlant.query.filter_by(plant_type='Hydro').all()
-        for plant in hydro_plants:
-            response = requests.get(
-                hydro_provider.api_endpoint,
-                params={
-                    'lat': plant.latitude,
-                    'lon': plant.longitude,
-                    'key': hydro_provider.api_key,
-                }
-            )
-            if response.status_code == 200:
-                data = response.json()
-                for i, forecast in enumerate(data.get('hourly', {}).get('precipitation', [])):
-                    timestamp = datetime.utcnow() + timedelta(hours=i)
-                    hydro_forecast = HydroForecastData(
-                        plant_id=plant.plant_id,
-                        provider_id=hydro_provider.provider_id,
-                        latitude=plant.latitude,
-                        longitude=plant.longitude,
-                        precipitation=forecast,
-                        forecast_timestamp=timestamp
-                    )
-                    db.session.add(hydro_forecast)
-                
-                db.session.commit()
-                update_plant_forecast(plant, data['hourly']['precipitation'])
-            else:
-                print(f"Error fetching hydro data for plant {plant.plant_name}: {response.status_code}")
+            hydro_plants = session.query(PowerPlant).filter_by(plant_type='Hydro').all()
+            for plant in hydro_plants:
+                response = requests.get(
+                    hydro_provider.api_endpoint,
+                    params={
+                        'lat': plant.latitude,
+                        'lon': plant.longitude,
+                        'key': hydro_provider.api_key,
+                    }
+                )
+                if response.status_code == 200:
+                    data = response.json()
+                    for i, forecast in enumerate(data.get('hourly', {}).get('precipitation', [])):
+                        timestamp = datetime.utcnow() + timedelta(hours=i)
+                        hydro_forecast = HydroForecastData(
+                            plant_id=plant.plant_id,
+                            provider_id=hydro_provider.provider_id,
+                            latitude=plant.latitude,
+                            longitude=plant.longitude,
+                            precipitation=forecast,
+                            forecast_timestamp=timestamp
+                        )
+                        session.add(hydro_forecast)
+                    
+                    session.commit()
+                    update_plant_forecast(session, plant, data['hourly']['precipitation'])
+                else:
+                    print(f"Error fetching hydro data for plant {plant.plant_name}: {response.status_code}")
+        finally:
+            session.close()
 
-def update_plant_forecast(plant, forecast_data):
+def update_plant_forecast(session, plant, forecast_data):
     if plant.plant_type == 'Solar':
         plant.forecast_1_hour_mw = calculate_solar_power(forecast_data[0], plant)
         plant.forecast_1_day_mw = sum(calculate_solar_power(f, plant) for f in forecast_data[:24]) / 24
@@ -125,14 +138,13 @@ def update_plant_forecast(plant, forecast_data):
         plant.forecast_1_hour_mw = calculate_wind_power(forecast_data[0], plant)
         plant.forecast_1_day_mw = sum(calculate_wind_power(f, plant) for f in forecast_data[:24]) / 24
     elif plant.plant_type == 'Hydro':
-        hydro_plant = HydroPlant.query.get(plant.plant_id)
+        hydro_plant = session.query(HydroPlant).get(plant.plant_id)
         plant.forecast_1_hour_mw = calculate_hydro_power(forecast_data[0], hydro_plant)
         plant.forecast_1_day_mw = sum(calculate_hydro_power(f, hydro_plant) for f in forecast_data[:24]) / 24
     
-    db.session.commit()
+    session.commit()
 
 def calculate_solar_power(forecast, plant):
-    # This is a simplified calculation and should be adjusted based on more precise formulas
     ghi = forecast.get('ghi', 0)
     dni = forecast.get('dni', 0)
     dhi = forecast.get('dhi', 0)
@@ -144,7 +156,6 @@ def calculate_solar_power(forecast, plant):
     return min(raw_output, plant.installed_capacity_mw)
 
 def calculate_wind_power(wind_speed, plant):
-    # This is a simplified power curve and should be replaced with actual turbine data
     if wind_speed < 3 or wind_speed > 25:
         return 0
     elif wind_speed < 13:
@@ -153,13 +164,12 @@ def calculate_wind_power(wind_speed, plant):
         return plant.installed_capacity_mw
 
 def calculate_hydro_power(precipitation, hydro_plant):
-    # This is a simplified calculation and should be adjusted based on more precise formulas
     water_flow = hydro_plant.catchment_area * precipitation
     power_output = water_flow * hydro_plant.mw_per_m3 * hydro_plant.plant_efficiency
     return min(power_output, hydro_plant.plant.installed_capacity_mw)
 
-def aggregate_substation_forecast(substation):
-    plants = PowerPlant.query.filter_by(connected_grid_substation_id=substation.grid_substation_id).all()
+def aggregate_substation_forecast(session, substation):
+    plants = session.query(PowerPlant).filter_by(connected_grid_substation_id=substation.grid_substation_id).all()
     
     total_solar = sum(p.forecast_1_hour_mw for p in plants if p.plant_type == 'Solar')
     total_wind = sum(p.forecast_1_hour_mw for p in plants if p.plant_type == 'Wind')
@@ -169,7 +179,7 @@ def aggregate_substation_forecast(substation):
     substation.total_connected_mw_wind = total_wind
     substation.total_connected_mw_hydro = total_hydro
     
-    db.session.commit()
+    session.commit()
 
 def update_all_forecasts(app):
     fetch_solar_forecast(app)
@@ -177,6 +187,10 @@ def update_all_forecasts(app):
     fetch_hydro_forecast(app)
     
     with app.app_context():
-        substations = GridSubstation.query.all()
-        for substation in substations:
-            aggregate_substation_forecast(substation)
+        session = Session()
+        try:
+            substations = session.query(GridSubstation).all()
+            for substation in substations:
+                aggregate_substation_forecast(session, substation)
+        finally:
+            session.close()
