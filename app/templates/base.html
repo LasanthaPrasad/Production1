@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Renewable Energy Forecast</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY"></script>
+</head>
+<body>
+    <header>
+        <img src="{{ url_for('static', filename='images/company_logo.png') }}" alt="Company Logo" class="logo">
+        <h1>Renewable Energy Forecast</h1>
+    </header>
+    <nav>
+        <ul>
+            <li><a href="#map">Map</a></li>
+            <li><a href="#plants">Power Plants</a></li>
+            <li><a href="#substations">Grid Substations</a></li>
+            <li><a href="#forecast-locations">Forecast Locations</a></li>
+        </ul>
+    </nav>
+    <main>
+        {% block content %}{% endblock %}
+    </main>
+    <footer>
+        <p>&copy; 2024 Your Company Name. All rights reserved.</p>
+    </footer>
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

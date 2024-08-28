@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section id="map">
+    <h2>Renewable Energy Map</h2>
+    <div id="map-container"></div>
+</section>
+
+<section id="forecast">
+    <h2>Forecast</h2>
+    <canvas id="forecast-chart"></canvas>
+</section>
+
+<section id="plants">
+    <h2>Power Plants</h2>
+    <ul id="plant-list"></ul>
+</section>
+
+<section id="substations">
+    <h2>Grid Substations</h2>
+    <ul id="substation-list"></ul>
+</section>
+
+<section id="forecast-locations">
+    <h2>Forecast Locations</h2>
+    <ul id="forecast-location-list"></ul>
+</section>
+{% endblock %}
