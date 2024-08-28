@@ -83,8 +83,8 @@ def init_db():
         # Add Forecasting Providers
         providers = [
             ForecastingProvider(provider_name="Solcast", api_key="kAVziMj4__x-RQ9Ab67-TBwv2ry_Z9uY", api_endpoint="https://api.solcast.com.au", service_type="Solar"),
-           # ForecastingProvider(provider_name="OpenWeatherMap", api_key="openweathermap_api_key_here", api_endpoint="https://api.openweathermap.org/data/2.5/forecast", service_type="Wind"),
-           # ForecastingProvider(provider_name="Weatherbit", api_key="weatherbit_api_key_here", api_endpoint="https://api.weatherbit.io/v2.0/forecast/daily", service_type="Hydro")
+            ForecastingProvider(provider_name="OpenWeatherMap", api_key="openweathermap_api_key_here", api_endpoint="https://api.openweathermap.org/data/2.5/forecast", service_type="Wind"),
+            ForecastingProvider(provider_name="Weatherbit", api_key="weatherbit_api_key_here", api_endpoint="https://api.weatherbit.io/v2.0/forecast/daily", service_type="Hydro")
         ]
         session.add_all(providers)
         session.commit()
