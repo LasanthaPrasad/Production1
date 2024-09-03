@@ -25,7 +25,28 @@ def index():
 def solar_plants():
     if request.method == 'POST':
         # Handle create/update solar plant
-        pass
+        name = request.form['name']
+        latitude = float(request.form['latitude'])
+        longitude = float(request.form['longitude'])
+        grid_substation_id = int(request.form['grid_substation_id'])
+        feeder_id = int(request.form['feeder_id'])
+        forecast_location_id = int(request.form['forecast_location_id'])
+        installed_capacity = float(request.form['installed_capacity'])
+        panel_capacity = float(request.form['panel_capacity'])
+        inverter_capacity = float(request.form['inverter_capacity'])
+        plant_angle = float(request.form['plant_angle'])
+        company = request.form['company']
+
+        solar_plant = SolarPlant(
+            name=name, latitude=latitude, longitude=longitude,
+            grid_substation_id=grid_substation_id, feeder_id=feeder_id,
+            forecast_location_id=forecast_location_id, installed_capacity=installed_capacity,
+            panel_capacity=panel_capacity, inverter_capacity=inverter_capacity,
+            plant_angle=plant_angle, company=company
+        )
+        db.session.add(solar_plant)
+        db.session.commit()
+        return redirect(url_for('main.solar_plants'))
     elif request.method == 'GET':
         solar_plants = SolarPlant.query.all()
         return render_template('solar_plants.html', solar_plants=solar_plants)
@@ -35,8 +56,22 @@ def solar_plant_detail(id):
     solar_plant = SolarPlant.query.get(id)
     if request.method == 'POST':
         # Handle update solar plant
-        pass
+        solar_plant.name = request.form['name']
+        solar_plant.latitude = float(request.form['latitude'])
+        solar_plant.longitude = float(request.form['longitude'])
+        solar_plant.grid_substation_id = int(request.form['grid_substation_id'])
+        solar_plant.feeder_id = int(request.form['feeder_id'])
+        solar_plant.forecast_location_id = int(request.form['forecast_location_id'])
+        solar_plant.installed_capacity = float(request.form['installed_capacity'])
+        solar_plant.panel_capacity = float(request.form['panel_capacity'])
+        solar_plant.inverter_capacity = float(request.form['inverter_capacity'])
+        solar_plant.plant_angle = float(request.form['plant_angle'])
+        solar_plant.company = request.form['company']
+        db.session.commit()
+        return redirect(url_for('main.solar_plants'))
     elif request.method == 'DELETE':
         # Handle delete solar plant
-        pass
+        db.session.delete(solar_plant)
+        db.session.commit()
+        return redirect(url_for('main.solar_plants'))
     return render_template('solar_plant_detail.html', solar_plant=solar_plant)
