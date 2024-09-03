@@ -1,12 +1,8 @@
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
 import os
-from app.models import db, ForecastLocation, GridSubstation, Feeder, SolarPlant
+from app import create_app, db
+from app.models import ForecastLocation, GridSubstation, Feeder, SolarPlant
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', '').replace('postgres://', 'postgresql://') or 'sqlite:///app.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db.init_app(app)
+app = create_app()
 
 def init_db():
     # Clear existing data
@@ -83,6 +79,6 @@ def init_db():
     db.session.add(solar_plant2)
     db.session.commit()
 
-
-with app.app_context():
-    init_db()
+if __name__ == '__main__':
+    with app.app_context():
+        init_db()
