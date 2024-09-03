@@ -1,21 +1,20 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 import os
-from app.models import ForecastLocation, GridSubstation, Feeder, SolarPlant
+from app.models import db, ForecastLocation, GridSubstation, Feeder, SolarPlant
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DATABASE_URL', '').replace('postgres://', 'postgresql://') or 'sqlite:///app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
-db = SQLAlchemy(app)
+db.init_app(app)
 
 def init_db():
     # Clear existing data
-    #db.reflect()
-    #db.drop_all()
+    db.reflect()
+    db.drop_all()
 
     # Create tables in the correct order
     db.create_all()
-
 
     # Create sample data for Sri Lanka
     forecast_location1 = ForecastLocation(
