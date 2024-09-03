@@ -83,5 +83,6 @@ def init_db():
     db.session.add(solar_plant2)
     db.session.commit()
 
+
 with app.app_context():
     init_db()
