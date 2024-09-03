@@ -14,10 +14,7 @@ def init_db():
     db.drop_all()
 
     # Create tables in the correct order
-    db.create_all(bind=['forecastlocation'])
-    db.create_all(bind=['gridsubstation'])
-    db.create_all(bind=['feeder'])
-    db.create_all(bind=['solarplant'])
+    db.create_all()
 
     # Create sample data for Sri Lanka
     forecast_location1 = ForecastLocation(
@@ -40,6 +37,7 @@ def init_db():
     )
     db.session.add(forecast_location1)
     db.session.add(forecast_location2)
+    db.session.commit()
 
     grid_substation1 = GridSubstation(
         name='Hambantota Grid Substation', code='GS-001',
@@ -53,6 +51,7 @@ def init_db():
     )
     db.session.add(grid_substation1)
     db.session.add(grid_substation2)
+    db.session.commit()
 
     feeder1 = Feeder(
         name='Hambantota Feeder 1', code='F-001',
@@ -66,6 +65,7 @@ def init_db():
     )
     db.session.add(feeder1)
     db.session.add(feeder2)
+    db.session.commit()
 
     solar_plant = SolarPlant(
         name='Hambantota Solar Power Plant', latitude=6.1344, longitude=81.1248,
@@ -81,7 +81,6 @@ def init_db():
     )
     db.session.add(solar_plant)
     db.session.add(solar_plant2)
-
     db.session.commit()
 
 with app.app_context():
