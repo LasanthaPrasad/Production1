@@ -1,124 +1,66 @@
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy import Column, Integer, String, Float, DateTime, Enum, ForeignKey
-from sqlalchemy.orm import relationship
-from datetime import datetime
+from app import db
 
-Base = declarative_base()
+class SolarPlant(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
+    grid_substation_id = db.Column(db.Integer, db.ForeignKey('gridsubstation.id'), nullable=False)
+    feeder_id = db.Column(db.Integer, db.ForeignKey('feeder.id'), nullable=False)
+    forecast_location_id = db.Column(db.Integer, db.ForeignKey('forecastlocation.id'), nullable=False)
+    installed_capacity = db.Column(db.Float, nullable=False)
+    panel_capacity = db.Column(db.Float, nullable=False)
+    inverter_capacity = db.Column(db.Float, nullable=False)
+    plant_angle = db.Column(db.Float, nullable=False)
+    company = db.Column(db.String(100), nullable=False)
 
-class PowerPlant(Base):
-    __tablename__ = 'power_plants'
-    plant_id = Column(Integer, primary_key=True, autoincrement=True)
-    plant_name = Column(String(255), nullable=False)
-    plant_type = Column(Enum('Solar', 'Wind', 'Hydro', 'Bio-mass', 'Thermal', name='plant_type_enum'), nullable=False)
-    latitude = Column(Float, nullable=False)
-    longitude = Column(Float, nullable=False)
-    installed_capacity_mw = Column(Float, nullable=False)
-    real_time_mw = Column(Float)
-    real_time_mvar = Column(Float)
-    forecast_1_hour_mw = Column(Float)
-    forecast_1_day_mw = Column(Float)
-    forecast_7_day_energy = Column(Float)
-    connected_grid_substation_id = Column(Integer, ForeignKey('grid_substations.grid_substation_id'))
-    connected_feeder_id = Column(Integer, ForeignKey('feeders.feeder_id'))
-    feeder_number = Column(String(100))
-    plant_contact_number = Column(String(20))
-    plant_account_number = Column(String(100))
-    plant_company_name = Column(String(255))
-    cloud_cover = Column(Float)
-    plant_area = Column(String(255))
-    division = Column(String(50))
-    plant_account_type = Column(Enum('Net Metering', 'Net Account', 'Net Plus Plus', name='account_type_enum'))
+class GridSubstation(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    code = db.Column(db.String(50), nullable=False)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
+    forecast_location_id = db.Column(db.Integer, db.ForeignKey('forecastlocation.id'), nullable=False)
+    installed_solar_capacity = db.Column(db.Float, nullable=False)
 
-class ForecastLocation(Base):
-    __tablename__ = 'forecast_locations'
-    forecast_location_id = Column(Integer, primary_key=True, autoincrement=True)
-    location_name = Column(String(255), nullable=False)
-    latitude = Column(Float, nullable=False)
-    longitude = Column(Float, nullable=False)
-    area_name = Column(String(255))
-    division = Column(String(50))
+class Feeder(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(100), nullable=False)
+    code = db.Column(db.String(50), nullable=False)
+    grid_substation_id = db.Column(db.Integer, db.ForeignKey('gridsubstation.id'), nullable=False)
+    installed_solar_capacity = db.Column(db.Float, nullable=False)
+    status = db.Column(db.String(50), nullable=False)
+    outage_start = db.Column(db.DateTime)
+    outage_end = db.Column(db.DateTime)
 
-class ForecastingProvider(Base):
-    __tablename__ = 'forecasting_providers'
-    provider_id = Column(Integer, primary_key=True, autoincrement=True)
-    provider_name = Column(String(255), nullable=False)
-    api_key = Column(String(255))
-    api_endpoint = Column(String(255))
-    service_type = Column(Enum('Solar', 'Wind', 'Hydro', name='service_type_enum'), nullable=False)
+class ForecastLocation(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    provider_name = db.Column(db.String(100), nullable=False)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
+    ghi = db.Column(db.Float, nullable=False)
+    dni = db.Column(db.Float, nullable=False)
+    dhi = db.Column(db.Float, nullable=False)
+    air_temperature = db.Column(db.Float, nullable=False)
+    zenith = db.Column(db.Float, nullable=False)
+    azimuth = db.Column(db.Float, nullable=False)
+    cloud_opacity = db.Column(db.Float, nullable=False)
+    next_hour_forecast = db.Column(db.JSON, nullable=False)
+    next_24_hours_forecast = db.Column(db.JSON, nullable=False)
 
-class GridSubstation(Base):
-    __tablename__ = 'grid_substations'
-    grid_substation_id = Column(Integer, primary_key=True, autoincrement=True)
-    substation_name = Column(String(255), nullable=False)
-    latitude = Column(Float, nullable=False)
-    longitude = Column(Float, nullable=False)
-    total_connected_mw_solar = Column(Float)
-    total_connected_mw_wind = Column(Float)
-    total_connected_mw_hydro = Column(Float)
-    total_connected_mw_biomass = Column(Float)
-    total_connected_mw_thermal = Column(Float)
-
-class Feeder(Base):
-    __tablename__ = 'feeders'
-    feeder_id = Column(Integer, primary_key=True, autoincrement=True)
-    feeder_number = Column(String(100), nullable=False)
-    feeder_status = Column(Enum('Active', 'Outage', name='feeder_status_enum'), nullable=False)
-    grid_substation_id = Column(Integer, ForeignKey('grid_substations.grid_substation_id'), nullable=False)
-
-class FeederOutage(Base):
-    __tablename__ = 'feeder_outages'
-    outage_id = Column(Integer, primary_key=True, autoincrement=True)
-    feeder_id = Column(Integer, ForeignKey('feeders.feeder_id'), nullable=False)
-    outage_start_time = Column(DateTime, nullable=False)
-    outage_end_time = Column(DateTime, nullable=False)
-    reason = Column(String(255))
-
-class SolarForecastData(Base):
-    __tablename__ = 'solar_forecast_data'
-    forecast_id = Column(Integer, primary_key=True, autoincrement=True)
-    plant_id = Column(Integer, ForeignKey('power_plants.plant_id'))
-    forecast_location_id = Column(Integer, ForeignKey('forecast_locations.forecast_location_id'))
-    provider_id = Column(Integer, ForeignKey('forecasting_providers.provider_id'), nullable=False)
-    latitude = Column(Float, nullable=False)
-    longitude = Column(Float, nullable=False)
-    ghi = Column(Float)
-    dni = Column(Float)
-    dhi = Column(Float)
-    air_temp = Column(Float)
-    zenith = Column(Float)
-    azimuth = Column(Float)
-    cloud_opacity = Column(Float)
-    forecast_timestamp = Column(DateTime, nullable=False)
-    forecast_created_at = Column(DateTime, default=datetime.utcnow)
-
-class HydroForecastData(Base):
-    __tablename__ = 'hydro_forecast_data'
-    forecast_id = Column(Integer, primary_key=True, autoincrement=True)
-    plant_id = Column(Integer, ForeignKey('power_plants.plant_id'))
-    forecast_location_id = Column(Integer, ForeignKey('forecast_locations.forecast_location_id'))
-    provider_id = Column(Integer, ForeignKey('forecasting_providers.provider_id'), nullable=False)
-    latitude = Column(Float, nullable=False)
-    longitude = Column(Float, nullable=False)
-    precipitation = Column(Float)
-    forecast_timestamp = Column(DateTime, nullable=False)
-    forecast_created_at = Column(DateTime, default=datetime.utcnow)
-
-class WindForecastData(Base):
-    __tablename__ = 'wind_forecast_data'
-    forecast_id = Column(Integer, primary_key=True, autoincrement=True)
-    plant_id = Column(Integer, ForeignKey('power_plants.plant_id'))
-    forecast_location_id = Column(Integer, ForeignKey('forecast_locations.forecast_location_id'))
-    provider_id = Column(Integer, ForeignKey('forecasting_providers.provider_id'), nullable=False)
-    latitude = Column(Float, nullable=False)
-    longitude = Column(Float, nullable=False)
-    wind_speed = Column(Float)
-    wind_direction = Column(Float)
-    forecast_timestamp = Column(DateTime, nullable=False)
-    forecast_created_at = Column(DateTime, default=datetime.utcnow)
-
-class HydroPlant(Base):
-    __tablename__ = 'hydro_plants'
-    plant_id = Column(Integer, ForeignKey('power_plants.plant_id'), primary_key=True)
-    catchment_area = Column(Float)
-    plant_efficiency = Column(Float)
-    mw_per_m3 = Column(Float)
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'provider_name': self.provider_name,
+            'latitude': self.latitude,
+            'longitude': self.longitude,
+            'ghi': self.ghi,
+            'dni': self.dni,
+            'dhi': self.dhi,
+            'air_temperature': self.air_temperature,
+            'zenith': self.zenith,
+            'azimuth': self.azimuth,
+            'cloud_opacity': self.cloud_opacity,
+            'next_hour_forecast': self.next_hour_forecast,
+            'next_24_hours_forecast': self.next_24_hours_forecast
+        }
