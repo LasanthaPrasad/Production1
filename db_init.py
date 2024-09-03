@@ -10,8 +10,8 @@ db = SQLAlchemy(app)
 
 def init_db():
     # Clear existing data
-    db.reflect()
-    db.drop_all()
+    #db.reflect()
+    #db.drop_all()
 
     # Create tables in the correct order
     db.create_all()
@@ -85,4 +85,3 @@ def init_db():
 
 with app.app_context():
     init_db()
-    
