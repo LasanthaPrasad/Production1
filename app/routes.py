@@ -6,7 +6,7 @@ import schedule
 import time 
 import os
 import json
-
+import datetime
 
 @app.route('/solar-plants', methods=['GET', 'POST'])
 def solar_plants():
@@ -64,6 +64,9 @@ def solar_plant_detail(id):
     return render_template('solar_plant_detail.html', solar_plant=solar_plant)
 
 def fetch_forecast():
+ current_time = datetime.datetime.now().time()
+ if current_time.hour >= 6 and current_time.hour < 18:
+ 
     for location in ForecastLocation.query.all():
         url = f"https://api.solcast.com.au/radiation/forecasts?latitude={location.latitude}&longitude={location.longitude}&api_key={os.getenv('SOLCAST_API_KEY')}"
         response = requests.get(url)
@@ -80,9 +83,11 @@ def fetch_forecast():
         db.session.add(location)
     db.session.commit()
 
-schedule.every().hour.between(6, 18).do(fetch_forecast)
+
+schedule.every().hour.do(fetch_forecast)
 
 
+#schedule.every().hour.between(6, 18).do(fetch_forecast)
 
 
 @app.route('/')
