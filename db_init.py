@@ -16,6 +16,7 @@ def init_db():
     # Create tables in the correct order
     db.create_all()
 
+
     # Create sample data for Sri Lanka
     forecast_location1 = ForecastLocation(
         provider_name='Solcast',
