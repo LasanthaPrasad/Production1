@@ -149,4 +149,27 @@ function showForecast(locationId) {
                         y: {
                             title: {
                                 display: true,
-                                text: 'Irradiance
+                                text: 'Irradiance (W/m²)'
+                            }
+                        }
+                    }
+                }
+            });
+            $('#forecastModal').modal('show');
+        })
+        .catch(error => {
+            console.error('Error fetching forecast data:', error);
+            alert('Failed to fetch forecast data. Please try again.');
+        });
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    initMap();
+    document.querySelectorAll('.show-forecast').forEach(button => {
+        button.addEventListener('click', function() {
+            showForecast(this.getAttribute('data-location-id'));
+        });
+    });
+});
+</script>
+{% endblock %}
