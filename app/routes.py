@@ -84,6 +84,7 @@ def solar_plant_detail(id):
 
 
 
+
     if request.method == 'POST':
         # Handle update solar plant
         solar_plant.name = request.form['name']
