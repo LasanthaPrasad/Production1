@@ -2,6 +2,15 @@ from flask import render_template, request, redirect, url_for, flash
 from app import app, db
 from app.models import SolarPlant, GridSubstation, Feeder, ForecastLocation, Forecast
 
+from flask import jsonify
+
+@app.route('/get_feeders/<int:substation_id>')
+def get_feeders(substation_id):
+    feeders = Feeder.query.filter_by(grid_substation=substation_id).all()
+    return jsonify([{'id': f.id, 'name': f.name} for f in feeders])
+
+
+
 #@app.route('/')
 #def index():
 #    total_mw = db.session.query(db.func.sum(SolarPlant.installed_capacity)).scalar() or 0
@@ -192,6 +201,9 @@ def solar_plants():
 #    return render_template('solar_plants.html', plants=plants)
 
 
+
+
+
 @app.route('/solar_plants/create', methods=['GET', 'POST'])
 def create_solar_plant():
     if request.method == 'POST':
@@ -213,6 +225,7 @@ def create_solar_plant():
         flash('Solar Plant created successfully!', 'success')
         return redirect(url_for('solar_plants'))
 
+
     substations = GridSubstation.query.all()
     feeders = Feeder.query.all()
     forecast_locations = ForecastLocation.query.all()
@@ -220,6 +233,8 @@ def create_solar_plant():
                            substations=substations, 
                            feeders=feeders, 
                            forecast_locations=forecast_locations)
+
+
 
 
 
@@ -243,7 +258,7 @@ def edit_solar_plant(id):
         flash('Solar Plant updated successfully!', 'success')
         return redirect(url_for('solar_plants'))
     substations = GridSubstation.query.all()
-    feeders = Feeder.query.all()
+    feeders = Feeder.query.filter_by(grid_substation=plant.grid_substation).all()
     forecast_locations = ForecastLocation.query.all()
     return render_template('edit_solar_plant.html', plant=plant, substations=substations, feeders=feeders, forecast_locations=forecast_locations)
 
