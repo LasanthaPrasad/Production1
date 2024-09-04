@@ -167,10 +167,15 @@ def create_solar_plant():
         db.session.commit()
         flash('Solar Plant created successfully!', 'success')
         return redirect(url_for('solar_plants'))
+
     substations = GridSubstation.query.all()
     feeders = Feeder.query.all()
     forecast_locations = ForecastLocation.query.all()
-    return render_template('create_solar_plant.html', substations=substations, feeders=feeders, forecast_locations=forecast_locations)
+    return render_template('create_solar_plant.html', 
+                           substations=substations, 
+                           feeders=feeders, 
+                           forecast_locations=forecast_locations)
+
 
 
 

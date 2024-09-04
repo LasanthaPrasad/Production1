@@ -23,19 +23,17 @@
             {% endfor %}
         </select>
     </div>
-
-
     <div class="form-group">
-        <label for="feeder_id">Feeder</label>
-        <select class="form-control" id="feeder_id" name="feeder_id" required>
+        <label for="feeder">Feeder</label>
+        <select class="form-control" id="feeder" name="feeder" required>
             {% for feeder in feeders %}
             <option value="{{ feeder.id }}">{{ feeder.name }}</option>
             {% endfor %}
         </select>
     </div>
     <div class="form-group">
-        <label for="forecast_location_id">Forecast Location</label>
-        <select class="form-control" id="forecast_location_id" name="forecast_location_id" required>
+        <label for="forecast_location">Forecast Location</label>
+        <select class="form-control" id="forecast_location" name="forecast_location" required>
             {% for location in forecast_locations %}
             <option value="{{ location.id }}">{{ location.provider_name }} ({{ location.latitude }}, {{ location.longitude }})</option>
             {% endfor %}
@@ -61,6 +59,6 @@
         <label for="company">Company</label>
         <input type="text" class="form-control" id="company" name="company" required>
     </div>
-    <button type="submit" class="btn btn-primary">Create</button>
+    <button type="submit" class="btn btn-primary">Create Solar Plant</button>
 </form>
 {% endblock %}
