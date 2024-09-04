@@ -1,35 +1,29 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block content %}
-<h2>Forecast Locations <div class="d-flex justify-content-end mb-3">
-    <a href="{{ url_for('main.forecast_location_detail', id=0) }}" class="btn btn-primary">Create Forecast Location</a>
-</div></h2>
-<hr>
-<table class="table table-striped">
+<h1>Forecast Locations</h1>
+<a href="{{ url_for('create_forecast_location') }}" class="btn btn-primary mb-3">Create New Forecast Location</a>
+<table class="table">
     <thead>
         <tr>
-            <th>Provider</th>
-            <th>Location</th>
-            <th>GHI</th>
-            <th>DNI</th>
-            <th>DHI</th>
+            <th>ID</th>
+            <th>Provider Name</th>
+            <th>Latitude</th>
+            <th>Longitude</th>
             <th>Actions</th>
         </tr>
     </thead>
     <tbody>
-        {% for location in forecast_locations %}
+        {% for location in locations %}
         <tr>
+            <td>{{ location.id }}</td>
             <td>{{ location.provider_name }}</td>
-            <td>{{ location.latitude }}, {{ location.longitude }}</td>
-            <td>{{ location.ghi }}</td>
-            <td>{{ location.dni }}</td>
-            <td>{{ location.dhi }}</td>
+            <td>{{ location.latitude }}</td>
+            <td>{{ location.longitude }}</td>
             <td>
-                <a href="{{ url_for('main.forecast_location_detail', id=location.id) }}" class="btn btn-primary btn-sm">View</a>
-                <a href="{{ url_for('main.forecast_location_detail', id=location.id) }}" class="btn btn-warning btn-sm">Edit</a>
-                <form action="{{ url_for('main.forecast_location_detail', id=location.id) }}" method="post" style="display: inline;">
-                    <input type="hidden" name="_method" value="DELETE">
-                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                <a href="{{ url_for('edit_forecast_location', id=location.id) }}" class="btn btn-sm btn-warning">Edit</a>
+                <form action="{{ url_for('delete_forecast_location', id=location.id) }}" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
                 </form>
             </td>
         </tr>

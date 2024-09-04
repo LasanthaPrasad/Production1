@@ -1,40 +1,33 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block content %}
-<h2>Feeders<div class="d-flex justify-content-end mb-3">
-    <a href="{{ url_for('main.feeder_detail', id=0) }}" class="btn btn-primary">Create Feeder</a>
-</div>
-</h2>
-<hr>
-<table class="table table-striped">
+<h1>Feeders</h1>
+<a href="{{ url_for('create_feeder') }}" class="btn btn-primary mb-3">Create New Feeder</a>
+<table class="table">
     <thead>
         <tr>
+            <th>ID</th>
             <th>Name</th>
             <th>Code</th>
             <th>Grid Substation</th>
-            <th>Installed Solar Capacity (MW)</th>
+            <th>Installed Solar Capacity</th>
             <th>Status</th>
-            <th>Outage Start</th>
-            <th>Outage End</th>
             <th>Actions</th>
         </tr>
     </thead>
     <tbody>
         {% for feeder in feeders %}
         <tr>
+            <td>{{ feeder.id }}</td>
             <td>{{ feeder.name }}</td>
             <td>{{ feeder.code }}</td>
-            <td>{{ feeder.grid_substation_id }}</td>
+            <td>{{ feeder.grid_substation.name }}</td>
             <td>{{ feeder.installed_solar_capacity }}</td>
             <td>{{ feeder.status }}</td>
-            <td>{{ feeder.outage_start }}</td>
-            <td>{{ feeder.outage_end }}</td>
             <td>
-                <a href="{{ url_for('main.feeder_detail', id=feeder.id) }}" class="btn btn-primary btn-sm">View</a>
-                <a href="{{ url_for('main.feeder_detail', id=feeder.id) }}" class="btn btn-warning btn-sm">Edit</a>
-                <form action="{{ url_for('main.feeder_detail', id=feeder.id) }}" method="post" style="display: inline;">
-                    <input type="hidden" name="_method" value="DELETE">
-                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                <a href="{{ url_for('edit_feeder', id=feeder.id) }}" class="btn btn-sm btn-warning">Edit</a>
+                <form action="{{ url_for('delete_feeder', id=feeder.id) }}" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
                 </form>
             </td>
         </tr>

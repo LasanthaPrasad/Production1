@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Create Solar Plant</h1>
+<form method="POST">
+    <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" class="form-control" id="name" name="name" required>
+    </div>
+    <div class="form-group">
+        <label for="latitude">Latitude</label>
+        <input type="number" step="any" class="form-control" id="latitude" name="latitude" required>
+    </div>
+    <div class="form-group">
+        <label for="longitude">Longitude</label>
+        <input type="number" step="any" class="form-control" id="longitude" name="longitude" required>
+    </div>
+    <div class="form-group">
+        <label for="grid_substation_id">Grid Substation</label>
+        <select class="form-control" id="grid_substation_id" name="grid_substation_id" required>
+            {% for substation in substations %}
+            <option value="{{ substation.id }}">{{ substation.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="feeder_id">Feeder</label>
+        <select class="form-control" id="feeder_id" name="feeder_id" required>
+            {% for feeder in feeders %}
+            <option value="{{ feeder.id }}">{{ feeder.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="forecast_location_id">Forecast Location</label>
+        <select class="form-control" id="forecast_location_id" name="forecast_location_id" required>
+            {% for location in forecast_locations %}
+            <option value="{{ location.id }}">{{ location.provider_name }} ({{ location.latitude }}, {{ location.longitude }})</option>
+            {% endfor %}
+        </select>
+    </div>
+    <div class="form-group">
+        <label for="installed_capacity">Installed Capacity (MW)</label>
+        <input type="number" step="0.01" class="form-control" id="installed_capacity" name="installed_capacity" required>
+    </div>
+    <div class="form-group">
+        <label for="panel_capacity">Panel Capacity (MW)</label>
+        <input type="number" step="0.01" class="form-control" id="panel_capacity" name="panel_capacity" required>
+    </div>
+    <div class="form-group">
+        <label for="inverter_capacity">Inverter Capacity (MW)</label>
+        <input type="number" step="0.01" class="form-control" id="inverter_capacity" name="inverter_capacity" required>
+    </div>
+    <div class="form-group">
+        <label for="plant_angle">Plant Angle</label>
+        <input type="number" step="0.1" class="form-control" id="plant_angle" name="plant_angle" required>
+    </div>
+    <div class="form-group">
+        <label for="company">Company</label>
+        <input type="text" class="form-control" id="company" name="company" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Create</button>
+</form>
+{% endblock %}

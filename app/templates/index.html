@@ -1,35 +1,42 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Solar Forecast App{% endblock %}
 
 {% block content %}
+<h1>Dashboard</h1>
 <div class="row">
-    <div class="col-md-3">
-        <div class="list-group">
-            <a href="{{ url_for('main.index') }}" class="list-group-item list-group-item-action active">Dashboard</a>
-            <a href="{{ url_for('main.solar_plants') }}" class="list-group-item list-group-item-action">Solar Plants</a>
-            <a href="{{ url_for('main.grid_substations') }}" class="list-group-item list-group-item-action">Grid Substations</a>
-            <a href="{{ url_for('main.feeders') }}" class="list-group-item list-group-item-action">Feeders</a>
-            <a href="{{ url_for('main.forecast_locations') }}" class="list-group-item list-group-item-action">Forecast Locations</a>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Total Installed Capacity</h5>
+                <p class="card-text">{{ total_capacity|round(2) }} MW</p>
+            </div>
         </div>
     </div>
-    <div class="col-md-9">
-        <div class="row">
-            <div class="col-md-6">
-                <h2>Solar Forecasting Dashboard</h2>
-                <hr>
-                <p>Total Solar Capacity: {{ total_solar_capacity }} MW</p>
-                <p>Total Substation Capacity: {{ total_substation_capacity }} MW</p>
-            </div>
-            <div class="col-md-6">
-                <h2>Forecast Locations</h2>
-                <hr>
-                <div id="map" style="height: 400px;"></div>
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Total Real-time MW</h5>
+                <p class="card-text">{{ total_mw|round(2) }} MW</p>
             </div>
         </div>
     </div>
 </div>
+
+<div class="mt-4" id="map" style="height: 400px;"></div>
 {% endblock %}
 
-{% block scripts %}
-<script src="https://maps.googleapis.com/maps/api/js?key={{ google_maps_api_key }}"></script>
-<script src="{{ url_for('static', filename='js/map.js') }}"></script>
+{% block extra_js %}
+<script>
+function initMap() {
+    const map = new google.maps.Map(document.getElementById("map"), {
+        center: { lat: 7.8731, lng: 80.7718 },  // Center of Sri Lanka
+        zoom: 8,
+    });
+
+    // TODO: Add markers for forecast locations
+}
+
+document.addEventListener("DOMContentLoaded", initMap);
+</script>
 {% endblock %}

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Edit Grid Substation</h1>
+<form method="POST">
+    <div class="form-group">
+        <label for="name">Name</label>
+        <input type="text" class="form-control" id="name" name="name" value="{{ substation.name }}" required>
+    </div>
+    <div class="form-group">
+        <label for="code">Code</label>
+        <input type="text" class="form-control" id="code" name="code" value="{{ substation.code }}" required>
+    </div>
+    <div class="form-group">
+        <label for="latitude">Latitude</label>
+        <input type="number" step="any" class="form-control" id="latitude" name="latitude" value="{{ substation.latitude }}" required>
+    </div>
+    <div class="form-group">
+        <label for="longitude">Longitude</label>
+        <input type="number" step="any" class="form-control" id="longitude" name="longitude" value="{{ substation.longitude }}" required>
+    </div>
+    <div class="form-group">
+        <label for="installed_solar_capacity">Installed Solar Capacity</label>
+        <input type="number" step="any" class="form-control" id="installed_solar_capacity" name="installed_solar_capacity" value="{{ substation.installed_solar_capacity }}" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Update</button>
+</form>
+{% endblock %}

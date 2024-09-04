@@ -1,36 +1,33 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block content %}
-<h2>Grid Substations<div class="d-flex justify-content-end mb-3">
-    <a href="{{ url_for('main.grid_substation_detail', id=0) }}" class="btn btn-primary">Create Grid Substation</a>
-</div>
-</h2>
-<hr>
-<table class="table table-striped">
+<h1>Grid Substations</h1>
+<a href="{{ url_for('create_grid_substation') }}" class="btn btn-primary mb-3">Create New Grid Substation</a>
+<table class="table">
     <thead>
         <tr>
+            <th>ID</th>
             <th>Name</th>
             <th>Code</th>
-            <th>Location</th>
-            <th>Forecast Location</th>
-            <th>Installed Solar Capacity (MW)</th>
+            <th>Latitude</th>
+            <th>Longitude</th>
+            <th>Installed Solar Capacity</th>
             <th>Actions</th>
         </tr>
     </thead>
     <tbody>
-        {% for substation in grid_substations %}
+        {% for substation in substations %}
         <tr>
+            <td>{{ substation.id }}</td>
             <td>{{ substation.name }}</td>
             <td>{{ substation.code }}</td>
-            <td>{{ substation.latitude }}, {{ substation.longitude }}</td>
-            <td>{{ substation.forecast_location_id }}</td>
+            <td>{{ substation.latitude }}</td>
+            <td>{{ substation.longitude }}</td>
             <td>{{ substation.installed_solar_capacity }}</td>
             <td>
-                <a href="{{ url_for('main.grid_substation_detail', id=substation.id) }}" class="btn btn-primary btn-sm">View</a>
-                <a href="{{ url_for('main.grid_substation_detail', id=substation.id) }}" class="btn btn-warning btn-sm">Edit</a>
-                <form action="{{ url_for('main.grid_substation_detail', id=substation.id) }}" method="post" style="display: inline;">
-                    <input type="hidden" name="_method" value="DELETE">
-                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                <a href="{{ url_for('edit_grid_substation', id=substation.id) }}" class="btn btn-sm btn-warning">Edit</a>
+                <form action="{{ url_for('delete_grid_substation', id=substation.id) }}" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
                 </form>
             </td>
         </tr>

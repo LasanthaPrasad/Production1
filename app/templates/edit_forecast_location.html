@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Edit Forecast Location</h1>
+<form method="POST">
+    <div class="form-group">
+        <label for="provider_name">Provider Name</label>
+        <input type="text" class="form-control" id="provider_name" name="provider_name" value="{{ location.provider_name }}" required>
+    </div>
+    <div class="form-group">
+        <label for="latitude">Latitude</label>
+        <input type="number" step="any" class="form-control" id="latitude" name="latitude" value="{{ location.latitude }}" required>
+    </div>
+    <div class="form-group">
+        <label for="longitude">Longitude</label>
+        <input type="number" step="any" class="form-control" id="longitude" name="longitude" value="{{ location.longitude }}" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Update</button>
+</form>
+{% endblock %}

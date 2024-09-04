@@ -1,16 +1,15 @@
-{% extends 'base.html' %}
+{% extends "base.html" %}
 
 {% block content %}
-<h2>Solar Plants  <div class="d-flex justify-content-end mb-3">
-    <a href="{{ url_for('main.solar_plant_detail', id=0) }}" class="btn btn-primary">Create Solar Plant</a>
-</div>
-</h2>
-<hr>
-<table class="table table-striped">
+<h1>Solar Plants</h1>
+<a href="{{ url_for('create_solar_plant') }}" class="btn btn-primary mb-3">Create New Solar Plant</a>
+<table class="table">
     <thead>
         <tr>
+            <th>ID</th>
             <th>Name</th>
-            <th>Location</th>
+            <th>Latitude</th>
+            <th>Longitude</th>
             <th>Grid Substation</th>
             <th>Feeder</th>
             <th>Installed Capacity (MW)</th>
@@ -18,23 +17,44 @@
         </tr>
     </thead>
     <tbody>
-        {% for plant in solar_plants %}
+        {% for plant in plants %}
         <tr>
+            <td>{{ plant.id }}</td>
             <td>{{ plant.name }}</td>
-            <td>{{ plant.latitude }}, {{ plant.longitude }}</td>
-            <td>{{ plant.grid_substation_id }}</td>
-            <td>{{ plant.feeder_id }}</td>
+            <td>{{ plant.latitude }}</td>
+            <td>{{ plant.longitude }}</td>
+            <td>{{ plant.grid_substation.name if plant.grid_substation else 'N/A' }}</td>
+            <td>{{ plant.feeder.name if plant.feeder else 'N/A' }}</td>
             <td>{{ plant.installed_capacity }}</td>
             <td>
-                <a href="{{ url_for('main.solar_plant_detail', id=plant.id) }}" class="btn btn-primary btn-sm">View</a>
-                <a href="{{ url_for('main.solar_plant_detail', id=plant.id) }}" class="btn btn-warning btn-sm">Edit</a>
-                <form action="{{ url_for('main.solar_plant_detail', id=plant.id) }}" method="post" style="display: inline;">
-                    <input type="hidden" name="_method" value="DELETE">
-                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                <a href="{{ url_for('edit_solar_plant', id=plant.id) }}" class="btn btn-sm btn-warning">Edit</a>
+                <form action="{{ url_for('delete_solar_plant', id=plant.id) }}" method="POST" class="d-inline">
+                    <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
                 </form>
             </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function initMap() {
+    const map = new google.maps.Map(document.getElementById("map"), {
+        center: { lat: 7.8731, lng: 80.7718 },  // Center of Sri Lanka
+        zoom: 8,
+    });
+
+  //  {% for plant in plants %}
+  //  new google.maps.Marker({
+  //      position: { lat: {{ plant.latitude }}, lng: {{ plant.longitude }} },
+  //      map: map,
+ //       title: "{{ plant.name }}"
+ //   });
+ //   {% endfor %}
+}
+
+document.addEventListener("DOMContentLoaded", initMap);
+</script>
 {% endblock %}
