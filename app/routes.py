@@ -75,6 +75,8 @@ def grid_substations():
     substations = GridSubstation.query.all()
     return render_template('grid_substations.html', substations=substations)
 
+
+
 @app.route('/grid_substations/create', methods=['GET', 'POST'])
 def create_grid_substation():
     if request.method == 'POST':

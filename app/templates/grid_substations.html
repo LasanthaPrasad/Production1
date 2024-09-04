@@ -34,4 +34,49 @@
         {% endfor %}
     </tbody>
 </table>
+
+<div id="map" style="height: 400px; width: 100%;"></div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function initMap() {
+    const map = new google.maps.Map(document.getElementById("map"), {
+        center: { lat: 7.8731, lng: 80.7718 },  // Center of Sri Lanka
+        zoom: 8,
+    });
+
+    const substations = [
+        {% for substation in substations %}
+        {
+            position: { lat: {{ substation.latitude }}, lng: {{ substation.longitude }} },
+            title: "{{ substation.name }}",
+            content: "<h6>{{ substation.name }}</h6>" +
+                     "<p>Code: {{ substation.code }}<br>" +
+                     "Installed Solar Capacity: {{ substation.installed_solar_capacity }} MW<br>" +
+                     "Latitude: {{ substation.latitude }}<br>" +
+                     "Longitude: {{ substation.longitude }}</p>"
+        },
+        {% endfor %}
+    ];
+
+    const infoWindow = new google.maps.InfoWindow();
+
+    substations.forEach(substation => {
+        const marker = new google.maps.Marker({
+            position: substation.position,
+            map: map,
+            title: substation.title
+        });
+
+        marker.addListener("click", () => {
+            infoWindow.close();
+            infoWindow.setContent(substation.content);
+            infoWindow.open(map, marker);
+        });
+    });
+}
+
+document.addEventListener("DOMContentLoaded", initMap);
+</script>
 {% endblock %}
