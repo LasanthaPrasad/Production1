@@ -118,7 +118,6 @@ def delete_grid_substation(id):
 def feeders():
     feeders = Feeder.query.options(db.joinedload(Feeder.grid_substation_rel)).all()
     return render_template('feeders.html', feeders=feeders)
-
 #@app.route('/feeders')
 #def feeders():
 #    feeders = Feeder.query.all()
@@ -130,7 +129,7 @@ def create_feeder():
         feeder = Feeder(
             name=request.form['name'],
             code=request.form['code'],
-            grid_substation=int(request.form['grid_substation']),  # Note: no '_id' suffix
+            grid_substation=int(request.form['grid_substation']),
             installed_solar_capacity=float(request.form['installed_solar_capacity']),
             status=request.form['status']
         )
@@ -147,7 +146,7 @@ def edit_feeder(id):
     if request.method == 'POST':
         feeder.name = request.form['name']
         feeder.code = request.form['code']
-        feeder.grid_substation = int(request.form['grid_substation'])  # Note: no '_id' suffix
+        feeder.grid_substation = int(request.form['grid_substation'])
         feeder.installed_solar_capacity = float(request.form['installed_solar_capacity'])
         feeder.status = request.form['status']
         db.session.commit()
@@ -155,6 +154,13 @@ def edit_feeder(id):
         return redirect(url_for('feeders'))
     substations = GridSubstation.query.all()
     return render_template('edit_feeder.html', feeder=feeder, substations=substations)
+
+
+
+
+
+
+
 
 
 

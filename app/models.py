@@ -27,6 +27,19 @@ class GridSubstation(db.Model):
     forecast_location = db.Column(db.Integer, db.ForeignKey('forecast_locations.id'))
     installed_solar_capacity = db.Column(db.Numeric(10, 2))
 
+#class Feeder(db.Model):
+#    __tablename__ = 'feeders'
+#    id = db.Column(db.Integer, primary_key=True)
+#    name = db.Column(db.String(255), nullable=False)
+#    code = db.Column(db.String(50), unique=True, nullable=False)
+#    grid_substation = db.Column(db.Integer, db.ForeignKey('grid_substations.id'))
+#    installed_solar_capacity = db.Column(db.Numeric(10, 2))
+#    status = db.Column(db.String(50))
+#    outage_start = db.Column(db.DateTime)
+#    outage_end = db.Column(db.DateTime)
+
+
+
 class Feeder(db.Model):
     __tablename__ = 'feeders'
     id = db.Column(db.Integer, primary_key=True)
@@ -38,7 +51,7 @@ class Feeder(db.Model):
     outage_start = db.Column(db.DateTime)
     outage_end = db.Column(db.DateTime)
 
-
+    grid_substation_rel = db.relationship('GridSubstation', backref='feeders')
 
 class SolarPlant(db.Model):
     __tablename__ = 'solar_plants'
