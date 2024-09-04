@@ -15,6 +15,7 @@
         <label for="longitude">Longitude</label>
         <input type="number" step="any" class="form-control" id="longitude" name="longitude" value="{{ plant.longitude if plant else '' }}" required>
     </div>
+
     <div class="form-group">
         <label for="grid_substation">Grid Substation</label>
         <select class="form-control" id="grid_substation" name="grid_substation" required>
@@ -39,6 +40,9 @@
             {% endif %}
         </select>
     </div>
+
+
+
     <div class="form-group">
         <label for="forecast_location">Forecast Location</label>
         <select class="form-control" id="forecast_location" name="forecast_location" required>
