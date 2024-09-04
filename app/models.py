@@ -38,20 +38,42 @@ class Feeder(db.Model):
     outage_start = db.Column(db.DateTime)
     outage_end = db.Column(db.DateTime)
 
+
 class SolarPlant(db.Model):
     __tablename__ = 'solar_plants'
     id = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(255), nullable=False)
     latitude = db.Column(db.Numeric(10, 8), nullable=False)
     longitude = db.Column(db.Numeric(11, 8), nullable=False)
-    grid_substation = db.Column(db.Integer, db.ForeignKey('grid_substations.id'))
-    feeder = db.Column(db.Integer, db.ForeignKey('feeders.id'))
-    forecast_location = db.Column(db.Integer, db.ForeignKey('forecast_locations.id'))
+    grid_substation_id = db.Column(db.Integer, db.ForeignKey('grid_substations.id'))
+    feeder_id = db.Column(db.Integer, db.ForeignKey('feeders.id'))
+    forecast_location_id = db.Column(db.Integer, db.ForeignKey('forecast_locations.id'))
     installed_capacity = db.Column(db.Numeric(10, 2))
     panel_capacity = db.Column(db.Numeric(10, 2))
     inverter_capacity = db.Column(db.Numeric(10, 2))
     plant_angle = db.Column(db.Numeric(5, 2))
     company = db.Column(db.String(255))
+
+    grid_substation = db.relationship('GridSubstation', backref='solar_plants')
+    feeder = db.relationship('Feeder', backref='solar_plants')
+    forecast_location = db.relationship('ForecastLocation', backref='solar_plants')
+
+
+
+#class SolarPlant(db.Model):
+#    __tablename__ = 'solar_plants'
+#    id = db.Column(db.Integer, primary_key=True)
+#    name = db.Column(db.String(255), nullable=False)
+#    latitude = db.Column(db.Numeric(10, 8), nullable=False)
+#    longitude = db.Column(db.Numeric(11, 8), nullable=False)
+#    grid_substation = db.Column(db.Integer, db.ForeignKey('grid_substations.id'))
+#    feeder = db.Column(db.Integer, db.ForeignKey('feeders.id'))
+#    forecast_location = db.Column(db.Integer, db.ForeignKey('forecast_locations.id'))
+#    installed_capacity = db.Column(db.Numeric(10, 2))
+#    panel_capacity = db.Column(db.Numeric(10, 2))
+#    inverter_capacity = db.Column(db.Numeric(10, 2))
+#    plant_angle = db.Column(db.Numeric(5, 2))
+#    company = db.Column(db.String(255))
 
 class Forecast(db.Model):
     __tablename__ = 'forecasts'

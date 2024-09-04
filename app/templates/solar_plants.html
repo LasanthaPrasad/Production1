@@ -23,8 +23,20 @@
             <td>{{ plant.name }}</td>
             <td>{{ plant.latitude }}</td>
             <td>{{ plant.longitude }}</td>
-            <td>{{ plant.grid_substation.id if plant.grid_substation else '12345' }}</td>
-            <td>{{ plant.feeder.name if plant.feeder else 'N/A' }}</td>
+            <td>
+                {% if plant.grid_substation %}
+                    {{ plant.grid_substation.name }}
+                {% else %}
+                    N/A
+                {% endif %}
+            </td>
+            <td>
+                {% if plant.feeder %}
+                    {{ plant.feeder.name }}
+                {% else %}
+                    N/A
+                {% endif %}
+            </td>
             <td>{{ plant.installed_capacity }}</td>
             <td>
                 <a href="{{ url_for('edit_solar_plant', id=plant.id) }}" class="btn btn-sm btn-warning">Edit</a>
@@ -36,6 +48,8 @@
         {% endfor %}
     </tbody>
 </table>
+
+<div id="map" style="height: 400px; width: 100%;"></div>
 {% endblock %}
 
 {% block extra_js %}
@@ -46,13 +60,34 @@ function initMap() {
         zoom: 8,
     });
 
-    {% for plant in plants %}
-    new google.maps.Marker({
-        position: { lat: {{ plant.latitude }}, lng: {{ plant.longitude }} },
-        map: map,
-        title: "{{ plant.name }}"
+    const plants = [
+        {% for plant in plants %}
+        {
+            position: { lat: {{ plant.latitude }}, lng: {{ plant.longitude }} },
+            title: "{{ plant.name }}",
+            content: "<h6>{{ plant.name }}</h6>" +
+                     "<p>Capacity: {{ plant.installed_capacity }} MW<br>" +
+                     "Grid Substation: {{ plant.grid_substation.name if plant.grid_substation else 'N/A' }}<br>" +
+                     "Feeder: {{ plant.feeder.name if plant.feeder else 'N/A' }}</p>"
+        },
+        {% endfor %}
+    ];
+
+    const infoWindow = new google.maps.InfoWindow();
+
+    plants.forEach(plant => {
+        const marker = new google.maps.Marker({
+            position: plant.position,
+            map: map,
+            title: plant.title
+        });
+
+        marker.addListener("click", () => {
+            infoWindow.close();
+            infoWindow.setContent(plant.content);
+            infoWindow.open(map, marker);
+        });
     });
-    {% endfor %}
 }
 
 document.addEventListener("DOMContentLoaded", initMap);
