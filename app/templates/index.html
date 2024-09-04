@@ -27,15 +27,15 @@
                 <div id="map" style="height: 400px;"></div>
                 <script>
                     var forecastLocations = [
-                        {% for location in forecast_locations %}
+                    {% for location in forecast_locations %}
                         {
                             latitude: {{ location.latitude }},
                             longitude: {{ location.longitude }},
-                            ghi: {{ location.next_hour_forecast_dict()['ghi'] }},
-                            dni: {{ location.next_hour_forecast_dict()['dni'] }},
-                            dhi: {{ location.next_hour_forecast_dict()['dhi'] }}
-                        },
-                        {% endfor %}
+                            ghi: {{ location.next_hour_forecast.ghi }},
+                            dni: {{ location.next_hour_forecast.dni }},
+                            dhi: {{ location.next_hour_forecast.dhi }}
+                        }{% if not loop.last %},{% endif %}
+                    {% endfor %}
                     ];
                 </script>
             </div>
