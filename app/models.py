@@ -27,6 +27,13 @@ class GridSubstation(db.Model):
     forecast_location = db.Column(db.Integer, db.ForeignKey('forecast_locations.id'))
     installed_solar_capacity = db.Column(db.Numeric(10, 2))
 
+
+    def update_installed_capacity(self):
+        total_capacity = sum(feeder.installed_solar_capacity for feeder in self.feeders)
+        self.installed_solar_capacity = total_capacity
+        db.session.commit()
+
+
 #class Feeder(db.Model):
 #    __tablename__ = 'feeders'
 #    id = db.Column(db.Integer, primary_key=True)
