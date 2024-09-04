@@ -5,7 +5,11 @@ from app.models import SolarPlant, GridSubstation, Feeder, ForecastLocation
 
 
 
-
+def recalculate_all_substation_capacities():
+    substations = GridSubstation.query.all()
+    for substation in substations:
+        substation.update_installed_capacity()
+    db.session.commit()
 
 
 
@@ -122,6 +126,90 @@ def delete_grid_substation(id):
     flash('Grid Substation deleted successfully!', 'success')
     return redirect(url_for('grid_substations'))
 
+
+
+
+@app.route('/feeders/create', methods=['GET', 'POST'])
+def create_feeder():
+    if request.method == 'POST':
+        try:
+            feeder = Feeder(
+                name=request.form['name'],
+                code=request.form['code'],
+                grid_substation=int(request.form['grid_substation']),
+                installed_solar_capacity=float(request.form['installed_solar_capacity']),
+                status=request.form['status']
+            )
+            db.session.add(feeder)
+            db.session.commit()
+            
+            # Update Grid Substation capacity
+            substation = GridSubstation.query.get(feeder.grid_substation)
+            substation.update_installed_capacity()
+            
+            flash('Feeder created successfully!', 'success')
+            return redirect(url_for('feeders'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error creating Feeder: {str(e)}', 'danger')
+
+    substations = GridSubstation.query.all()
+    return render_template('create_feeder.html', substations=substations)
+
+@app.route('/feeders/<int:id>/edit', methods=['GET', 'POST'])
+def edit_feeder(id):
+    feeder = Feeder.query.get_or_404(id)
+    if request.method == 'POST':
+        try:
+            old_substation = GridSubstation.query.get(feeder.grid_substation)
+            
+            feeder.name = request.form['name']
+            feeder.code = request.form['code']
+            feeder.grid_substation = int(request.form['grid_substation'])
+            feeder.installed_solar_capacity = float(request.form['installed_solar_capacity'])
+            feeder.status = request.form['status']
+            db.session.commit()
+            
+            # Update old Grid Substation capacity if changed
+            if old_substation.id != feeder.grid_substation:
+                old_substation.update_installed_capacity()
+            
+            # Update new Grid Substation capacity
+            new_substation = GridSubstation.query.get(feeder.grid_substation)
+            new_substation.update_installed_capacity()
+            
+            flash('Feeder updated successfully!', 'success')
+            return redirect(url_for('feeders'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error updating Feeder: {str(e)}', 'danger')
+
+    substations = GridSubstation.query.all()
+    return render_template('edit_feeder.html', feeder=feeder, substations=substations)
+
+@app.route('/feeders/<int:id>/delete', methods=['POST'])
+def delete_feeder(id):
+    feeder = Feeder.query.get_or_404(id)
+    try:
+        substation = GridSubstation.query.get(feeder.grid_substation)
+        db.session.delete(feeder)
+        db.session.commit()
+        
+        # Update Grid Substation capacity
+        substation.update_installed_capacity()
+        
+        flash('Feeder deleted successfully!', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error deleting Feeder: {str(e)}', 'danger')
+    return redirect(url_for('feeders'))
+
+
+
+
+
+
+
 # Feeders
 @app.route('/feeders')
 def feeders():
@@ -131,59 +219,6 @@ def feeders():
 #def feeders():
 #    feeders = Feeder.query.all()
 #    return render_template('feeders.html', feeders=feeders)
-
-@app.route('/feeders/create', methods=['GET', 'POST'])
-def create_feeder():
-    if request.method == 'POST':
-        feeder = Feeder(
-            name=request.form['name'],
-            code=request.form['code'],
-            grid_substation=int(request.form['grid_substation']),
-            installed_solar_capacity=float(request.form['installed_solar_capacity']),
-            status=request.form['status']
-        )
-        db.session.add(feeder)
-        db.session.commit()
-        flash('Feeder created successfully!', 'success')
-        return redirect(url_for('feeders'))
-    substations = GridSubstation.query.all()
-    return render_template('create_feeder.html', substations=substations)
-
-@app.route('/feeders/<int:id>/edit', methods=['GET', 'POST'])
-def edit_feeder(id):
-    feeder = Feeder.query.get_or_404(id)
-    if request.method == 'POST':
-        feeder.name = request.form['name']
-        feeder.code = request.form['code']
-        feeder.grid_substation = int(request.form['grid_substation'])
-        feeder.installed_solar_capacity = float(request.form['installed_solar_capacity'])
-        feeder.status = request.form['status']
-        db.session.commit()
-        flash('Feeder updated successfully!', 'success')
-        return redirect(url_for('feeders'))
-    substations = GridSubstation.query.all()
-    return render_template('edit_feeder.html', feeder=feeder, substations=substations)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-@app.route('/feeders/<int:id>/delete', methods=['POST'])
-def delete_feeder(id):
-    feeder = Feeder.query.get_or_404(id)
-    db.session.delete(feeder)
-    db.session.commit()
-    flash('Feeder deleted successfully!', 'success')
-    return redirect(url_for('feeders'))
 
 
 @app.route('/solar_plants')
