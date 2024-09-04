@@ -3,22 +3,21 @@ from datetime import datetime, timedelta
 from app import db
 from app.models import ForecastLocation, IrradiationForecast
 
-SOLCAST_API_KEY = 'your_solcast_api_key_here'
+SOLCAST_API_KEY = 'kAVziMj4__x-RQ9Ab67-TBwv2ry_Z9uY'
 SOLCAST_BASE_URL = 'https://api.solcast.com.au/world_radiation/forecasts'
 
 def fetch_solcast_forecasts():
     locations = ForecastLocation.query.all()
     for location in locations:
-        if not location.solcast_resource_id:
-            continue
-
         params = {
+            'latitude': location.latitude,
+            'longitude': location.longitude,
             'api_key': SOLCAST_API_KEY,
             'format': 'json',
             'hours': 72  # 3 days
         }
 
-        response = requests.get(f"{SOLCAST_BASE_URL}/{location.solcast_resource_id}", params=params)
+        response = requests.get(SOLCAST_BASE_URL, params=params)
         
         if response.status_code == 200:
             forecasts = response.json()['forecasts']
