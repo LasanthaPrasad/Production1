@@ -1,7 +1,58 @@
 from flask import render_template, request, redirect, url_for, flash, jsonify
 from app import app, db
-from app.models import SolarPlant, GridSubstation, Feeder, ForecastLocation
+from app.models import SolarPlant, GridSubstation, Feeder, ForecastLocation, IrradiationForecast
+from datetime import datetime, timedelta
 
+
+def calculate_plant_forecasts(plant_id):
+    plant = SolarPlant.query.get(plant_id)
+    forecasts = IrradiationForecast.query.filter_by(forecast_location_id=plant.forecast_location).all()
+
+    plant_forecasts = []
+    for forecast in forecasts:
+        # This is a simplified calculation. You might need a more complex model.
+        estimated_mw = (forecast.ghi / 1000) * plant.installed_capacity * 0.15  # Assuming 15% efficiency
+        plant_forecasts.append({
+            'timestamp': forecast.timestamp,
+            'estimated_mw': estimated_mw
+        })
+
+    return plant_forecasts
+
+
+@app.route('/api/plant_forecast/<int:plant_id>')
+def get_plant_forecast(plant_id):
+    forecasts = calculate_plant_forecasts(plant_id)
+    return jsonify(forecasts)
+
+
+
+
+
+
+
+@app.route('/api/location_forecast/<int:location_id>')
+def get_location_forecast(location_id):
+    now = datetime.utcnow()
+    three_days_later = now + timedelta(days=3)
+    
+    forecasts = IrradiationForecast.query.filter(
+        IrradiationForecast.forecast_location_id == location_id,
+        IrradiationForecast.timestamp >= now,
+        IrradiationForecast.timestamp <= three_days_later
+    ).order_by(IrradiationForecast.timestamp).all()
+
+    timestamps = [f.timestamp.isoformat() for f in forecasts]
+    ghi_values = [f.ghi for f in forecasts]
+    dni_values = [f.dni for f in forecasts]
+    dhi_values = [f.dhi for f in forecasts]
+
+    return jsonify({
+        'timestamps': timestamps,
+        'ghi': ghi_values,
+        'dni': dni_values,
+        'dhi': dhi_values
+    })
 
 
 

@@ -2,6 +2,7 @@
 
 {% block content %}
 <h1>Forecast Locations</h1>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <a href="{{ url_for('create_forecast_location') }}" class="btn btn-primary mb-3">Create New Forecast Location</a>
 <table class="table">
     <thead>
@@ -21,6 +22,7 @@
             <td>{{ location.latitude }}</td>
             <td>{{ location.longitude }}</td>
             <td>
+                <button class="btn btn-sm btn-info show-forecast" data-location-id="{{ location.id }}">Show Forecast</button>
                 <a href="{{ url_for('edit_forecast_location', id=location.id) }}" class="btn btn-sm btn-warning">Edit</a>
                 <form action="{{ url_for('delete_forecast_location', id=location.id) }}" method="POST" class="d-inline">
                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
@@ -30,4 +32,121 @@
         {% endfor %}
     </tbody>
 </table>
+
+<div id="map" style="height: 400px; width: 100%;"></div>
+
+<!-- Modal for Forecast Graph -->
+<div class="modal fade" id="forecastModal" tabindex="-1" role="dialog" aria-labelledby="forecastModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="forecastModalLabel">3-Day Forecast</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <canvas id="forecastChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+function initMap() {
+    const map = new google.maps.Map(document.getElementById("map"), {
+        center: { lat: 7.8731, lng: 80.7718 },  // Center of Sri Lanka
+        zoom: 8,
+    });
+
+    const locations = [
+        {% for location in locations %}
+        {
+            position: { lat: {{ location.latitude }}, lng: {{ location.longitude }} },
+            title: "{{ location.provider_name }}",
+            id: {{ location.id }}
+        },
+        {% endfor %}
+    ];
+
+    locations.forEach(location => {
+        const marker = new google.maps.Marker({
+            position: location.position,
+            map: map,
+            title: location.title
+        });
+
+        marker.addListener("click", () => {
+            showForecast(location.id);
+        });
+    });
+}
+
+function showForecast(locationId) {
+    fetch(`/api/location_forecast/${locationId}`)
+        .then(response => response.json())
+        .then(data => {
+            const ctx = document.getElementById('forecastChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.timestamps,
+                    datasets: [{
+                        label: 'GHI',
+                        data: data.ghi,
+                        borderColor: 'rgb(255, 99, 132)',
+                        tension: 0.1
+                    }, {
+                        label: 'DNI',
+                        data: data.dni,
+                        borderColor: 'rgb(54, 162, 235)',
+                        tension: 0.1
+                    }, {
+                        label: 'DHI',
+                        data: data.dhi,
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'hour',
+                                displayFormats: {
+                                    hour: 'MMM D, HH:mm'
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Date/Time'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Irradiance (W/m²)'
+                            }
+                        }
+                    }
+                }
+            });
+            $('#forecastModal').modal('show');
+        });
+}
+
+document.addEventListener("DOMContentLoaded", function() {
+    initMap();
+    document.querySelectorAll('.show-forecast').forEach(button => {
+        button.addEventListener('click', function() {
+            showForecast(this.getAttribute('data-location-id'));
+        });
+    });
+});
+</script>
 {% endblock %}
