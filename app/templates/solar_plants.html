@@ -23,7 +23,7 @@
             <td>{{ plant.name }}</td>
             <td>{{ plant.latitude }}</td>
             <td>{{ plant.longitude }}</td>
-            <td>{{ plant.grid_substation.name if plant.grid_substation else 'N/A' }}</td>
+            <td>{{ plant.grid_substation.id if plant.grid_substation else '12345' }}</td>
             <td>{{ plant.feeder.name if plant.feeder else 'N/A' }}</td>
             <td>{{ plant.installed_capacity }}</td>
             <td>
@@ -46,13 +46,13 @@ function initMap() {
         zoom: 8,
     });
 
-  //  {% for plant in plants %}
-  //  new google.maps.Marker({
-  //      position: { lat: {{ plant.latitude }}, lng: {{ plant.longitude }} },
-  //      map: map,
- //       title: "{{ plant.name }}"
- //   });
- //   {% endfor %}
+    {% for plant in plants %}
+    new google.maps.Marker({
+        position: { lat: {{ plant.latitude }}, lng: {{ plant.longitude }} },
+        map: map,
+        title: "{{ plant.name }}"
+    });
+    {% endfor %}
 }
 
 document.addEventListener("DOMContentLoaded", initMap);
