@@ -15,7 +15,6 @@
         <label for="longitude">Longitude</label>
         <input type="number" step="any" class="form-control" id="longitude" name="longitude" value="{{ plant.longitude if plant else '' }}" required>
     </div>
-
     <div class="form-group">
         <label for="grid_substation">Grid Substation</label>
         <select class="form-control" id="grid_substation" name="grid_substation" required>
@@ -31,18 +30,8 @@
         <label for="feeder">Feeder</label>
         <select class="form-control" id="feeder" name="feeder" required>
             <option value="">Select a Feeder</option>
-            {% if plant %}
-                {% for feeder in feeders %}
-                <option value="{{ feeder.id }}" {% if plant.feeder == feeder.id %}selected{% endif %}>
-                    {{ feeder.name }}
-                </option>
-                {% endfor %}
-            {% endif %}
         </select>
     </div>
-
-
-
     <div class="form-group">
         <label for="forecast_location">Forecast Location</label>
         <select class="form-control" id="forecast_location" name="forecast_location" required>
@@ -80,6 +69,37 @@
 
 {% block extra_js %}
 <script>
-// Your existing JavaScript for dynamic feeder selection
+document.addEventListener('DOMContentLoaded', function() {
+    const gridSubstationSelect = document.getElementById('grid_substation');
+    const feederSelect = document.getElementById('feeder');
+
+    function updateFeeders() {
+        const substationId = gridSubstationSelect.value;
+        feederSelect.innerHTML = '<option value="">Select a Feeder</option>';
+        
+        if (substationId) {
+            fetch(`/get_feeders/${substationId}`)
+                .then(response => response.json())
+                .then(feeders => {
+                    feeders.forEach(feeder => {
+                        const option = document.createElement('option');
+                        option.value = feeder.id;
+                        option.textContent = feeder.name;
+                        feederSelect.appendChild(option);
+                    });
+                    {% if plant %}
+                    feederSelect.value = "{{ plant.feeder }}";
+                    {% endif %}
+                });
+        }
+    }
+
+    gridSubstationSelect.addEventListener('change', updateFeeders);
+
+    // Call updateFeeders on page load for edit page
+    {% if plant %}
+    updateFeeders();
+    {% endif %}
+});
 </script>
 {% endblock %}

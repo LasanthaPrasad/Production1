@@ -1,32 +1,11 @@
-from flask import render_template, request, redirect, url_for, flash
+from flask import render_template, request, redirect, url_for, flash, jsonify
 from app import app, db
-from app.models import SolarPlant, GridSubstation, Feeder, ForecastLocation, Forecast
-
-from flask import jsonify
+from app.models import SolarPlant, GridSubstation, Feeder, ForecastLocation
 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-@app.route('/get_feeders/<int:substation_id>')
-def get_feeders(substation_id):
-    feeders = Feeder.query.filter_by(grid_substation=substation_id).all()
-    return jsonify([{'id': f.id, 'name': f.name} for f in feeders])
 
 
 
@@ -220,8 +199,6 @@ def solar_plants():
 #    return render_template('solar_plants.html', plants=plants)
 
 
-
-
 @app.route('/solar_plants/create', methods=['GET', 'POST'])
 def create_solar_plant():
     if request.method == 'POST':
@@ -248,9 +225,8 @@ def create_solar_plant():
             flash(f'Error creating Solar Plant: {str(e)}', 'danger')
 
     substations = GridSubstation.query.all()
-    feeders = Feeder.query.all()
     forecast_locations = ForecastLocation.query.all()
-    return render_template('create_solar_plant.html', substations=substations, feeders=feeders, forecast_locations=forecast_locations)
+    return render_template('create_solar_plant.html', substations=substations, forecast_locations=forecast_locations)
 
 @app.route('/solar_plants/<int:id>/edit', methods=['GET', 'POST'])
 def edit_solar_plant(id):
@@ -276,11 +252,13 @@ def edit_solar_plant(id):
             flash(f'Error updating Solar Plant: {str(e)}', 'danger')
 
     substations = GridSubstation.query.all()
-    feeders = Feeder.query.filter_by(grid_substation=plant.grid_substation).all()
     forecast_locations = ForecastLocation.query.all()
-    return render_template('edit_solar_plant.html', plant=plant, substations=substations, feeders=feeders, forecast_locations=forecast_locations)
+    return render_template('edit_solar_plant.html', plant=plant, substations=substations, forecast_locations=forecast_locations)
 
-
+@app.route('/get_feeders/<int:substation_id>')
+def get_feeders(substation_id):
+    feeders = Feeder.query.filter_by(grid_substation=substation_id).all()
+    return jsonify([{'id': f.id, 'name': f.name} for f in feeders])
 
 
 @app.route('/solar_plants/<int:id>/delete', methods=['POST'])
