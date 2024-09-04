@@ -1,8 +1,8 @@
 import os
 import requests
-from datetime import datetime, timedelta
-from app import db
-from app.models import ForecastLocation, IrradiationForecast
+from datetime import datetime
+from . import db
+from .models import ForecastLocation, IrradiationForecast
 
 SOLCAST_API_KEY = os.environ.get('SOLCAST_API_KEY')
 SOLCAST_BASE_URL = 'https://api.solcast.com.au/world_radiation/forecasts'

@@ -1,11 +1,9 @@
-
-
-
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from apscheduler.schedulers.background import BackgroundScheduler
 
 db = SQLAlchemy()
+scheduler = BackgroundScheduler()
 
 def create_app():
     app = Flask(__name__)
@@ -15,9 +13,9 @@ def create_app():
     
     with app.app_context():
         from .models import ForecastLocation, IrradiationForecast
-        from .solcast_api import fetch_solcast_forecasts
-        
         db.create_all()  # Create tables if they don't exist
+        
+        from .solcast_api import fetch_solcast_forecasts
         
         # Fetch forecasts on startup
         if fetch_solcast_forecasts():
@@ -26,7 +24,6 @@ def create_app():
             print("Initial forecast fetch failed")
         
         # Set up scheduler for periodic updates
-        scheduler = BackgroundScheduler()
         scheduler.add_job(func=fetch_solcast_forecasts, trigger="interval", hours=1)
         scheduler.start()
     

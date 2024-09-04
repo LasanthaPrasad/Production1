@@ -1,7 +1,19 @@
-from flask import render_template, request, redirect, url_for, flash, jsonify
+
+
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+
 from app import app, db
 from app.models import SolarPlant, GridSubstation, Feeder, ForecastLocation, IrradiationForecast
 from datetime import datetime, timedelta
+
+
+
+
+
+main = Blueprint('main', __name__)
+
+
+
 
 
 def calculate_plant_forecasts(plant_id):
