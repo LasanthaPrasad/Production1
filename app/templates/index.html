@@ -2,18 +2,31 @@
 
 {% block content %}
 <div class="row">
-    <div class="col-md-6">
-        <h2>Solar Forecasting Dashboard</h2>
-        <hr>
-        <p>Total Solar Capacity: {{ total_solar_capacity }} MW</p>
-        <p>Total Substation Capacity: {{ total_substation_capacity }} MW</p>
-        <p>Total Plant Forecast: {{ total_plant_forecast }} GHI</p>
-        <p>Total Substation Forecast: {{ total_substation_forecast }} GHI</p>
+    <div class="col-md-3">
+        <div class="list-group">
+            <a href="{{ url_for('main.index') }}" class="list-group-item list-group-item-action active">Dashboard</a>
+            <a href="{{ url_for('main.solar_plants') }}" class="list-group-item list-group-item-action">Solar Plants</a>
+            <a href="{{ url_for('main.grid_substations') }}" class="list-group-item list-group-item-action">Grid Substations</a>
+            <a href="{{ url_for('main.feeders') }}" class="list-group-item list-group-item-action">Feeders</a>
+            <a href="{{ url_for('main.forecast_locations') }}" class="list-group-item list-group-item-action">Forecast Locations</a>
+        </div>
     </div>
-    <div class="col-md-6">
-        <h2>Forecast Locations</h2>
-        <hr>
-        <div id="map" style="height: 400px;"></div>
+    <div class="col-md-9">
+        <div class="row">
+            <div class="col-md-6">
+                <h2>Solar Forecasting Dashboard</h2>
+                <hr>
+                <p>Total Solar Capacity: {{ total_solar_capacity }} MW</p>
+                <p>Total Substation Capacity: {{ total_substation_capacity }} MW</p>
+                <p>Total Plant Forecast: {{ total_plant_forecast }} GHI</p>
+                <p>Total Substation Forecast: {{ total_substation_forecast }} GHI</p>
+            </div>
+            <div class="col-md-6">
+                <h2>Forecast Locations</h2>
+                <hr>
+                <div id="map" style="height: 400px;"></div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
