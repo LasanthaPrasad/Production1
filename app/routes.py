@@ -61,7 +61,6 @@ def get_location_forecast(location_id):
 
 
 
-
 def recalculate_all_substation_capacities():
     substations = GridSubstation.query.all()
     for substation in substations:
