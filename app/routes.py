@@ -4,6 +4,25 @@ from app.models import SolarPlant, GridSubstation, Feeder, ForecastLocation, For
 
 from flask import jsonify
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @app.route('/get_feeders/<int:substation_id>')
 def get_feeders(substation_id):
     feeders = Feeder.query.filter_by(grid_substation=substation_id).all()
@@ -203,64 +222,66 @@ def solar_plants():
 
 
 
-
 @app.route('/solar_plants/create', methods=['GET', 'POST'])
 def create_solar_plant():
     if request.method == 'POST':
-        plant = SolarPlant(
-            name=request.form['name'],
-            latitude=float(request.form['latitude']),
-            longitude=float(request.form['longitude']),
-            grid_substation=int(request.form['grid_substation']),  # Note: no '_id' suffix
-            feeder=int(request.form['feeder']),  # Note: no '_id' suffix
-            forecast_location=int(request.form['forecast_location']),  # Note: no '_id' suffix
-            installed_capacity=float(request.form['installed_capacity']),
-            panel_capacity=float(request.form['panel_capacity']),
-            inverter_capacity=float(request.form['inverter_capacity']),
-            plant_angle=float(request.form['plant_angle']),
-            company=request.form['company']
-        )
-        db.session.add(plant)
-        db.session.commit()
-        flash('Solar Plant created successfully!', 'success')
-        return redirect(url_for('solar_plants'))
-
+        try:
+            plant = SolarPlant(
+                name=request.form['name'],
+                latitude=float(request.form['latitude']),
+                longitude=float(request.form['longitude']),
+                grid_substation=int(request.form['grid_substation']),
+                feeder=int(request.form['feeder']),
+                forecast_location=int(request.form['forecast_location']),
+                installed_capacity=float(request.form['installed_capacity']),
+                panel_capacity=float(request.form['panel_capacity']),
+                inverter_capacity=float(request.form['inverter_capacity']),
+                plant_angle=float(request.form['plant_angle']),
+                company=request.form['company']
+            )
+            db.session.add(plant)
+            db.session.commit()
+            flash('Solar Plant created successfully!', 'success')
+            return redirect(url_for('solar_plants'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error creating Solar Plant: {str(e)}', 'danger')
 
     substations = GridSubstation.query.all()
     feeders = Feeder.query.all()
     forecast_locations = ForecastLocation.query.all()
-    return render_template('create_solar_plant.html', 
-                           substations=substations, 
-                           feeders=feeders, 
-                           forecast_locations=forecast_locations)
-
-
-
-
-
+    return render_template('create_solar_plant.html', substations=substations, feeders=feeders, forecast_locations=forecast_locations)
 
 @app.route('/solar_plants/<int:id>/edit', methods=['GET', 'POST'])
 def edit_solar_plant(id):
     plant = SolarPlant.query.get_or_404(id)
     if request.method == 'POST':
-        plant.name = request.form['name']
-        plant.latitude = float(request.form['latitude'])
-        plant.longitude = float(request.form['longitude'])
-        plant.grid_substation_id = int(request.form['grid_substation_id'])
-        plant.feeder_id = int(request.form['feeder_id'])
-        plant.forecast_location_id = int(request.form['forecast_location_id'])
-        plant.installed_capacity = float(request.form['installed_capacity'])
-        plant.panel_capacity = float(request.form['panel_capacity'])
-        plant.inverter_capacity = float(request.form['inverter_capacity'])
-        plant.plant_angle = float(request.form['plant_angle'])
-        plant.company = request.form['company']
-        db.session.commit()
-        flash('Solar Plant updated successfully!', 'success')
-        return redirect(url_for('solar_plants'))
+        try:
+            plant.name = request.form['name']
+            plant.latitude = float(request.form['latitude'])
+            plant.longitude = float(request.form['longitude'])
+            plant.grid_substation = int(request.form['grid_substation'])
+            plant.feeder = int(request.form['feeder'])
+            plant.forecast_location = int(request.form['forecast_location'])
+            plant.installed_capacity = float(request.form['installed_capacity'])
+            plant.panel_capacity = float(request.form['panel_capacity'])
+            plant.inverter_capacity = float(request.form['inverter_capacity'])
+            plant.plant_angle = float(request.form['plant_angle'])
+            plant.company = request.form['company']
+            db.session.commit()
+            flash('Solar Plant updated successfully!', 'success')
+            return redirect(url_for('solar_plants'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error updating Solar Plant: {str(e)}', 'danger')
+
     substations = GridSubstation.query.all()
     feeders = Feeder.query.filter_by(grid_substation=plant.grid_substation).all()
     forecast_locations = ForecastLocation.query.all()
     return render_template('edit_solar_plant.html', plant=plant, substations=substations, feeders=feeders, forecast_locations=forecast_locations)
+
+
+
 
 @app.route('/solar_plants/<int:id>/delete', methods=['POST'])
 def delete_solar_plant(id):
