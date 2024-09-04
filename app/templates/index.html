@@ -18,26 +18,11 @@
                 <hr>
                 <p>Total Solar Capacity: {{ total_solar_capacity }} MW</p>
                 <p>Total Substation Capacity: {{ total_substation_capacity }} MW</p>
-                <p>Total Plant Forecast: {{ total_plant_forecast }} GHI</p>
-                <p>Total Substation Forecast: {{ total_substation_forecast }} GHI</p>
             </div>
             <div class="col-md-6">
                 <h2>Forecast Locations</h2>
                 <hr>
                 <div id="map" style="height: 400px;"></div>
-                <script>
-                    var forecastLocations = [
-                    {% for location in forecast_locations %}
-                        {
-                            latitude: {{ location.latitude }},
-                            longitude: {{ location.longitude }},
-                            ghi: {{ location.next_hour_forecast.ghi }},
-                            dni: {{ location.next_hour_forecast.dni }},
-                            dhi: {{ location.next_hour_forecast.dhi }}
-                        }{% if not loop.last %},{% endif %}
-                    {% endfor %}
-                    ];
-                </script>
             </div>
         </div>
     </div>
