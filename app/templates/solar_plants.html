@@ -24,19 +24,20 @@
             <td>{{ plant.latitude }}</td>
             <td>{{ plant.longitude }}</td>
             <td>
-                {% if plant.grid_substation %}
-                    {{ plant.grid_substation.name }}
+                {% if plant.grid_substation_rel %}
+                    {{ plant.grid_substation_rel.name }}
                 {% else %}
                     N/A
                 {% endif %}
             </td>
             <td>
-                {% if plant.feeder %}
-                    {{ plant.feeder.name }}
+                {% if plant.feeder_rel %}
+                    {{ plant.feeder_rel.name }}
                 {% else %}
                     N/A
                 {% endif %}
             </td>
+
             <td>{{ plant.installed_capacity }}</td>
             <td>
                 <a href="{{ url_for('edit_solar_plant', id=plant.id) }}" class="btn btn-sm btn-warning">Edit</a>

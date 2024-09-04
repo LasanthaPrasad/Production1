@@ -161,10 +161,11 @@ def delete_feeder(id):
     flash('Feeder deleted successfully!', 'success')
     return redirect(url_for('feeders'))
 
+
 @app.route('/solar_plants')
 def solar_plants():
-    plants = SolarPlant.query.options(db.joinedload(SolarPlant.grid_substation), 
-                                      db.joinedload(SolarPlant.feeder)).all()
+    plants = SolarPlant.query.options(db.joinedload(SolarPlant.grid_substation_rel), 
+                                      db.joinedload(SolarPlant.feeder_rel)).all()
     return render_template('solar_plants.html', plants=plants)
 
 # Solar Plants
