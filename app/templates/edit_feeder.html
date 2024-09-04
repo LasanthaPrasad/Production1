@@ -12,13 +12,16 @@
         <input type="text" class="form-control" id="code" name="code" value="{{ feeder.code }}" required>
     </div>
     <div class="form-group">
-        <label for="grid_substation_id">Grid Substation</label>
-        <select class="form-control" id="grid_substation_id" name="grid_substation_id" required>
+        <label for="grid_substation">Grid Substation</label>
+        <select class="form-control" id="grid_substation" name="grid_substation" required>
             {% for substation in substations %}
-            <option value="{{ substation.id }}" {% if substation.id == feeder.grid_substation_id %}selected{% endif %}>{{ substation.name }}</option>
+            <option value="{{ substation.id }}" {% if feeder and feeder.grid_substation == substation.id %}selected{% endif %}>
+                {{ substation.name }}
+            </option>
             {% endfor %}
         </select>
     </div>
+
     <div class="form-group">
         <label for="installed_solar_capacity">Installed Solar Capacity</label>
         <input type="number" step="any" class="form-control" id="installed_solar_capacity" name="installed_solar_capacity" value="{{ feeder.installed_solar_capacity }}" required>

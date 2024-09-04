@@ -21,7 +21,13 @@
             <td>{{ feeder.id }}</td>
             <td>{{ feeder.name }}</td>
             <td>{{ feeder.code }}</td>
-            <td>{{ feeder.grid_substation.name }}</td>
+            <td>
+                {% if feeder.grid_substation_rel %}
+                    {{ feeder.grid_substation_rel.name }}
+                {% else %}
+                    N/A
+                {% endif %}
+            </td>
             <td>{{ feeder.installed_solar_capacity }}</td>
             <td>{{ feeder.status }}</td>
             <td>
