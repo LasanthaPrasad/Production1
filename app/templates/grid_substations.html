@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Grid Substations</h2>
+<h2>Grid Substations<div class="d-flex justify-content-end mb-3">
+    <a href="{{ url_for('main.grid_substation_detail', id=0) }}" class="btn btn-primary">Create Grid Substation</a>
+</div>
+</h2>
 <hr>
 <table class="table table-striped">
     <thead>

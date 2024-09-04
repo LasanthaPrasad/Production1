@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Feeders</h2>
+<h2>Feeders<div class="d-flex justify-content-end mb-3">
+    <a href="{{ url_for('main.feeder_detail', id=0) }}" class="btn btn-primary">Create Feeder</a>
+</div>
+</h2>
 <hr>
 <table class="table table-striped">
     <thead>

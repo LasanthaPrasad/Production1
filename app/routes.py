@@ -21,6 +21,10 @@ def index():
                            forecast_locations=forecast_locations,
                            google_maps_api_key=os.getenv('GOOGLE_MAPS_API_KEY'))
 
+
+
+
+
 @bp.route('/solar-plants', methods=['GET', 'POST'])
 def solar_plants():
     if request.method == 'POST':
@@ -53,7 +57,33 @@ def solar_plants():
 
 @bp.route('/solar-plants/<int:id>', methods=['GET', 'POST', 'DELETE'])
 def solar_plant_detail(id):
-    solar_plant = SolarPlant.query.get(id)
+    if id == 0:
+        solar_plant = SolarPlant(
+            name='', latitude=0.0, longitude=0.0,
+            grid_substation_id=0, feeder_id=0, forecast_location_id=0,
+            installed_capacity=0.0, panel_capacity=0.0, inverter_capacity=0.0,
+            plant_angle=0.0, company=''
+        )
+    else:
+        solar_plant = SolarPlant.query.get(id)
+
+
+
+@bp.route('/solar-plants/<int:id>', methods=['GET', 'POST', 'DELETE'])
+def solar_plant_detail(id):
+
+    if id == 0:
+        solar_plant = SolarPlant(
+            name='', latitude=0.0, longitude=0.0,
+            grid_substation_id=0, feeder_id=0, forecast_location_id=0,
+            installed_capacity=0.0, panel_capacity=0.0, inverter_capacity=0.0,
+            plant_angle=0.0, company=''
+        )
+    else:
+        solar_plant = SolarPlant.query.get(id)
+
+
+
     if request.method == 'POST':
         # Handle update solar plant
         solar_plant.name = request.form['name']

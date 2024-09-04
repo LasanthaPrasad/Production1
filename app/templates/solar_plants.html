@@ -1,7 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Solar Plants</h2>
+<h2>Solar Plants  <div class="d-flex justify-content-end mb-3">
+    <a href="{{ url_for('main.solar_plant_detail', id=0) }}" class="btn btn-primary">Create Solar Plant</a>
+</div>
+</h2>
 <hr>
 <table class="table table-striped">
     <thead>

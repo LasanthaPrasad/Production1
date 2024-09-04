@@ -1,7 +1,9 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Forecast Locations</h2>
+<h2>Forecast Locations <div class="d-flex justify-content-end mb-3">
+    <a href="{{ url_for('main.forecast_location_detail', id=0) }}" class="btn btn-primary">Create Forecast Location</a>
+</div></h2>
 <hr>
 <table class="table table-striped">
     <thead>
