@@ -21,10 +21,6 @@ def index():
                            forecast_locations=forecast_locations,
                            google_maps_api_key=os.getenv('GOOGLE_MAPS_API_KEY'))
 
-
-
-
-
 @bp.route('/solar-plants', methods=['GET', 'POST'])
 def solar_plants():
     if request.method == 'POST':
@@ -66,25 +62,6 @@ def solar_plant_detail(id):
         )
     else:
         solar_plant = SolarPlant.query.get(id)
-
-
-
-@bp.route('/solar-plants/<int:id>', methods=['GET', 'POST', 'DELETE'])
-def solar_plant_detail(id):
-
-    if id == 0:
-        solar_plant = SolarPlant(
-            name='', latitude=0.0, longitude=0.0,
-            grid_substation_id=0, feeder_id=0, forecast_location_id=0,
-            installed_capacity=0.0, panel_capacity=0.0, inverter_capacity=0.0,
-            plant_angle=0.0, company=''
-        )
-    else:
-        solar_plant = SolarPlant.query.get(id)
-
-
-
-
     if request.method == 'POST':
         # Handle update solar plant
         solar_plant.name = request.form['name']
@@ -131,7 +108,13 @@ def grid_substations():
 
 @bp.route('/grid-substations/<int:id>', methods=['GET', 'POST', 'DELETE'])
 def grid_substation_detail(id):
-    grid_substation = GridSubstation.query.get(id)
+    if id == 0:
+        grid_substation = GridSubstation(
+            name='', code='', latitude=0.0, longitude=0.0,
+            forecast_location_id=0, installed_solar_capacity=0.0
+        )
+    else:
+        grid_substation = GridSubstation.query.get(id)
     if request.method == 'POST':
         # Handle update grid substation
         grid_substation.name = request.form['name']
@@ -175,7 +158,14 @@ def feeders():
 
 @bp.route('/feeders/<int:id>', methods=['GET', 'POST', 'DELETE'])
 def feeder_detail(id):
-    feeder = Feeder.query.get(id)
+    if id == 0:
+        feeder = Feeder(
+            name='', code='', grid_substation_id=0,
+            installed_solar_capacity=0.0, status='',
+            outage_start=None, outage_end=None
+        )
+    else:
+        feeder = Feeder.query.get(id)
     if request.method == 'POST':
         # Handle update feeder
         feeder.name = request.form['name']
@@ -193,7 +183,6 @@ def feeder_detail(id):
         db.session.commit()
         return redirect(url_for('main.feeders'))
     return render_template('feeder_detail.html', feeder=feeder)
-
 
 @bp.route('/forecast-locations', methods=['GET', 'POST'])
 def forecast_locations():
@@ -227,7 +216,15 @@ def forecast_locations():
 
 @bp.route('/forecast-locations/<int:id>', methods=['GET', 'POST', 'DELETE'])
 def forecast_location_detail(id):
-    forecast_location = ForecastLocation.query.get(id)
+    if id == 0:
+        forecast_location = ForecastLocation(
+            provider_name='', latitude=0.0, longitude=0.0,
+            ghi=0.0, dni=0.0, dhi=0.0, air_temperature=0.0,
+            zenith=0.0, azimuth=0.0, cloud_opacity=0.0,
+            next_hour_forecast='{}', next_24_hours_forecast='{}'
+        )
+    else:
+        forecast_location = ForecastLocation.query.get(id)
     if request.method == 'POST':
         # Handle update forecast location
         forecast_location.provider_name = request.form['provider_name']
