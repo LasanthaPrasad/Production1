@@ -162,3 +162,60 @@ def feeder_detail(id):
         db.session.commit()
         return redirect(url_for('main.feeders'))
     return render_template('feeder_detail.html', feeder=feeder)
+
+
+@bp.route('/forecast-locations', methods=['GET', 'POST'])
+def forecast_locations():
+    if request.method == 'POST':
+        # Handle create/update forecast location
+        provider_name = request.form['provider_name']
+        latitude = float(request.form['latitude'])
+        longitude = float(request.form['longitude'])
+        ghi = float(request.form['ghi'])
+        dni = float(request.form['dni'])
+        dhi = float(request.form['dhi'])
+        air_temperature = float(request.form['air_temperature'])
+        zenith = float(request.form['zenith'])
+        azimuth = float(request.form['azimuth'])
+        cloud_opacity = float(request.form['cloud_opacity'])
+        next_hour_forecast = request.form['next_hour_forecast']
+        next_24_hours_forecast = request.form['next_24_hours_forecast']
+
+        forecast_location = ForecastLocation(
+            provider_name=provider_name, latitude=latitude, longitude=longitude,
+            ghi=ghi, dni=dni, dhi=dhi, air_temperature=air_temperature,
+            zenith=zenith, azimuth=azimuth, cloud_opacity=cloud_opacity,
+            next_hour_forecast=next_hour_forecast, next_24_hours_forecast=next_24_hours_forecast
+        )
+        db.session.add(forecast_location)
+        db.session.commit()
+        return redirect(url_for('main.forecast_locations'))
+    elif request.method == 'GET':
+        forecast_locations = ForecastLocation.query.all()
+        return render_template('forecast_locations.html', forecast_locations=forecast_locations)
+
+@bp.route('/forecast-locations/<int:id>', methods=['GET', 'POST', 'DELETE'])
+def forecast_location_detail(id):
+    forecast_location = ForecastLocation.query.get(id)
+    if request.method == 'POST':
+        # Handle update forecast location
+        forecast_location.provider_name = request.form['provider_name']
+        forecast_location.latitude = float(request.form['latitude'])
+        forecast_location.longitude = float(request.form['longitude'])
+        forecast_location.ghi = float(request.form['ghi'])
+        forecast_location.dni = float(request.form['dni'])
+        forecast_location.dhi = float(request.form['dhi'])
+        forecast_location.air_temperature = float(request.form['air_temperature'])
+        forecast_location.zenith = float(request.form['zenith'])
+        forecast_location.azimuth = float(request.form['azimuth'])
+        forecast_location.cloud_opacity = float(request.form['cloud_opacity'])
+        forecast_location.next_hour_forecast = request.form['next_hour_forecast']
+        forecast_location.next_24_hours_forecast = request.form['next_24_hours_forecast']
+        db.session.commit()
+        return redirect(url_for('main.forecast_locations'))
+    elif request.method == 'DELETE':
+        # Handle delete forecast location
+        db.session.delete(forecast_location)
+        db.session.commit()
+        return redirect(url_for('main.forecast_locations'))
+    return render_template('forecast_location_detail.html', forecast_location=forecast_location)

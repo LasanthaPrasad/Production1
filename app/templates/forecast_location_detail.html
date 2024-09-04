@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Forecast Location Details</h2>
+<hr>
+<form method="post">
+    <div class="form-group">
+        <label for="provider_name">Provider</label>
+        <input type="text" class="form-control" id="provider_name" name="provider_name" value="{{ forecast_location.provider_name }}">
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+            <label for="latitude">Latitude</label>
+            <input type="number" step="0.0001" class="form-control" id="latitude" name="latitude" value="{{ forecast_location.latitude }}">
+        </div>
+        <div class="form-group col-md-6">
+            <label for="longitude">Longitude</label>
+            <input type="number" step="0.0001" class="form-control" id="longitude" name="longitude" value="{{ forecast_location.longitude }}">
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-4">
+            <label for="ghi">GHI</label>
+            <input type="number" step="0.1" class="form-control" id="ghi" name="ghi" value="{{ forecast_location.ghi }}">
+        </div>
+        <div class="form-group col-md-4">
+            <label for="dni">DNI</label>
+            <input type="number" step="0.1" class="form-control" id="dni" name="dni" value="{{ forecast_location.dni }}">
+        </div>
+        <div class="form-group col-md-4">
+            <label for="dhi">DHI</label>
+            <input type="number" step="0.1" class="form-control" id="dhi" name="dhi" value="{{ forecast_location.dhi }}">
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-4">
+            <label for="air_temperature">Air Temperature</label>
+            <input type="number" step="0.1" class="form-control" id="air_temperature" name="air_temperature" value="{{ forecast_location.air_temperature }}">
+        </div>
+        <div class="form-group col-md-4">
+            <label for="zenith">Zenith</label>
+            <input type="number" step="0.1" class="form-control" id="zenith" name="zenith" value="{{ forecast_location.zenith }}">
+        </div>
+        <div class="form-group col-md-4">
+            <label for="azimuth">Azimuth</label>
+            <input type="number" step="0.1" class="form-control" id="azimuth" name="azimuth" value="{{ forecast_location.azimuth }}">
+        </div>
+    </div>
+    <div class="form-group">
+        <label for="cloud_opacity">Cloud Opacity</label>
+        <input type="number" step="0.1" class="form-control" id="cloud_opacity" name="cloud_opacity" value="{{ forecast_location.cloud_opacity }}">
+    </div>
+    <div class="form-group">
+        <label for="next_hour_forecast">Next Hour Forecast</label>
+        <textarea class="form-control" id="next_hour_forecast" name="next_hour_forecast">{{ forecast_location.next_hour_forecast }}</textarea>
+    </div>
+    <div class="form-group">
+        <label for="next_24_hours_forecast">Next 24 Hours Forecast</label>
+        <textarea class="form-control" id="next_24_hours_forecast" name="next_24_hours_forecast">{{ forecast_location.next_24_hours_forecast }}</textarea>
+    </div>
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+{% endblock %}
