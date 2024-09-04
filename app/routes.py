@@ -1,25 +1,12 @@
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from . import db
-from .models import ForecastLocation, IrradiationForecast
-
-
-#from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
-
-#from app import app, db
-#from app.models import SolarPlant, GridSubstation, Feeder, ForecastLocation, IrradiationForecast
-#from datetime import datetime, timedelta
-
-
-
+from .models import ForecastLocation, IrradiationForecast, SolarPlant, GridSubstation, Feeder
+from datetime import datetime, timedelta
 
 
 main = Blueprint('main', __name__)
 
-
-
-@main.route('/')
-def index():
 
 
 def calculate_plant_forecasts(plant_id):
@@ -38,7 +25,7 @@ def calculate_plant_forecasts(plant_id):
     return plant_forecasts
 
 
-@app.route('/api/plant_forecast/<int:plant_id>')
+@main.route('/api/plant_forecast/<int:plant_id>')
 def get_plant_forecast(plant_id):
     forecasts = calculate_plant_forecasts(plant_id)
     return jsonify(forecasts)
@@ -47,9 +34,7 @@ def get_plant_forecast(plant_id):
 
 
 
-
-
-@app.route('/api/location_forecast/<int:location_id>')
+@main.route('/api/location_forecast/<int:location_id>')
 def get_location_forecast(location_id):
     now = datetime.utcnow()
     three_days_later = now + timedelta(days=3)
@@ -74,6 +59,9 @@ def get_location_forecast(location_id):
 
 
 
+
+
+
 def recalculate_all_substation_capacities():
     substations = GridSubstation.query.all()
     for substation in substations:
@@ -89,7 +77,7 @@ def recalculate_all_substation_capacities():
 #    return render_template('index.html', total_mw=total_mw, total_capacity=total_capacity)
 
 
-@app.route('/')
+@main.route('/')
 def index():
     total_mw = db.session.query(db.func.sum(SolarPlant.installed_capacity)).scalar() or 0
     total_capacity = db.session.query(db.func.sum(GridSubstation.installed_solar_capacity)).scalar() or 0
@@ -110,12 +98,12 @@ def index():
 
 
 # Forecast Locations
-@app.route('/forecast_locations')
+@main.route('/forecast_locations')
 def forecast_locations():
     locations = ForecastLocation.query.all()
     return render_template('forecast_locations.html', locations=locations)
 
-@app.route('/forecast_locations/create', methods=['GET', 'POST'])
+@main.route('/forecast_locations/create', methods=['GET', 'POST'])
 def create_forecast_location():
     if request.method == 'POST':
         location = ForecastLocation(
@@ -129,7 +117,7 @@ def create_forecast_location():
         return redirect(url_for('forecast_locations'))
     return render_template('create_forecast_location.html')
 
-@app.route('/forecast_locations/<int:id>/edit', methods=['GET', 'POST'])
+@main.route('/forecast_locations/<int:id>/edit', methods=['GET', 'POST'])
 def edit_forecast_location(id):
     location = ForecastLocation.query.get_or_404(id)
     if request.method == 'POST':
@@ -141,7 +129,7 @@ def edit_forecast_location(id):
         return redirect(url_for('forecast_locations'))
     return render_template('edit_forecast_location.html', location=location)
 
-@app.route('/forecast_locations/<int:id>/delete', methods=['POST'])
+@main.route('/forecast_locations/<int:id>/delete', methods=['POST'])
 def delete_forecast_location(id):
     location = ForecastLocation.query.get_or_404(id)
     db.session.delete(location)
@@ -150,14 +138,14 @@ def delete_forecast_location(id):
     return redirect(url_for('forecast_locations'))
 
 # Grid Substations
-@app.route('/grid_substations')
+@main.route('/grid_substations')
 def grid_substations():
     substations = GridSubstation.query.all()
     return render_template('grid_substations.html', substations=substations)
 
 
 
-@app.route('/grid_substations/create', methods=['GET', 'POST'])
+@main.route('/grid_substations/create', methods=['GET', 'POST'])
 def create_grid_substation():
     if request.method == 'POST':
         substation = GridSubstation(
@@ -173,7 +161,7 @@ def create_grid_substation():
         return redirect(url_for('grid_substations'))
     return render_template('create_grid_substation.html')
 
-@app.route('/grid_substations/<int:id>/edit', methods=['GET', 'POST'])
+@main.route('/grid_substations/<int:id>/edit', methods=['GET', 'POST'])
 def edit_grid_substation(id):
     substation = GridSubstation.query.get_or_404(id)
     if request.method == 'POST':
@@ -187,7 +175,7 @@ def edit_grid_substation(id):
         return redirect(url_for('grid_substations'))
     return render_template('edit_grid_substation.html', substation=substation)
 
-@app.route('/grid_substations/<int:id>/delete', methods=['POST'])
+@main.route('/grid_substations/<int:id>/delete', methods=['POST'])
 def delete_grid_substation(id):
     substation = GridSubstation.query.get_or_404(id)
     db.session.delete(substation)
@@ -197,7 +185,7 @@ def delete_grid_substation(id):
 
 
 
-@app.route('/feeders/create', methods=['GET', 'POST'])
+@main.route('/feeders/create', methods=['GET', 'POST'])
 def create_feeder():
     if request.method == 'POST':
         try:
@@ -224,7 +212,7 @@ def create_feeder():
     substations = GridSubstation.query.all()
     return render_template('create_feeder.html', substations=substations)
 
-@app.route('/feeders/<int:id>/edit', methods=['GET', 'POST'])
+@main.route('/feeders/<int:id>/edit', methods=['GET', 'POST'])
 def edit_feeder(id):
     feeder = Feeder.query.get_or_404(id)
     old_status = feeder.status
@@ -257,7 +245,7 @@ def edit_feeder(id):
     substations = GridSubstation.query.all()
     return render_template('edit_feeder.html', feeder=feeder, substations=substations)
 
-@app.route('/feeders/<int:id>/delete', methods=['POST'])
+@main.route('/feeders/<int:id>/delete', methods=['POST'])
 def delete_feeder(id):
     feeder = Feeder.query.get_or_404(id)
     try:
@@ -279,7 +267,7 @@ def delete_feeder(id):
 
 
 # Feeders
-@app.route('/feeders')
+@main.route('/feeders')
 def feeders():
     feeders = Feeder.query.options(db.joinedload(Feeder.grid_substation_rel)).all()
     return render_template('feeders.html', feeders=feeders)
@@ -289,7 +277,7 @@ def feeders():
 #    return render_template('feeders.html', feeders=feeders)
 
 
-@app.route('/solar_plants')
+@main.route('/solar_plants')
 def solar_plants():
     plants = SolarPlant.query.options(db.joinedload(SolarPlant.grid_substation_rel), 
                                       db.joinedload(SolarPlant.feeder_rel)).all()
@@ -302,7 +290,7 @@ def solar_plants():
 #    return render_template('solar_plants.html', plants=plants)
 
 
-@app.route('/solar_plants/create', methods=['GET', 'POST'])
+@main.route('/solar_plants/create', methods=['GET', 'POST'])
 def create_solar_plant():
     if request.method == 'POST':
         try:
@@ -331,7 +319,7 @@ def create_solar_plant():
     forecast_locations = ForecastLocation.query.all()
     return render_template('create_solar_plant.html', substations=substations, forecast_locations=forecast_locations)
 
-@app.route('/solar_plants/<int:id>/edit', methods=['GET', 'POST'])
+@main.route('/solar_plants/<int:id>/edit', methods=['GET', 'POST'])
 def edit_solar_plant(id):
     plant = SolarPlant.query.get_or_404(id)
     if request.method == 'POST':
@@ -358,13 +346,13 @@ def edit_solar_plant(id):
     forecast_locations = ForecastLocation.query.all()
     return render_template('edit_solar_plant.html', plant=plant, substations=substations, forecast_locations=forecast_locations)
 
-@app.route('/get_feeders/<int:substation_id>')
+@main.route('/get_feeders/<int:substation_id>')
 def get_feeders(substation_id):
     feeders = Feeder.query.filter_by(grid_substation=substation_id).all()
     return jsonify([{'id': f.id, 'name': f.name} for f in feeders])
 
 
-@app.route('/solar_plants/<int:id>/delete', methods=['POST'])
+@main.route('/solar_plants/<int:id>/delete', methods=['POST'])
 def delete_solar_plant(id):
     plant = SolarPlant.query.get_or_404(id)
     db.session.delete(plant)
