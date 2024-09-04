@@ -28,12 +28,14 @@ class GridSubstation(db.Model):
     installed_solar_capacity = db.Column(db.Numeric(10, 2))
 
 
+
     def update_installed_capacity(self):
-        total_capacity = sum(feeder.installed_solar_capacity for feeder in self.feeders)
+        total_capacity = sum(feeder.installed_solar_capacity 
+                             for feeder in self.feeders 
+                             if feeder.status == 'active')
         self.installed_solar_capacity = total_capacity
         db.session.commit()
-
-
+        
 #class Feeder(db.Model):
 #    __tablename__ = 'feeders'
 #    id = db.Column(db.Integer, primary_key=True)
@@ -54,7 +56,7 @@ class Feeder(db.Model):
     code = db.Column(db.String(50), unique=True, nullable=False)
     grid_substation = db.Column(db.Integer, db.ForeignKey('grid_substations.id'), nullable=False)
     installed_solar_capacity = db.Column(db.Numeric(10, 2))
-    status = db.Column(db.String(50))
+    status = db.Column(db.String(50), default='active')
     outage_start = db.Column(db.DateTime)
     outage_end = db.Column(db.DateTime)
 

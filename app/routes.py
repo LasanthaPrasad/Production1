@@ -128,7 +128,6 @@ def delete_grid_substation(id):
 
 
 
-
 @app.route('/feeders/create', methods=['GET', 'POST'])
 def create_feeder():
     if request.method == 'POST':
@@ -159,10 +158,11 @@ def create_feeder():
 @app.route('/feeders/<int:id>/edit', methods=['GET', 'POST'])
 def edit_feeder(id):
     feeder = Feeder.query.get_or_404(id)
+    old_status = feeder.status
+    old_substation_id = feeder.grid_substation
+
     if request.method == 'POST':
         try:
-            old_substation = GridSubstation.query.get(feeder.grid_substation)
-            
             feeder.name = request.form['name']
             feeder.code = request.form['code']
             feeder.grid_substation = int(request.form['grid_substation'])
@@ -171,7 +171,8 @@ def edit_feeder(id):
             db.session.commit()
             
             # Update old Grid Substation capacity if changed
-            if old_substation.id != feeder.grid_substation:
+            if old_substation_id != feeder.grid_substation or old_status != feeder.status:
+                old_substation = GridSubstation.query.get(old_substation_id)
                 old_substation.update_installed_capacity()
             
             # Update new Grid Substation capacity
@@ -203,8 +204,6 @@ def delete_feeder(id):
         db.session.rollback()
         flash(f'Error deleting Feeder: {str(e)}', 'danger')
     return redirect(url_for('feeders'))
-
-
 
 
 
