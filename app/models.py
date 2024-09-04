@@ -1,12 +1,36 @@
 from app import db
 from datetime import datetime
 
+
+
+class IrradiationForecast(db.Model):
+    __tablename__ = 'irradiation_forecasts'
+    id = db.Column(db.Integer, primary_key=True)
+    forecast_location_id = db.Column(db.Integer, db.ForeignKey('forecast_locations.id'), nullable=False)
+    timestamp = db.Column(db.DateTime, nullable=False)
+    ghi = db.Column(db.Float)
+    dni = db.Column(db.Float)
+    dhi = db.Column(db.Float)
+    air_temp = db.Column(db.Float)
+    cloud_opacity = db.Column(db.Float)
+
+    forecast_location = db.relationship('ForecastLocation', backref='irradiation_forecasts')
+
+    __table_args__ = (db.UniqueConstraint('forecast_location_id', 'timestamp', name='uix_1'),)
+
+
+
+
+
 class ForecastLocation(db.Model):
     __tablename__ = 'forecast_locations'
     id = db.Column(db.Integer, primary_key=True)
     provider_name = db.Column(db.String(255), nullable=False)
     latitude = db.Column(db.Numeric(10, 8), nullable=False)
     longitude = db.Column(db.Numeric(11, 8), nullable=False)
+
+    solcast_resource_id = db.Column(db.String(255), unique=True)
+
     ghi = db.Column(db.Numeric(10, 2))
     dni = db.Column(db.Numeric(10, 2))
     dhi = db.Column(db.Numeric(10, 2))
