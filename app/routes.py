@@ -104,7 +104,7 @@ def create_feeder():
         feeder = Feeder(
             name=request.form['name'],
             code=request.form['code'],
-            grid_substation_id=int(request.form['grid_substation_id']),
+            grid_substation=int(request.form['grid_substation']),  # Note: no '_id' suffix
             installed_solar_capacity=float(request.form['installed_solar_capacity']),
             status=request.form['status']
         )
@@ -114,6 +114,8 @@ def create_feeder():
         return redirect(url_for('feeders'))
     substations = GridSubstation.query.all()
     return render_template('create_feeder.html', substations=substations)
+
+
 
 @app.route('/feeders/<int:id>/edit', methods=['GET', 'POST'])
 def edit_feeder(id):
