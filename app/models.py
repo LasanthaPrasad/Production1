@@ -1,4 +1,5 @@
 from app import db
+import json
 
 class ForecastLocation(db.Model):
     __tablename__ = 'forecastlocation'
@@ -15,6 +16,14 @@ class ForecastLocation(db.Model):
     cloud_opacity = db.Column(db.Float, nullable=False)
     next_hour_forecast = db.Column(db.JSON, nullable=False)
     next_24_hours_forecast = db.Column(db.JSON, nullable=False)
+
+    def next_hour_forecast_dict(self):
+        return json.loads(self.next_hour_forecast)
+
+    def next_24_hours_forecast_dict(self):
+        return json.loads(self.next_24_hours_forecast)
+    
+
 
 class GridSubstation(db.Model):
     __tablename__ = 'gridsubstation'
