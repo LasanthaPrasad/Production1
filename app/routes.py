@@ -144,6 +144,7 @@ def solar_plants():
     plants = SolarPlant.query.all()
     return render_template('solar_plants.html', plants=plants)
 
+
 @app.route('/solar_plants/create', methods=['GET', 'POST'])
 def create_solar_plant():
     if request.method == 'POST':
@@ -151,9 +152,9 @@ def create_solar_plant():
             name=request.form['name'],
             latitude=float(request.form['latitude']),
             longitude=float(request.form['longitude']),
-            grid_substation_id=int(request.form['grid_substation_id']),
-            feeder_id=int(request.form['feeder_id']),
-            forecast_location_id=int(request.form['forecast_location_id']),
+            grid_substation=int(request.form['grid_substation']),  # Note: no '_id' suffix
+            feeder=int(request.form['feeder']),  # Note: no '_id' suffix
+            forecast_location=int(request.form['forecast_location']),  # Note: no '_id' suffix
             installed_capacity=float(request.form['installed_capacity']),
             panel_capacity=float(request.form['panel_capacity']),
             inverter_capacity=float(request.form['inverter_capacity']),
@@ -168,6 +169,8 @@ def create_solar_plant():
     feeders = Feeder.query.all()
     forecast_locations = ForecastLocation.query.all()
     return render_template('create_solar_plant.html', substations=substations, feeders=feeders, forecast_locations=forecast_locations)
+
+
 
 @app.route('/solar_plants/<int:id>/edit', methods=['GET', 'POST'])
 def edit_solar_plant(id):

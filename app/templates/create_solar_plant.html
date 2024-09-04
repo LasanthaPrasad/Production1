@@ -16,13 +16,15 @@
         <input type="number" step="any" class="form-control" id="longitude" name="longitude" required>
     </div>
     <div class="form-group">
-        <label for="grid_substation_id">Grid Substation</label>
-        <select class="form-control" id="grid_substation_id" name="grid_substation_id" required>
+        <label for="grid_substation">Grid Substation</label>
+        <select class="form-control" id="grid_substation" name="grid_substation" required>
             {% for substation in substations %}
             <option value="{{ substation.id }}">{{ substation.name }}</option>
             {% endfor %}
         </select>
     </div>
+
+
     <div class="form-group">
         <label for="feeder_id">Feeder</label>
         <select class="form-control" id="feeder_id" name="feeder_id" required>
