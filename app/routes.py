@@ -75,3 +75,90 @@ def solar_plant_detail(id):
         db.session.commit()
         return redirect(url_for('main.solar_plants'))
     return render_template('solar_plant_detail.html', solar_plant=solar_plant)
+
+@bp.route('/grid-substations', methods=['GET', 'POST'])
+def grid_substations():
+    if request.method == 'POST':
+        # Handle create/update grid substation
+        name = request.form['name']
+        code = request.form['code']
+        latitude = float(request.form['latitude'])
+        longitude = float(request.form['longitude'])
+        forecast_location_id = int(request.form['forecast_location_id'])
+        installed_solar_capacity = float(request.form['installed_solar_capacity'])
+
+        grid_substation = GridSubstation(
+            name=name, code=code, latitude=latitude, longitude=longitude,
+            forecast_location_id=forecast_location_id, installed_solar_capacity=installed_solar_capacity
+        )
+        db.session.add(grid_substation)
+        db.session.commit()
+        return redirect(url_for('main.grid_substations'))
+    elif request.method == 'GET':
+        grid_substations = GridSubstation.query.all()
+        return render_template('grid_substations.html', grid_substations=grid_substations)
+
+@bp.route('/grid-substations/<int:id>', methods=['GET', 'POST', 'DELETE'])
+def grid_substation_detail(id):
+    grid_substation = GridSubstation.query.get(id)
+    if request.method == 'POST':
+        # Handle update grid substation
+        grid_substation.name = request.form['name']
+        grid_substation.code = request.form['code']
+        grid_substation.latitude = float(request.form['latitude'])
+        grid_substation.longitude = float(request.form['longitude'])
+        grid_substation.forecast_location_id = int(request.form['forecast_location_id'])
+        grid_substation.installed_solar_capacity = float(request.form['installed_solar_capacity'])
+        db.session.commit()
+        return redirect(url_for('main.grid_substations'))
+    elif request.method == 'DELETE':
+        # Handle delete grid substation
+        db.session.delete(grid_substation)
+        db.session.commit()
+        return redirect(url_for('main.grid_substations'))
+    return render_template('grid_substation_detail.html', grid_substation=grid_substation)
+
+@bp.route('/feeders', methods=['GET', 'POST'])
+def feeders():
+    if request.method == 'POST':
+        # Handle create/update feeder
+        name = request.form['name']
+        code = request.form['code']
+        grid_substation_id = int(request.form['grid_substation_id'])
+        installed_solar_capacity = float(request.form['installed_solar_capacity'])
+        status = request.form['status']
+        outage_start = request.form['outage_start']
+        outage_end = request.form['outage_end']
+
+        feeder = Feeder(
+            name=name, code=code, grid_substation_id=grid_substation_id,
+            installed_solar_capacity=installed_solar_capacity, status=status,
+            outage_start=outage_start, outage_end=outage_end
+        )
+        db.session.add(feeder)
+        db.session.commit()
+        return redirect(url_for('main.feeders'))
+    elif request.method == 'GET':
+        feeders = Feeder.query.all()
+        return render_template('feeders.html', feeders=feeders)
+
+@bp.route('/feeders/<int:id>', methods=['GET', 'POST', 'DELETE'])
+def feeder_detail(id):
+    feeder = Feeder.query.get(id)
+    if request.method == 'POST':
+        # Handle update feeder
+        feeder.name = request.form['name']
+        feeder.code = request.form['code']
+        feeder.grid_substation_id = int(request.form['grid_substation_id'])
+        feeder.installed_solar_capacity = float(request.form['installed_solar_capacity'])
+        feeder.status = request.form['status']
+        feeder.outage_start = request.form['outage_start']
+        feeder.outage_end = request.form['outage_end']
+        db.session.commit()
+        return redirect(url_for('main.feeders'))
+    elif request.method == 'DELETE':
+        # Handle delete feeder
+        db.session.delete(feeder)
+        db.session.commit()
+        return redirect(url_for('main.feeders'))
+    return render_template('feeder_detail.html', feeder=feeder)
