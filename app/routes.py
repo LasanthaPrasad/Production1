@@ -2,11 +2,32 @@ from flask import render_template, request, redirect, url_for, flash
 from app import app, db
 from app.models import SolarPlant, GridSubstation, Feeder, ForecastLocation, Forecast
 
+#@app.route('/')
+#def index():
+#    total_mw = db.session.query(db.func.sum(SolarPlant.installed_capacity)).scalar() or 0
+#    total_capacity = db.session.query(db.func.sum(GridSubstation.installed_solar_capacity)).scalar() or 0
+#    return render_template('index.html', total_mw=total_mw, total_capacity=total_capacity)
+
+
 @app.route('/')
 def index():
     total_mw = db.session.query(db.func.sum(SolarPlant.installed_capacity)).scalar() or 0
     total_capacity = db.session.query(db.func.sum(GridSubstation.installed_solar_capacity)).scalar() or 0
-    return render_template('index.html', total_mw=total_mw, total_capacity=total_capacity)
+    forecast_locations = ForecastLocation.query.all()
+    
+    # Add this print statement for debugging
+    print(f"Number of forecast locations: {len(forecast_locations)}")
+    
+    return render_template('index.html', 
+                           total_mw=total_mw, 
+                           total_capacity=total_capacity,
+                           forecast_locations=forecast_locations)
+
+
+
+
+
+
 
 # Forecast Locations
 @app.route('/forecast_locations')

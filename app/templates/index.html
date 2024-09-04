@@ -1,7 +1,5 @@
 {% extends "base.html" %}
 
-{% block title %}Dashboard - Solar Forecast App{% endblock %}
-
 {% block content %}
 <h1>Dashboard</h1>
 <div class="row">
@@ -34,7 +32,40 @@ function initMap() {
         zoom: 8,
     });
 
-    // TODO: Add markers for forecast locations
+    const locations = [
+        {% if forecast_locations %}
+            {% for location in forecast_locations %}
+            {
+                position: { lat: {{ location.latitude }}, lng: {{ location.longitude }} },
+                title: "{{ location.provider_name }}",
+                content: "<h6>{{ location.provider_name }}</h6>" +
+                         "<p>Latitude: {{ location.latitude }}<br>" +
+                         "Longitude: {{ location.longitude }}<br>" +
+                         "GHI: {{ location.ghi|default('N/A') }}<br>" +
+                         "DNI: {{ location.dni|default('N/A') }}<br>" +
+                         "DHI: {{ location.dhi|default('N/A') }}</p>"
+            },
+            {% endfor %}
+        {% endif %}
+    ];
+
+    console.log("Number of locations:", locations.length);
+
+    const infoWindow = new google.maps.InfoWindow();
+
+    locations.forEach(location => {
+        const marker = new google.maps.Marker({
+            position: location.position,
+            map: map,
+            title: location.title
+        });
+
+        marker.addListener("click", () => {
+            infoWindow.close();
+            infoWindow.setContent(location.content);
+            infoWindow.open(map, marker);
+        });
+    });
 }
 
 document.addEventListener("DOMContentLoaded", initMap);
