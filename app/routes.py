@@ -4,6 +4,7 @@ import requests
 import schedule
 import time
 import os
+import json
 
 bp = Blueprint('main', __name__)
 
@@ -11,13 +12,16 @@ bp = Blueprint('main', __name__)
 def index():
     total_solar_capacity = sum(plant.installed_capacity for plant in SolarPlant.query.all())
     total_substation_capacity = sum(substation.installed_solar_capacity for substation in GridSubstation.query.all())
-    total_plant_forecast = sum(location.next_hour_forecast['ghi'] for location in ForecastLocation.query.all())
-    total_substation_forecast = sum(location.next_hour_forecast['ghi'] for location in ForecastLocation.query.all())
-    forecast_locations = ForecastLocation.query.all()
+    forecast_locations = [
+        {
+            'latitude': location.latitude,
+            'longitude': location.longitude,
+            'next_hour_forecast': json.loads(location.next_hour_forecast)
+        }
+        for location in ForecastLocation.query.all()
+    ]
     return render_template('index.html', total_solar_capacity=total_solar_capacity,
                            total_substation_capacity=total_substation_capacity,
-                           total_plant_forecast=total_plant_forecast,
-                           total_substation_forecast=total_substation_forecast,
                            forecast_locations=forecast_locations,
                            google_maps_api_key=os.getenv('GOOGLE_MAPS_API_KEY'))
 
