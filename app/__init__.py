@@ -12,19 +12,19 @@ def create_app():
     db.init_app(app)
     
     with app.app_context():
-        from .models import ForecastLocation, IrradiationForecast
+        from . import models
         db.create_all()  # Create tables if they don't exist
         
-        from .solcast_api import fetch_solcast_forecasts
+        from . import solcast_api
         
         # Fetch forecasts on startup
-        if fetch_solcast_forecasts():
+        if solcast_api.fetch_solcast_forecasts():
             print("Initial forecast fetch successful")
         else:
             print("Initial forecast fetch failed")
         
         # Set up scheduler for periodic updates
-        scheduler.add_job(func=fetch_solcast_forecasts, trigger="interval", hours=1)
+        scheduler.add_job(func=solcast_api.fetch_solcast_forecasts, trigger="interval", hours=1)
         scheduler.start()
     
     # Import and register blueprints/routes here

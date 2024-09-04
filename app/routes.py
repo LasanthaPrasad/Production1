@@ -1,10 +1,14 @@
 
-
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from . import db
+from .models import ForecastLocation, IrradiationForecast
 
-from app import app, db
-from app.models import SolarPlant, GridSubstation, Feeder, ForecastLocation, IrradiationForecast
-from datetime import datetime, timedelta
+
+#from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+
+#from app import app, db
+#from app.models import SolarPlant, GridSubstation, Feeder, ForecastLocation, IrradiationForecast
+#from datetime import datetime, timedelta
 
 
 
@@ -14,6 +18,8 @@ main = Blueprint('main', __name__)
 
 
 
+@main.route('/')
+def index():
 
 
 def calculate_plant_forecasts(plant_id):
