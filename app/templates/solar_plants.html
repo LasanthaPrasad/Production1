@@ -68,8 +68,8 @@ function initMap() {
             title: "{{ plant.name }}",
             content: "<h6>{{ plant.name }}</h6>" +
                      "<p>Capacity: {{ plant.installed_capacity }} MW<br>" +
-                     "Grid Substation: {{ plant.grid_substation.name }}<br>" +
-                     "Feeder: {{ plant.feeder.name }}</p>"
+                     "Grid Substation: {{ plant.grid_substation_rel.namee }}<br>" +
+                     "Feeder: {{ plant.feeder_rel.name }}</p>"
         },
         {% endfor %}
     ];
