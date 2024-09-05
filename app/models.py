@@ -1,5 +1,8 @@
 from . import db
 from datetime import datetime
+import uuid
+
+
 
 
 
@@ -50,7 +53,8 @@ class GridSubstation(db.Model):
     longitude = db.Column(db.Numeric(11, 8), nullable=False)
     forecast_location = db.Column(db.Integer, db.ForeignKey('forecast_locations.id'))
     installed_solar_capacity = db.Column(db.Numeric(10, 2))
-
+    api_key = db.Column(db.String(36), unique=True, default=lambda: str(uuid.uuid4()))
+    api_status = db.Column(db.String(10), default='disabled')
 
 
     def update_installed_capacity(self):
@@ -101,7 +105,9 @@ class SolarPlant(db.Model):
     inverter_capacity = db.Column(db.Float, nullable=False)
     plant_angle = db.Column(db.Float, nullable=False)
     company = db.Column(db.String(255), nullable=False)
-    api_key = db.Column(db.String(255))
+    api_key = db.Column(db.String(36), unique=True, default=lambda: str(uuid.uuid4()))
+    api_status = db.Column(db.String(10), default='disabled')
+
 
     grid_substation_rel = db.relationship('GridSubstation', backref='solar_plants')
     feeder_rel = db.relationship('Feeder', backref='solar_plants')
