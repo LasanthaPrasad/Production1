@@ -57,6 +57,10 @@
 <script>
 
 
+let map;
+let markers = [];
+let currentInfoWindow = null;
+
 function initMap() {
     console.log("Initializing map");
     map = new google.maps.Map(document.getElementById("map"), {
