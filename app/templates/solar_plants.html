@@ -68,6 +68,14 @@ function initMap() {
         zoom: 8,
     });
 
+    const solarPanelIcon = {
+        url: "{{ url_for('static', filename='images/solar-panel-icon.png') }}",
+        scaledSize: new google.maps.Size(32, 32),  // size of the icon
+        origin: new google.maps.Point(0, 0),       // origin of the image
+        anchor: new google.maps.Point(16, 32)      // anchor point of the icon (bottom middle)
+    };
+
+
     const plants = [
         {% for plant in plants %}
         {
@@ -91,7 +99,8 @@ function initMap() {
         const marker = new google.maps.Marker({
             position: plant.position,
             map: map,
-            title: plant.title
+            title: plant.title,
+            icon: solarPanelIcon
         });
 
         const infoWindow = new google.maps.InfoWindow({
