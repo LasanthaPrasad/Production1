@@ -2,7 +2,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 from . import db
 from .models import ForecastLocation, IrradiationForecast, SolarPlant, GridSubstation, Feeder
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 
 main = Blueprint('main', __name__)
@@ -36,7 +36,7 @@ def get_plant_forecast(plant_id):
 @main.route('/api/check_forecasts/<int:location_id>')
 def check_forecasts(location_id):
 
-    now = datetime.datetime.now() #datetime.now(datetime.UTC)()
+    now = datetime.now(timezone.utc)
     three_days_later = now + timedelta(hours=1)
         
     forecasts = IrradiationForecast.query.filter(
