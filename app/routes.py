@@ -35,7 +35,19 @@ def get_plant_forecast(plant_id):
 
 @main.route('/api/check_forecasts/<int:location_id>')
 def check_forecasts(location_id):
-    forecasts = IrradiationForecast.query.filter_by(forecast_location_id=location_id).limit(5).all()
+
+    now = datetime.utcnow()
+    three_days_later = now + timedelta(days=1)
+        
+    forecasts = IrradiationForecast.query.filter(
+            IrradiationForecast.forecast_location_id == location_id,
+            IrradiationForecast.timestamp >= now,
+            IrradiationForecast.timestamp <= three_days_later
+        ).limit(100).order_by(IrradiationForecast.timestamp).all()
+
+
+
+    #forecasts = IrradiationForecast.query.filter_by(forecast_location_id=location_id).limit(100).all()
     return jsonify([{
         'timestamp': f.timestamp.isoformat(),
         'ghi': f.ghi,
@@ -48,7 +60,7 @@ def check_forecasts(location_id):
 def get_location_forecast(location_id):
     try:
         now = datetime.utcnow()
-        three_days_later = now + timedelta(days=3)
+        three_days_later = now + timedelta(days=1)
         
         forecasts = IrradiationForecast.query.filter(
             IrradiationForecast.forecast_location_id == location_id,
