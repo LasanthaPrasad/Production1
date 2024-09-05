@@ -88,8 +88,6 @@ function initMap() {
                      "Longitude: {{ location.longitude }}</p>"
            
 
-
-
         },
         {% endfor %}
     ];
@@ -102,7 +100,7 @@ function initMap() {
         });
 
         const infoWindow = new google.maps.InfoWindow({
-            content: `<h6>${location.title}</h6><button onclick="showForecast(${location.id})">Show Forecast</button>`
+            content: `<h6>${location.title}</h6><button onclick="showForecast(${location.id})">Show Forecast</button>` + {{location.content}}
         });
 
         marker.addListener("click", () => {
