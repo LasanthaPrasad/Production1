@@ -11,7 +11,7 @@ main = Blueprint('main', __name__)
 
 def calculate_plant_forecasts(plant_id):
     plant = SolarPlant.query.get(plant_id)
-    forecasts = IrradiationForecast.query.filter_by(forecast_location_id=plant.forecast_location).all()
+    forecasts = IrradiationForecast.query.filter_by(forecast_location_id=plant.forecast_location).order_by(IrradiationForecast.timestamp).all()
 
     plant_forecasts = []
     for forecast in forecasts:
