@@ -16,7 +16,7 @@ def calculate_plant_forecasts(plant_id):
     plant_forecasts = []
     for forecast in forecasts:
         # This is a simplified calculation. You might need a more complex model.
-        estimated_mw = (forecast.ghi / 1000) * plant.installed_capacity * 0.15  # Assuming 15% efficiency
+        estimated_mw = (forecast.ghi / 1000) *10* plant.installed_capacity * 0.15  # Assuming 15% efficiency
         plant_forecasts.append({
             'timestamp': forecast.timestamp,
             'estimated_mw': estimated_mw
