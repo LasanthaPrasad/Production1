@@ -36,7 +36,7 @@ def get_plant_forecast(plant_id):
 @main.route('/api/check_forecasts/<int:location_id>')
 def check_forecasts(location_id):
 
-    now = datetime.utcnow()
+    now = datetime.now(datetime.UTC)()
     three_days_later = now + timedelta(days=1)
         
     forecasts = IrradiationForecast.query.filter(
