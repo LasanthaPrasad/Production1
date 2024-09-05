@@ -224,7 +224,7 @@ def edit_grid_substation(id):
         substation.api_status=request.form['api_status']
         db.session.commit()
         flash('Grid Substation updated successfully!', 'success')
-        return redirect(url_for('grid_substations'))
+        return redirect(url_for('main.grid_substations'))
     return render_template('edit_grid_substation.html', substation=substation)
 
 @main.route('/grid_substations/<int:id>/delete', methods=['POST'])
@@ -233,7 +233,7 @@ def delete_grid_substation(id):
     db.session.delete(substation)
     db.session.commit()
     flash('Grid Substation deleted successfully!', 'success')
-    return redirect(url_for('grid_substations'))
+    return redirect(url_for('main.grid_substations'))
 
 
 
@@ -256,7 +256,7 @@ def create_feeder():
             substation.update_installed_capacity()
             
             flash('Feeder created successfully!', 'success')
-            return redirect(url_for('feeders'))
+            return redirect(url_for('main.feeders'))
         except Exception as e:
             db.session.rollback()
             flash(f'Error creating Feeder: {str(e)}', 'danger')
@@ -289,7 +289,7 @@ def edit_feeder(id):
             new_substation.update_installed_capacity()
             
             flash('Feeder updated successfully!', 'success')
-            return redirect(url_for('feeders'))
+            return redirect(url_for('main.feeders'))
         except Exception as e:
             db.session.rollback()
             flash(f'Error updating Feeder: {str(e)}', 'danger')
@@ -312,7 +312,7 @@ def delete_feeder(id):
     except Exception as e:
         db.session.rollback()
         flash(f'Error deleting Feeder: {str(e)}', 'danger')
-    return redirect(url_for('feeders'))
+    return redirect(url_for('main.feeders'))
 
 
 
@@ -372,7 +372,7 @@ def create_solar_plant():
             db.session.add(plant)
             db.session.commit()
             flash('Solar Plant created successfully!', 'success')
-            return redirect(url_for('solar_plants'))
+            return redirect(url_for('main.solar_plants'))
         except Exception as e:
             db.session.rollback()
             flash(f'Error creating Solar Plant: {str(e)}', 'danger')
@@ -400,7 +400,7 @@ def edit_solar_plant(id):
             plant.api_status = request.form['api_status']           
             db.session.commit()
             flash('Solar Plant updated successfully!', 'success')
-            return redirect(url_for('solar_plants'))
+            return redirect(url_for('main.solar_plants'))
         except Exception as e:
             db.session.rollback()
             flash(f'Error updating Solar Plant: {str(e)}', 'danger')
