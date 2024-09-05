@@ -60,7 +60,7 @@ def check_forecasts(location_id):
 def get_location_forecast(location_id):
     try:
         now = datetime.now(timezone.utc)
-        three_days_later = now + timedelta(days=3)
+        three_days_later = now + timedelta(days=1)
         
         forecasts = IrradiationForecast.query.filter(
             IrradiationForecast.forecast_location_id == location_id,
