@@ -83,8 +83,13 @@ function initMap() {
         {% for location in locations %}
         {
             position: { lat: {{ location.latitude }}, lng: {{ location.longitude }} },
-            title: "{{ location.provider_name }}",
+            title: "<h6>{{ location.provider_name }}</h6>",            
+            content: "Latitude: {{ location.latitude }}<br>" +
+                     "Longitude: {{ location.longitude }}</p>"
             id: {{ location.id }}
+
+
+
         },
         {% endfor %}
     ];
