@@ -42,7 +42,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="forecastModalLabel">3-Day Forecast</h5>
+                <h5 class="modal-title" id="forecastModalLabel">1-Day Forecast</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -65,7 +65,7 @@
 
 {% block extra_js %}
 
-<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_API_KEY&callback=initMap" async defer></script>
+
 <script>
 
 
@@ -145,6 +145,56 @@ function showForecast(locationId) {
             
             window.forecastChart = new Chart(ctx, {
                 // Your chart configuration here
+
+                type: 'line',
+                data: {
+                    labels: data.timestamps,
+                    datasets: [{
+                        label: 'GHI',
+                        data: data.ghi,
+                        borderColor: 'rgb(255, 99, 132)',
+                        tension: 0.1
+                    }, {
+                        label: 'DNI',
+                        data: data.dni,
+                        borderColor: 'rgb(54, 162, 235)',
+                        tension: 0.1
+                    }, {
+                        label: 'DHI',
+                        data: data.dhi,
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'hour',
+                                displayFormats: {
+                                    hour: 'MMM D, HH:mm'
+                                }
+                            },
+                            title: {
+                                display: true,
+                                text: 'Date/Time'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Irradiance (W/m²)'
+                            }
+                        }
+                    }
+                }
+
+
+
+
+                
             });
         })
         .catch(error => {
