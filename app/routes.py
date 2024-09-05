@@ -33,6 +33,7 @@ def get_plant_forecast(plant_id):
 
 
 
+
 @main.route('/api/check_forecasts/<int:location_id>')
 def check_forecasts(location_id):
 
