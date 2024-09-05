@@ -101,6 +101,7 @@ class SolarPlant(db.Model):
     inverter_capacity = db.Column(db.Float, nullable=False)
     plant_angle = db.Column(db.Float, nullable=False)
     company = db.Column(db.String(255), nullable=False)
+    api_key = db.Column(db.String(255))
 
     grid_substation_rel = db.relationship('GridSubstation', backref='solar_plants')
     feeder_rel = db.relationship('Feeder', backref='solar_plants')

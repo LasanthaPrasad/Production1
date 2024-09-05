@@ -13,6 +13,9 @@
             <th>Grid Substation</th>
             <th>Feeder</th>
             <th>Installed Capacity (MW)</th>
+            <th>API Key</th>
+            <th>API Status</th>
+
             <th>Actions</th>
         </tr>
     </thead>
@@ -39,10 +42,16 @@
             </td>
 
             <td>{{ plant.installed_capacity }}</td>
+            <td>{{ plant.api_key }}</td>
+            <td>{{ plant.api_status }}</td>
             <td>
                 <a href="{{ url_for('main.edit_solar_plant', id=plant.id) }}" class="btn btn-sm btn-warning">Edit</a>
                 <form action="{{ url_for('main.delete_solar_plant', id=plant.id) }}" method="POST" class="d-inline">
                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure?')">Delete</button>
+
+                </form>
+                <form action="{{ url_for('main.generate_solar_plant_api_key', id=plant.id) }}" method="post">
+                    <button type="submit" class="btn btn-sm btn-primary">Generate New API Key</button>
                 </form>
             </td>
         </tr>

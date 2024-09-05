@@ -4,9 +4,25 @@ from . import db
 from .models import ForecastLocation, IrradiationForecast, SolarPlant, GridSubstation, Feeder
 from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import joinedload
+import uuid
 
 main = Blueprint('main', __name__)
 
+@main.route('/solar_plants/<int:id>/generate_api_key', methods=['POST'])
+def generate_solar_plant_api_key(id):
+    plant = SolarPlant.query.get_or_404(id)
+    plant.api_key = str(uuid.uuid4())
+    db.session.commit()
+    flash('New API key generated for Solar Plant', 'success')
+    return redirect(url_for('main.solar_plants'))
+
+@main.route('/grid_substations/<int:id>/generate_api_key', methods=['POST'])
+def generate_grid_substation_api_key(id):
+    substation = GridSubstation.query.get_or_404(id)
+    substation.api_key = str(uuid.uuid4())
+    db.session.commit()
+    flash('New API key generated for Grid Substation', 'success')
+    return redirect(url_for('main.grid_substations'))
 
 
 def calculate_plant_forecasts(plant_id):
