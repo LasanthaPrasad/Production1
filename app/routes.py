@@ -203,7 +203,7 @@ def create_grid_substation():
             code=request.form['code'],
             latitude=float(request.form['latitude']),
             longitude=float(request.form['longitude']),
-            installed_solar_capacity=float(request.form['installed_solar_capacity'])
+            installed_solar_capacity=float(request.form['installed_solar_capacity']),
             api_status=request.form['api_status']
         )
         db.session.add(substation)
@@ -366,7 +366,7 @@ def create_solar_plant():
                 panel_capacity=float(request.form['panel_capacity']),
                 inverter_capacity=float(request.form['inverter_capacity']),
                 plant_angle=float(request.form['plant_angle']),
-                company=request.form['company']
+                company=request.form['company'],
                 api_status=request.form['api_status']
             )
             db.session.add(plant)
