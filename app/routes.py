@@ -3,7 +3,7 @@ from flask import Blueprint, render_template, request, redirect, url_for, flash,
 from . import db
 from .models import ForecastLocation, IrradiationForecast, SolarPlant, GridSubstation, Feeder
 from datetime import datetime, timedelta, timezone
-
+from sqlalchemy.orm import joinedload
 
 main = Blueprint('main', __name__)
 
@@ -310,10 +310,19 @@ def feeders():
 #    return render_template('feeders.html', feeders=feeders)
 
 
+#@main.route('/solar_plants')
+#def solar_plants():
+#   plants = SolarPlant.query.options(db.joinedload(SolarPlant.grid_substation_rel), 
+#                                      db.joinedload(SolarPlant.feeder_rel)).all()
+#    return render_template('solar_plants.html', plants=plants)
+
+
 @main.route('/solar_plants')
 def solar_plants():
-    plants = SolarPlant.query.options(db.joinedload(SolarPlant.grid_substation_rel), 
-                                      db.joinedload(SolarPlant.feeder_rel)).all()
+    plants = SolarPlant.query.options(
+        joinedload(SolarPlant.grid_substation_rel),
+        joinedload(SolarPlant.feeder_rel)
+    ).all()
     return render_template('solar_plants.html', plants=plants)
 
 # Solar Plants
@@ -392,3 +401,5 @@ def delete_solar_plant(id):
     db.session.commit()
     flash('Solar Plant deleted successfully!', 'success')
     return redirect(url_for('solar_plants'))
+
+

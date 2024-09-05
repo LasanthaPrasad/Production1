@@ -55,8 +55,11 @@
 
 {% block extra_js %}
 <script>
+
+
 function initMap() {
-    const map = new google.maps.Map(document.getElementById("map"), {
+    console.log("Initializing map");
+    map = new google.maps.Map(document.getElementById("map"), {
         center: { lat: 7.8731, lng: 80.7718 },  // Center of Sri Lanka
         zoom: 8,
     });
@@ -66,15 +69,19 @@ function initMap() {
         {
             position: { lat: {{ plant.latitude }}, lng: {{ plant.longitude }} },
             title: "{{ plant.name }}",
-            content: "<h6>{{ plant.name }}</h6>" +
-                     "<p>Capacity: {{ plant.installed_capacity }} MW<br>" +
-                     "Grid Substation: {{ plant.grid_substation_rel.namee }}<br>" +
-                     "Feeder: {{ plant.feeder_rel.name }}</p>"
+            id: {{ plant.id }},
+            details: {
+                name: "{{ plant.name }}",
+                latitude: {{ plant.latitude }},
+                longitude: {{ plant.longitude }},
+                gridSubstation: "{{ plant.grid_substation_rel.name if plant.grid_substation_rel else 'N/A' }}",
+                feeder: "{{ plant.feeder_rel.name if plant.feeder_rel else 'N/A' }}",
+                installedCapacity: {{ plant.installed_capacity }},
+                // Add any other relevant details you want to display
+            }
         },
         {% endfor %}
     ];
-
-    const infoWindow = new google.maps.InfoWindow();
 
     plants.forEach(plant => {
         const marker = new google.maps.Marker({
@@ -83,13 +90,35 @@ function initMap() {
             title: plant.title
         });
 
-        marker.addListener("click", () => {
-            infoWindow.close();
-            infoWindow.setContent(plant.content);
-            infoWindow.open(map, marker);
+        const infoWindow = new google.maps.InfoWindow({
+            content: `
+                <div>
+                    <h6>${plant.title}</h6>
+                    <p>Latitude: ${plant.details.latitude}</p>
+                    <p>Longitude: ${plant.details.longitude}</p>
+                    <p>Grid Substation: ${plant.details.gridSubstation}</p>
+                    <p>Feeder: ${plant.details.feeder}</p>
+                    <p>Installed Capacity: ${plant.details.installedCapacity} MW</p>
+                    <button onclick="showPlantDetails(${plant.id})">Show Details</button>
+                </div>
+            `
         });
+
+        marker.addListener("click", () => {
+            if (currentInfoWindow) {
+                currentInfoWindow.close();
+            }
+            infoWindow.open(map, marker);
+            currentInfoWindow = infoWindow;
+        });
+
+        markers.push(marker);
     });
 }
+
+
+
+
 
 document.addEventListener("DOMContentLoaded", initMap);
 </script>
