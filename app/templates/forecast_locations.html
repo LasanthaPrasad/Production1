@@ -144,24 +144,22 @@ function showForecast(locationId) {
             }
             
             window.forecastChart = new Chart(ctx, {
-                // Your chart configuration here
-
                 type: 'line',
                 data: {
-                    labels: data.timestamps,
+                    labels: data.timestamps.map(t => moment(t)),
                     datasets: [{
                         label: 'GHI',
-                        data: data.ghi,
+                        data: data.ghi.map((value, index) => ({x: moment(data.timestamps[index]), y: value})),
                         borderColor: 'rgb(255, 99, 132)',
                         tension: 0.1
                     }, {
                         label: 'DNI',
-                        data: data.dni,
+                        data: data.dni.map((value, index) => ({x: moment(data.timestamps[index]), y: value})),
                         borderColor: 'rgb(54, 162, 235)',
                         tension: 0.1
                     }, {
                         label: 'DHI',
-                        data: data.dhi,
+                        data: data.dhi.map((value, index) => ({x: moment(data.timestamps[index]), y: value})),
                         borderColor: 'rgb(75, 192, 192)',
                         tension: 0.1
                     }]
@@ -190,11 +188,6 @@ function showForecast(locationId) {
                         }
                     }
                 }
-
-
-
-
-                
             });
         })
         .catch(error => {
@@ -204,6 +197,9 @@ function showForecast(locationId) {
             alert('Failed to fetch forecast data. Please try again.');
         });
 }
+
+
+
 
 $(document).ready(function() {
     console.log("Document ready");
