@@ -42,8 +42,8 @@ def check_forecasts(location_id):
     forecasts = IrradiationForecast.query.filter(
             IrradiationForecast.forecast_location_id == location_id,
             IrradiationForecast.timestamp >= now,
-            IrradiationForecast.timestamp <= three_days_later
-        ).limit(100).order_by(IrradiationForecast.timestamp).all()
+            IrradiationForecast.timestamp <= now +  timedelta(hours=1)
+        ).order_by(IrradiationForecast.timestamp).all()
 
 
 
