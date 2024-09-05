@@ -133,6 +133,9 @@ def forecast_locations():
     locations = ForecastLocation.query.all()
     return render_template('forecast_locations.html', locations=locations)
 
+
+
+
 @main.route('/forecast_locations/create', methods=['GET', 'POST'])
 def create_forecast_location():
     if request.method == 'POST':
