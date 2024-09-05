@@ -204,6 +204,7 @@ def create_grid_substation():
             latitude=float(request.form['latitude']),
             longitude=float(request.form['longitude']),
             installed_solar_capacity=float(request.form['installed_solar_capacity'])
+            api_status=request.form['api_status']
         )
         db.session.add(substation)
         db.session.commit()
@@ -220,6 +221,7 @@ def edit_grid_substation(id):
         substation.latitude = float(request.form['latitude'])
         substation.longitude = float(request.form['longitude'])
         substation.installed_solar_capacity = float(request.form['installed_solar_capacity'])
+        substation.api_status=request.form['api_status']
         db.session.commit()
         flash('Grid Substation updated successfully!', 'success')
         return redirect(url_for('grid_substations'))
@@ -365,6 +367,7 @@ def create_solar_plant():
                 inverter_capacity=float(request.form['inverter_capacity']),
                 plant_angle=float(request.form['plant_angle']),
                 company=request.form['company']
+                api_status=request.form['api_status']
             )
             db.session.add(plant)
             db.session.commit()
@@ -394,6 +397,7 @@ def edit_solar_plant(id):
             plant.inverter_capacity = float(request.form['inverter_capacity'])
             plant.plant_angle = float(request.form['plant_angle'])
             plant.company = request.form['company']
+            plant.api_status = request.form['api_status']           
             db.session.commit()
             flash('Solar Plant updated successfully!', 'success')
             return redirect(url_for('solar_plants'))

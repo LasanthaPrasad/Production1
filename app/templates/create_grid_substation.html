@@ -20,9 +20,16 @@
         <input type="number" step="any" class="form-control" id="longitude" name="longitude" required>
     </div>
     <div class="form-group">
-        <label for="installed_solar_capacity">Installed Solar Capacity</label>
-        <input type="number" step="any" class="form-control" id="installed_solar_capacity" name="installed_solar_capacity" required>
+        <label for="installed_solar_capacity">Installed Solar Capacity (MW)</label>
+        <input type="number" step="0.01" class="form-control" id="installed_solar_capacity" name="installed_solar_capacity" required>
     </div>
-    <button type="submit" class="btn btn-primary">Create</button>
+    <div class="form-group">
+        <label for="api_status">API Status</label>
+        <select class="form-control" id="api_status" name="api_status" required>
+            <option value="enabled">Enabled</option>
+            <option value="disabled" selected>Disabled</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Create Grid Substation</button>
 </form>
 {% endblock %}
