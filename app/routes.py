@@ -33,29 +33,48 @@ def get_plant_forecast(plant_id):
 
 
 
+@main.route('/api/check_forecasts/<int:location_id>')
+def check_forecasts(location_id):
+    forecasts = IrradiationForecast.query.filter_by(forecast_location_id=location_id).limit(5).all()
+    return jsonify([{
+        'timestamp': f.timestamp.isoformat(),
+        'ghi': f.ghi,
+        'dni': f.dni,
+        'dhi': f.dhi
+    } for f in forecasts])
+
 
 @main.route('/api/location_forecast/<int:location_id>')
 def get_location_forecast(location_id):
-    now = datetime.utcnow()
-    three_days_later = now + timedelta(days=3)
-    
-    forecasts = IrradiationForecast.query.filter(
-        IrradiationForecast.forecast_location_id == location_id,
-        IrradiationForecast.timestamp >= now,
-        IrradiationForecast.timestamp <= three_days_later
-    ).order_by(IrradiationForecast.timestamp).all()
+    try:
+        now = datetime.utcnow()
+        three_days_later = now + timedelta(days=3)
+        
+        forecasts = IrradiationForecast.query.filter(
+            IrradiationForecast.forecast_location_id == location_id,
+            IrradiationForecast.timestamp >= now,
+            IrradiationForecast.timestamp <= three_days_later
+        ).order_by(IrradiationForecast.timestamp).all()
 
-    timestamps = [f.timestamp.isoformat() for f in forecasts]
-    ghi_values = [f.ghi for f in forecasts]
-    dni_values = [f.dni for f in forecasts]
-    dhi_values = [f.dhi for f in forecasts]
+        if not forecasts:
+            return jsonify({'error': 'No forecast data available'}), 404
 
-    return jsonify({
-        'timestamps': timestamps,
-        'ghi': ghi_values,
-        'dni': dni_values,
-        'dhi': dhi_values
-    })
+        timestamps = [f.timestamp.isoformat() for f in forecasts]
+        ghi_values = [f.ghi for f in forecasts]
+        dni_values = [f.dni for f in forecasts]
+        dhi_values = [f.dhi for f in forecasts]
+
+        return jsonify({
+            'timestamps': timestamps,
+            'ghi': ghi_values,
+            'dni': dni_values,
+            'dhi': dhi_values
+        })
+    except Exception as e:
+        print(f"Error in get_location_forecast: {str(e)}")  # Server-side logging
+        return jsonify({'error': str(e)}), 500
+
+
 
 
 
