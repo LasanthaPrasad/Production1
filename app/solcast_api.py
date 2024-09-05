@@ -28,7 +28,7 @@ def fetch_solcast_forecasts():
             if response.status_code == 200:
                 forecasts = response.json()['forecasts']
                 for forecast in forecasts:
-                    timestamp = datetime.fromisoformat(forecast['period_end'].replace('Z', '+00:00'))
+                    timestamp = datetime.fromisoformat(forecast['period_end'].replace('Z', '+05:30'))
                     
                     existing_forecast = IrradiationForecast.query.filter_by(
                         forecast_location_id=location.id,
