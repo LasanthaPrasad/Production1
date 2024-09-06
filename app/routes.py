@@ -167,6 +167,7 @@ def create_forecast_location():
         return redirect(url_for('forecast_locations'))
     return render_template('create_forecast_location.html')
 
+
 @main.route('/forecast_locations/<int:id>/edit', methods=['GET', 'POST'])
 def edit_forecast_location(id):
     location = ForecastLocation.query.get_or_404(id)
