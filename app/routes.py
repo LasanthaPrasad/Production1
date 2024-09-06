@@ -5,6 +5,7 @@ from .models import ForecastLocation, IrradiationForecast, SolarPlant, GridSubst
 from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import joinedload
 import uuid
+from .auth import require_api_key
 
 main = Blueprint('main', __name__)
 
@@ -32,7 +33,7 @@ def calculate_plant_forecasts(plant_id):
     plant_forecasts = []
     for forecast in forecasts:
         # This is a simplified calculation. You might need a more complex model.
-        estimated_mw = (forecast.ghi / 1000) *10* plant.installed_capacity * 0.15  # Assuming 15% efficiency
+        estimated_mw = (forecast.ghi / 100) *10* plant.installed_capacity * 0.15  # Assuming 15% efficiency
         plant_forecasts.append({
             'timestamp': forecast.timestamp,
             'estimated_mw': estimated_mw
@@ -42,9 +43,17 @@ def calculate_plant_forecasts(plant_id):
 
 
 @main.route('/api/plant_forecast/<int:plant_id>')
+@require_api_key
 def get_plant_forecast(plant_id):
+    plant = SolarPlant.query.get_or_404(plant_id)
+
     forecasts = calculate_plant_forecasts(plant_id)
     return jsonify(forecasts)
+
+#@main.route('/api/plant_forecast/<int:plant_id>')
+#def get_plant_forecast(plant_id):
+#    forecasts = calculate_plant_forecasts(plant_id)
+#    return jsonify(forecasts)
 
 
 
