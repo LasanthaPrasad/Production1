@@ -164,7 +164,7 @@ def create_forecast_location():
         db.session.add(location)
         db.session.commit()
         flash('Forecast Location created successfully!', 'success')
-        return redirect(url_for('forecast_locations'))
+        return redirect(url_for('main.forecast_locations'))
     return render_template('create_forecast_location.html')
 
 
@@ -177,7 +177,7 @@ def edit_forecast_location(id):
         location.longitude = float(request.form['longitude'])
         db.session.commit()
         flash('Forecast Location updated successfully!', 'success')
-        return redirect(url_for('forecast_locations'))
+        return redirect(url_for('main.forecast_locations'))
     return render_template('edit_forecast_location.html', location=location)
 
 @main.route('/forecast_locations/<int:id>/delete', methods=['POST'])
@@ -186,7 +186,7 @@ def delete_forecast_location(id):
     db.session.delete(location)
     db.session.commit()
     flash('Forecast Location deleted successfully!', 'success')
-    return redirect(url_for('forecast_locations'))
+    return redirect(url_for('main.forecast_locations'))
 
 # Grid Substations
 @main.route('/grid_substations')
@@ -210,7 +210,7 @@ def create_grid_substation():
         db.session.add(substation)
         db.session.commit()
         flash('Grid Substation created successfully!', 'success')
-        return redirect(url_for('grid_substations'))
+        return redirect(url_for('main.grid_substations'))
     return render_template('create_grid_substation.html')
 
 @main.route('/grid_substations/<int:id>/edit', methods=['GET', 'POST'])
@@ -422,6 +422,6 @@ def delete_solar_plant(id):
     db.session.delete(plant)
     db.session.commit()
     flash('Solar Plant deleted successfully!', 'success')
-    return redirect(url_for('solar_plants'))
+    return redirect(url_for('main.solar_plants'))
 
 
