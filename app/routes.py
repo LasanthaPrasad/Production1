@@ -7,6 +7,7 @@ from sqlalchemy.orm import joinedload
 import uuid
 from .auth import require_api_key
 
+
 main = Blueprint('main', __name__)
 
 @main.route('/solar_plants/<int:id>/generate_api_key', methods=['POST'])
@@ -36,34 +37,44 @@ def get_plant_forecast(plant_id):
     forecasts = calculate_plant_forecasts(plant)
     return jsonify(forecasts)
 
-def calculate_plant_forecasts(plant):
-    forecasts = IrradiationForecast.query.filter_by(forecast_location_id=plant.forecast_location).order_by(IrradiationForecast.timestamp).all()
 
-    plant_forecasts = []
-    for forecast in forecasts:
+def calculate_plant_forecasts(plant):
+        
+        now = datetime.now(timezone.utc)
+        three_days_later = now + timedelta(days=1)
+
+
+        forecasts = IrradiationForecast.query.filter_by(forecast_location_id=plant.forecast_location).filter(            
+            IrradiationForecast.timestamp >= now,
+            IrradiationForecast.timestamp <= three_days_later
+        ).order_by(IrradiationForecast.timestamp).all()
+
+
+
+
+        if not forecasts:
+            return jsonify({'error': 'No forecast data available'}), 404
+
+
+
+        plant_forecasts = []
+        for forecast in forecasts:
         # This is a simplified calculation. You might need a more complex model.
-        estimated_mw = (forecast.ghi / 100) * plant.installed_capacity * 0.15  # Assuming 15% efficiency
-        plant_forecasts.append({
+            estimated_mw = (forecast.ghi / 150) * plant.installed_capacity * 0.15  # Assuming 15% efficiency
+            plant_forecasts.append({
             'timestamp': forecast.timestamp.isoformat(),
             'estimated_mw': estimated_mw
         })
 
-    return plant_forecasts
+        return plant_forecasts
 
 
 
-
-
-
-
-
-#@main.route('/api/plant_forecast/<int:plant_id>')
-#def get_plant_forecast(plant_id):
-#    forecasts = calculate_plant_forecasts(plant_id)
-#    return jsonify(forecasts)
-
-
-
+@main.route('/api/plant_forecast/<int:plant_id>')
+def get_plant_forecast1(plant_id):
+    plant = SolarPlant.query.get_or_404(plant_id)
+    forecasts = calculate_plant_forecasts(plant)
+    return jsonify(forecasts)
 
 
 @main.route('/api/check_forecasts/<int:location_id>')
@@ -87,6 +98,7 @@ def check_forecasts(location_id):
         'dni': f.dni,
         'dhi': f.dhi
     } for f in forecasts])
+
 
 
 @main.route('/api/location_forecast/<int:location_id>')
