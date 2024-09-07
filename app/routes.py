@@ -15,10 +15,8 @@ main = Blueprint('main', __name__)
 
 
 
-@main.route('/')
-def index():
-    """Home page route"""
-    return render_template('index.html')
+
+
 
 @main.route('/profile')
 @login_required
@@ -190,19 +188,19 @@ def recalculate_all_substation_capacities():
 #    return render_template('index.html', total_mw=total_mw, total_capacity=total_capacity)
 
 
-#@main.route('/')
-#def index():
-#    total_mw = db.session.query(db.func.sum(SolarPlant.installed_capacity)).scalar() or 0
-#    total_capacity = db.session.query(db.func.sum(GridSubstation.installed_solar_capacity)).scalar() or 0
-#    forecast_locations = ForecastLocation.query.all()
+@main.route('/')
+def index():
+    total_mw = db.session.query(db.func.sum(SolarPlant.installed_capacity)).scalar() or 0
+    total_capacity = db.session.query(db.func.sum(GridSubstation.installed_solar_capacity)).scalar() or 0
+    forecast_locations = ForecastLocation.query.all()
     
     # Add this print statement for debugging
-#    print(f"Number of forecast locations: {len(forecast_locations)}")
+    print(f"Number of forecast locations: {len(forecast_locations)}")
     
-#    return render_template('index.html', 
-#                           total_mw=total_mw, 
-#                           total_capacity=total_capacity,
-#                           forecast_locations=forecast_locations)
+    return render_template('index.html', 
+                           total_mw=total_mw, 
+                           total_capacity=total_capacity,
+                           forecast_locations=forecast_locations)
 
 
 
