@@ -1,4 +1,4 @@
-from . import db
+#from . import db
 from datetime import datetime
 import uuid
 from flask_login import UserMixin
