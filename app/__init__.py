@@ -11,7 +11,7 @@ from flask_security import SQLAlchemyUserDatastore
 
 
 
-db = SQLAlchemy()
+#db = SQLAlchemy()
 scheduler = BackgroundScheduler()
 
 def create_app():
