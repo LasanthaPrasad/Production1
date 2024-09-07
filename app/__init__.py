@@ -1,10 +1,11 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from apscheduler.schedulers.background import BackgroundScheduler
-from flask_login import loginManager
-from flask_principal import Principal, Permission, RoleNeed
+
 from app.models import User
 from config import Config
+from app.extensions import db, login_manager 
+
 
 db = SQLAlchemy()
 scheduler = BackgroundScheduler()
@@ -14,7 +15,7 @@ scheduler = BackgroundScheduler()
 
 def create_app():
     app = Flask(__name__)
-    app.config.from_object('Config')
+   # app.config.from_object('Config')
     
     db.init_app(app)
     
