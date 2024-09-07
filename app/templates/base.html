@@ -19,35 +19,11 @@
 </head>
 <body>
 
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <a class="navbar-brand" href="{{ url_for('main.index') }}">GeoClipz Forecast 2.01v</a>
-        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav">
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('main.index') }}">Dashboard</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('main.solar_plants') }}">Solar Plants</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('main.grid_substations') }}">Grid Substations</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('main.feeders') }}">Feeders</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="{{ url_for('main.forecast_locations') }}">Forecast Locations</a>
-                </li>
-            </ul>
-        </div>
-    </nav>
 
 
 
-    
+
+
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
         <div class="container">
           <a class="navbar-brand" href="{{ url_for('main.index') }}">GeoClipz Forecast</a>
@@ -60,6 +36,38 @@
                 <a class="nav-link" href="{{ url_for('main.index') }}">Home</a>
               </li>
               <!-- Add other navigation items here -->
+
+              <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                <a class="navbar-brand" href="{{ url_for('main.index') }}">GeoClipz Forecast 2.01v</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.index') }}">Dashboard</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.solar_plants') }}">Solar Plants</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.grid_substations') }}">Grid Substations</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.feeders') }}">Feeders</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('main.forecast_locations') }}">Forecast Locations</a>
+                        </li>
+                    </ul>
+                </div>
+            </nav>
+
+
+
+
+
+
             </ul>
             <ul class="navbar-nav">
               {% if current_user.is_authenticated %}
