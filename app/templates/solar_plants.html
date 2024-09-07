@@ -159,13 +159,22 @@ function initMap() {
     });
 }
 
-console.log("Showing forecast for location:", locationId);
+
+
+function showForecast(plantId, plantName) {
+
+    if (currentInfoWindow) {
+        currentInfoWindow.close();
+    }
+
+    console.log("Showing forecast for location:", locationId);
     // Show modal with loading spinner
     $('#forecastModal').modal('show');
     $('#loadingSpinner').show();
     $('#forecastChart').hide();
 
-function showForecast(plantId, plantName) {
+
+
     fetch(`/api/plant_forecast/${plantId}`)
         .then(response => response.json())
         .then(data => {
