@@ -1,13 +1,48 @@
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
-from . import db
+#from . import db
 from .models import ForecastLocation, IrradiationForecast, SolarPlant, GridSubstation, Feeder
 from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import joinedload
 import uuid
 from .auth import require_api_key
+from flask_security import login_required, roles_required, current_user
+
+from .extensions import db
+
 
 main = Blueprint('main', __name__)
+
+
+
+
+
+
+
+@main.route('/')
+def index():
+    return render_template('index.html')
+
+@main.route('/profile')
+@login_required
+def profile():
+    return render_template('profile.html')
+
+@main.route('/admin')
+@roles_required('admin')
+def admin():
+    return render_template('admin.html')
+
+
+
+
+
+
+
+
+
+
+
 
 @main.route('/solar_plants/<int:id>/generate_api_key', methods=['POST'])
 def generate_solar_plant_api_key(id):

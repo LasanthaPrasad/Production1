@@ -2,9 +2,11 @@ from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask_security import Security, SQLAlchemyUserDatastore
-from .models import db, User, Role
+from .models import User, Role
 
+from .extensions import db, security
 
+from flask_security import SQLAlchemyUserDatastore
 
 
 
@@ -21,6 +23,7 @@ def create_app():
     # Setup Flask-Security
     user_datastore = SQLAlchemyUserDatastore(db, User, Role)
     security = Security(app, user_datastore)
+
 
 
 
