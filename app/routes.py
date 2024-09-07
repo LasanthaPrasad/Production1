@@ -37,7 +37,7 @@ def get_plant_forecast(plant_id):
     return jsonify(forecasts)
 
 def calculate_plant_forecasts(plant):
-    forecasts = IrradiationForecast.query.filter_by(forecast_location_id=plant.forecast_location).all()
+    forecasts = IrradiationForecast.query.filter_by(forecast_location_id=plant.forecast_location).all().sort(IrradiationForecast.timestamp)
 
     plant_forecasts = []
     for forecast in forecasts:
