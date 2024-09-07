@@ -20,3 +20,5 @@ def require_api_key(f):
         kwargs['plant_id'] = plant.id
         return f(*args, **kwargs)
     return decorated_function
+
+    
