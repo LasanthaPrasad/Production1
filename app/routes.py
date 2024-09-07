@@ -53,7 +53,7 @@ def calculate_plant_forecasts(plant):
 
 
 @main.route('/api/plant_forecast/<int:plant_id>')
-def get_plant_forecast(plant_id):
+def get_plant_forecast1(plant_id):
     plant = SolarPlant.query.get_or_404(plant_id)
     forecasts = calculate_plant_forecasts(plant)
     return jsonify(forecasts)
