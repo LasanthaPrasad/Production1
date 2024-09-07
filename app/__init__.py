@@ -10,6 +10,17 @@ from flask_security import SQLAlchemyUserDatastore
 
 
 
+from .routes import main as main_blueprint
+
+
+
+
+
+
+
+
+
+
 
 #db = SQLAlchemy()
 scheduler = BackgroundScheduler()
