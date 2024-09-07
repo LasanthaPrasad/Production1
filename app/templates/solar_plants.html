@@ -111,6 +111,8 @@ let markers = [];
 let currentInfoWindow = null;
 
 function initMap() {
+
+    loadGoogleMapsScript()
     console.log("Initializing map");
     map = new google.maps.Map(document.getElementById("map"), {
         center: { lat: 7.8731, lng: 80.7718 },  // Center of Sri Lanka
