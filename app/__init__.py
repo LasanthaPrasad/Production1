@@ -4,7 +4,7 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from flask_login import LoginManager
 from flask_principal import Principal, Permission, RoleNeed
 from app.models import User
-
+from config import Config
 
 db = SQLAlchemy()
 scheduler = BackgroundScheduler()
@@ -53,5 +53,9 @@ def create_app():
     from .routes import main as main_blueprint
     app.register_blueprint(main_blueprint)
     
+   
     return app
+
+# Import models at the end to avoid circular imports
+from app import models
 
