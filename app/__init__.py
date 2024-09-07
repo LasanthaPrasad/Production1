@@ -49,13 +49,28 @@ def create_app():
         scheduler.add_job(func=solcast_api.fetch_solcast_forecasts, trigger="interval", hours=1)
         scheduler.start()
     
-    # Import and register blueprints/routes here
-    from .routes import main as main_blueprint
+
+    from app.auth import auth as auth_blueprint
+    app.register_blueprint(auth_blueprint)
+
+    from app.main import main as main_blueprint
     app.register_blueprint(main_blueprint)
+
+
+
     
    
     return app
 
 # Import models at the end to avoid circular imports
 from app import models
+
+
+
+
+
+
+
+
+
 
