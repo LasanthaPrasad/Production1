@@ -2,6 +2,8 @@
 
 {% block content %}
 <h1>Solar Plants</h1>
+
+
 <a href="{{ url_for('main.create_solar_plant') }}" class="btn btn-primary mb-3">Create New Solar Plant</a>
 <table class="table">
     <thead>
@@ -61,12 +63,32 @@
 </table>
 
 <div id="map" style="height: 800px; width: 100%;"></div>
+
+<div class="modal fade" id="forecastModal" tabindex="-1" role="dialog" aria-labelledby="forecastModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="forecastModalLabel">Solar Plant Forecast</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <canvas id="forecastChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+
+
+
+
 {% endblock %}
 
+
 {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-
-
 let map;
 let markers = [];
 let currentInfoWindow = null;
@@ -85,7 +107,6 @@ function initMap() {
         anchor: new google.maps.Point(16, 32)      // anchor point of the icon (bottom middle)
     };
 
-
     const plants = [
         {% for plant in plants %}
         {
@@ -99,7 +120,6 @@ function initMap() {
                 gridSubstation: "{{ plant.grid_substation_rel.name if plant.grid_substation_rel else 'N/A' }}",
                 feeder: "{{ plant.feeder_rel.name if plant.feeder_rel else 'N/A' }}",
                 installedCapacity: {{ plant.installed_capacity }},
-                // Add any other relevant details you want to display
             }
         },
         {% endfor %}
@@ -122,7 +142,7 @@ function initMap() {
                     <p>Grid Substation: ${plant.details.gridSubstation}</p>
                     <p>Feeder: ${plant.details.feeder}</p>
                     <p>Installed Capacity: ${plant.details.installedCapacity} MW</p>
-                    <button onclick="showPlantDetails(${plant.id})">Show Details</button>
+                    <button onclick="showForecast(${plant.id}, '${plant.title}')">Show Forecast</button>
                 </div>
             `
         });
@@ -139,14 +159,64 @@ function initMap() {
     });
 }
 
-
-function showPlantDetails(plantId) {
-    console.log("Showing details for plant:", plantId);
-    // You can implement a modal or redirect to a detailed view page here
-    alert(`Showing details for plant ${plantId}`);
+function showForecast(plantId, plantName) {
+    fetch(`/api/plant_forecast/${plantId}`)
+        .then(response => response.json())
+        .then(data => {
+            const ctx = document.getElementById('forecastChart').getContext('2d');
+            
+            // Destroy existing chart if it exists
+            if (window.forecastChart instanceof Chart) {
+                window.forecastChart.destroy();
+            }
+            
+            window.forecastChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(d => new Date(d.timestamp).toLocaleString()),
+                    datasets: [{
+                        label: 'Forecasted MW',
+                        data: data.map(d => d.estimated_mw),
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: `Forecast for ${plantName}`
+                    },
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'hour'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Time'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Estimated MW'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            $('#forecastModal').modal('show');
+        })
+        .catch(error => {
+            console.error('Error fetching forecast data:', error);
+            alert('Failed to fetch forecast data. Please try again.');
+        });
 }
-
 
 document.addEventListener("DOMContentLoaded", initMap);
 </script>
 {% endblock %}
+
