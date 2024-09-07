@@ -28,8 +28,16 @@ def generate_grid_substation_api_key(id):
 
 
 
+
+@main.route('/api/plant_forecast')
+@require_api_key
+def get_plant_forecast(plant_id):
+    plant = SolarPlant.query.get_or_404(plant_id)
+    forecasts = calculate_plant_forecasts(plant)
+    return jsonify(forecasts)
+
 def calculate_plant_forecasts(plant):
-    forecasts = IrradiationForecast.query.filter_by(forecast_location_id=plant.forecast_location).order_by(IrradiationForecast.timestamp).all()
+    forecasts = IrradiationForecast.query.filter_by(forecast_location_id=plant.forecast_location).all()
 
     plant_forecasts = []
     for forecast in forecasts:
@@ -45,31 +53,6 @@ def calculate_plant_forecasts(plant):
 
 
 
-
-
-def calculate_plant_forecasts(plant_id):
-    plant = SolarPlant.query.get(plant_id)
-    forecasts = IrradiationForecast.query.filter_by(forecast_location_id=plant.forecast_location).order_by(IrradiationForecast.timestamp).all()
-
-    plant_forecasts = []
-    for forecast in forecasts:
-        # This is a simplified calculation. You might need a more complex model.
-        estimated_mw = (forecast.ghi / 100) *10* plant.installed_capacity * 0.15  # Assuming 15% efficiency
-        plant_forecasts.append({
-            'timestamp': forecast.timestamp,
-            'estimated_mw': estimated_mw
-        })
-
-    return plant_forecasts
-
-
-
-
-@main.route('/api/plant_forecast')
-@require_api_key
-def get_plant_forecast(plant):
-    forecasts = calculate_plant_forecasts(plant)
-    return jsonify(forecasts)
 
 
 

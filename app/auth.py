@@ -17,6 +17,6 @@ def require_api_key(f):
         if plant.api_status != 'enabled':
             return jsonify({"error": "API access is not enabled for this plant"}), 403
         
-        kwargs['plant'] = plant
+        kwargs['plant_id'] = plant.id
         return f(*args, **kwargs)
     return decorated_function
