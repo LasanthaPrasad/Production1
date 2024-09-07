@@ -45,7 +45,15 @@
         </div>
     </nav>
 
+    {% if current_user.is_authenticated %}
+    Hi {{ current_user.email }}!
+    <a href="{{ url_for_security('logout') }}">Logout</a>
+  {% else %}
+    <a href="{{ url_for_security('login') }}">Login</a>
+    <a href="{{ url_for_security('register') }}">Register</a>
+  {% endif %}
 
+  
     <div id="flash-messages">
         {% with messages = get_flashed_messages(with_categories=true) %}
             {% if messages %}
