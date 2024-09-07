@@ -147,7 +147,7 @@ function initMap() {
                     <p>Grid Substation: ${plant.details.gridSubstation}</p>
                     <p>Feeder: ${plant.details.feeder}</p>
                     <p>Installed Capacity: ${plant.details.installedCapacity} MW</p>
-                    <button onclick="showForecast(${plant.id})">Show Forecast</button>
+                    <button onclick="showForecast(${plant.id}, '${plant.title}')">Show Forecast</button>
                 </div>
             `
         });
@@ -166,13 +166,13 @@ function initMap() {
 
 
 
-function showForecast(plantId) {
+function showForecast(plantId, plantName) {
 
     if (currentInfoWindow) {
         currentInfoWindow.close();
     }
 
-    console.log("Showing forecast for plant:", plantId);
+    console.log("Showing forecast for location:", plantId);
     // Show modal with loading spinner
     $('#forecastModal').modal('show');
     $('#loadingSpinner').show();
@@ -213,7 +213,7 @@ function showForecast(plantId) {
                     responsive: true,
                     title: {
                         display: true,
-                        text: `Forecast for `
+                        text: `Forecast for ${plantName}`
                     },
                     scales: {
                         x: {
