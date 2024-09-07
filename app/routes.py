@@ -36,19 +36,7 @@ def admin():
 
 
 
-#@main.route('/')
-#def index():
-#    return render_template('index.html')
 
-@main.route('/profile')
-@login_required
-def profile():
-    return render_template('profile.html')
-
-@main.route('/admin')
-@roles_required('admin')
-def admin():
-    return render_template('admin.html')
 
 
 
