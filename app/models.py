@@ -1,10 +1,12 @@
 from . import db
 from datetime import datetime
 import uuid
-from flask_login import UserMixin
+    from flask_login import UserMixin
 from werkzeug.security import generate_password_hash, check_password_hash
+from app.extensions import db, login_manager
 
-class User(db.Model, UserMixin):
+
+class User(UserMixin, db.Model):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(64), unique=True, index=True)
     email = db.Column(db.String(120), unique=True, index=True)
@@ -17,7 +19,9 @@ class User(db.Model, UserMixin):
     def check_password(self, password):
         return check_password_hash(self.password_hash, password)
 
-
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 
 class IrradiationForecast(db.Model):
@@ -150,3 +154,5 @@ class Forecast(db.Model):
     forecast_timestamp = db.Column(db.DateTime, nullable=False)
     forecast_interval = db.Column(db.String(20))
     forecasted_mw = db.Column(db.JSON)
+
+

@@ -5,8 +5,24 @@ from flask import Blueprint, render_template, redirect, url_for, flash
 from flask_login import login_user, logout_user, login_required, current_user
 from werkzeug.urls import url_parse
 from app.models import User
-from app import db
 from app.auth import auth
+from app.extensions import db
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 auth = Blueprint('auth', __name__)
 
@@ -44,6 +60,29 @@ def register():
         flash('Congratulations, you are now a registered user!')
         return redirect(url_for('auth.login'))
     return render_template('register.html')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
