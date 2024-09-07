@@ -5,12 +5,11 @@ from app.models import SolarPlant
 def require_api_key(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        api_key = request.headers.get('X-API-Key')
+        api_key = request.args.get('api_key')
         if not api_key:
             return jsonify({"error": "No API key provided"}), 401
         
-        plant_id = kwargs.get('plant_id')
-        plant = SolarPlant.query.filter_by(id=plant_id, api_key=api_key).first()
+        plant = SolarPlant.query.filter_by(api_key=api_key).first()
         
         if not plant:
             return jsonify({"error": "Invalid API key"}), 401
@@ -18,5 +17,6 @@ def require_api_key(f):
         if plant.api_status != 'enabled':
             return jsonify({"error": "API access is not enabled for this plant"}), 403
         
+        kwargs['plant'] = plant
         return f(*args, **kwargs)
     return decorated_function
