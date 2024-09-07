@@ -70,7 +70,7 @@ def require_api_key(f):
     
 
 
-
+#this is for the create admin role
 @auth.route('/create_admin', methods=['GET', 'POST'])
 def create_admin():
     if request.method == 'POST':

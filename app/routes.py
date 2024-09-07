@@ -7,7 +7,27 @@ from sqlalchemy.orm import joinedload
 import uuid
 from .auth import require_api_key
 
+from flask_login import login_required
+from flask_principal import Permission, RoleNeed
 main = Blueprint('main', __name__)
+
+
+
+admin_permission = Permission(RoleNeed('admin'))
+
+@main.route('/admin_only')
+@login_required
+@admin_permission.require(http_exception=403)
+def admin_only():
+    return "Only admins can see this"
+
+@main.route('/user_page')
+@login_required
+def user_page():
+    return "Any logged in user can see this"
+
+
+
 
 @main.route('/solar_plants/<int:id>/generate_api_key', methods=['POST'])
 def generate_solar_plant_api_key(id):
@@ -350,10 +370,7 @@ def delete_feeder(id):
 def feeders():
     feeders = Feeder.query.options(db.joinedload(Feeder.grid_substation_rel)).all()
     return render_template('feeders.html', feeders=feeders)
-#@app.route('/feeders')
-#def feeders():
-#    feeders = Feeder.query.all()
-#    return render_template('feeders.html', feeders=feeders)
+
 
 
 #@main.route('/solar_plants')
@@ -371,11 +388,6 @@ def solar_plants():
     ).all()
     return render_template('solar_plants.html', plants=plants)
 
-# Solar Plants
-#@app.route('/solar_plants')
-#def solar_plants():
-#    plants = SolarPlant.query.all()
-#    return render_template('solar_plants.html', plants=plants)
 
 
 @main.route('/solar_plants/create', methods=['GET', 'POST'])
