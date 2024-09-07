@@ -15,6 +15,23 @@ main = Blueprint('main', __name__)
 
 
 
+@main.route('/')
+def index():
+    """Home page route"""
+    return render_template('index.html')
+
+@main.route('/profile')
+@login_required
+def profile():
+    """User profile page route"""
+    return render_template('profile.html', user=current_user)
+
+@main.route('/admin')
+@roles_required('admin')
+def admin():
+    """Admin dashboard route"""
+    # Here you might want to fetch some admin-specific data
+    return render_template('admin.html')
 
 
 
