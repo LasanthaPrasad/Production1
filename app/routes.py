@@ -1,7 +1,7 @@
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 #from . import db
-from .models import ForecastLocation, IrradiationForecast, SolarPlant, GridSubstation, Feeder, User
+from .models import ForecastLocation, IrradiationForecast, SolarPlant, GridSubstation, Feeder, User, Role
 from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import joinedload
 import uuid
@@ -44,17 +44,28 @@ def manage_users():
     users = User.query.all()
     return render_template('manage_users.html', users=users)
 
+
+
 @main.route('/change_user_role/<int:user_id>', methods=['POST'])
-#@roles_required('admin')
+@roles_required('admin')
 def change_user_role(user_id):
     user_datastore = security.datastore
     user = User.query.get_or_404(user_id)
     new_role = request.form.get('role')
     if new_role in ['user', 'moderator', 'admin']:
-        user_datastore.remove_role_from_user(user, user.roles[0])
-        user_datastore.add_role_to_user(user, new_role)
-        db.session.commit()
-        flash(f'Role updated for user {user.email}', 'success')
+        # Remove all existing roles
+        for role in user.roles:
+            user_datastore.remove_role_from_user(user, role)
+        # Add the new role
+        role = Role.query.filter_by(name=new_role).first()
+        if role:
+            user_datastore.add_role_to_user(user, role)
+            db.session.commit()
+            flash(f'Role updated for user {user.email} to {new_role}', 'success')
+        else:
+            flash(f'Role {new_role} not found', 'error')
+    else:
+        flash(f'Invalid role specified', 'error')
     return redirect(url_for('main.manage_users'))
 
 

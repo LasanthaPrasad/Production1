@@ -27,6 +27,9 @@ class User(db.Model, UserMixin):
     roles = db.relationship('Role', secondary='roles_users',
                             backref=db.backref('users', lazy='dynamic'))
 
+    def has_role(self, role_name):
+        return any(role.name == role_name for role in self.roles)
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         if self.fs_uniquifier is None:
