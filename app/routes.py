@@ -14,12 +14,11 @@ from flask_security.views import reset_password, forgot_password
 from flask_security.utils import hash_password
 
 
-from . import create_app
-
-app, user_datastore = create_app()
 
 
 from .extensions import db
+from . import user_datastore
+
 
 
 main = Blueprint('main', __name__)

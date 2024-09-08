@@ -27,7 +27,8 @@ from flask_mail import Mail
 #db = SQLAlchemy()
 scheduler = BackgroundScheduler()
 mail = Mail()
-
+security = Security()
+user_datastore = None
 
 
 def create_app():
@@ -40,25 +41,24 @@ def create_app():
     app.config['MAIL_PASSWORD'] = 'f9a943428b0cb263bd5f9fb50b2b1bfc-2b755df8-b3abe6d6'
     app.config['SECURITY_EMAIL_SENDER'] = 'sales@geoclipz.com'
     
-
+    db.init_app(app)
 
     mail.init_app(app)
     
     from .models import User, Role  # Import your User and Role models
-    user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-    security = Security(app, user_datastore)
+
     
+
+    user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+    security.init_app(app, user_datastore)
+
     from .routes import main as main_blueprint
     app.register_blueprint(main_blueprint)
 
 
 
 
-    db.init_app(app)
-    
-    # Setup Flask-Security
-    user_datastore = SQLAlchemyUserDatastore(db, User, Role)
-    security = Security(app, user_datastore)
+
 
 
 
@@ -99,5 +99,5 @@ def create_app():
     
     
 
-    return app, user_datastore
+    return app
 
