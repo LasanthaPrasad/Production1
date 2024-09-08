@@ -1,12 +1,12 @@
 
 from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
 #from . import db
-from .models import ForecastLocation, IrradiationForecast, SolarPlant, GridSubstation, Feeder
+from .models import ForecastLocation, IrradiationForecast, SolarPlant, GridSubstation, Feeder, User
 from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import joinedload
 import uuid
 from .auth import require_api_key
-from flask_security import login_required, roles_required, current_user
+from flask_security import login_required, roles_required, roles_accepted, current_user
 
 from flask import render_template, redirect, url_for, request, flash
 
@@ -23,12 +23,45 @@ from .extensions import db, security
 
 main = Blueprint('main', __name__)
 
+user_datastore = security.datastore
+
+@main.route('/view_data')
+@login_required
+def view_data():
+    # All logged in users can view this
+    return render_template('view_data.html')
+
+@main.route('/edit_data')
+@roles_accepted('moderator', 'admin')
+def edit_data():
+    # Only moderators and admins can access this
+    return render_template('edit_data.html')
+
+@main.route('/manage_users')
+@roles_required('admin')
+def manage_users():
+    # Only admins can access this
+    users = User.query.all()
+    return render_template('manage_users.html', users=users)
+
+@main.route('/change_user_role/<int:user_id>', methods=['POST'])
+@roles_required('admin')
+def change_user_role(user_id):
+    user = User.query.get_or_404(user_id)
+    new_role = request.form.get('role')
+    if new_role in ['user', 'moderator', 'admin']:
+        user_datastore.remove_role_from_user(user, user.roles[0])
+        user_datastore.add_role_to_user(user, new_role)
+        db.session.commit()
+        flash(f'Role updated for user {user.email}', 'success')
+    return redirect(url_for('main.manage_users'))
+
 
 
 
 
 def init_routes(app):
-    user_datastore = security.datastore
+
 
     @app.route('/reset', methods=['GET', 'POST'])
     def reset():
