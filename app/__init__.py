@@ -35,7 +35,8 @@ def create_app():
     user_datastore = SQLAlchemyUserDatastore(db, User, Role)
     security = Security(app, user_datastore)
 
-
+    # In your config
+    SECURITY_RECOVERABLE = True
 
 
 
