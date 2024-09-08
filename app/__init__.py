@@ -37,12 +37,12 @@ scheduler = BackgroundScheduler()
 def create_app():
     app = Flask(__name__)
     app.config.from_object('config.Config')
-    app.config['MAIL_SERVER'] = 'smtp.mailgun.org'
+    app.config['MAIL_SERVER'] = 'smtp.cloudmta.net'
     app.config['MAIL_PORT'] = 587
     app.config['MAIL_USE_TLS'] = True
-    app.config['MAIL_USERNAME'] = 'postmaster@sandbox9a55f0d19a734d3b8d7dffb6eacee8e7.mailgun.org'
-    app.config['MAIL_PASSWORD'] = 'f9a943428b0cb263bd5f9fb50b2b1bfc-2b755df8-b3abe6d6'
-    app.config['SECURITY_EMAIL_SENDER'] = 'sales@geoclipz.com'
+    app.config['MAIL_USERNAME'] = '419506dea731b2f9'
+    app.config['MAIL_PASSWORD'] = 'hTaBwGSQbfNVdin9WrdeMJnt'
+    app.config['SECURITY_EMAIL_SENDER'] = 'sales@abc.com'
     
     db.init_app(app)
 
@@ -55,6 +55,13 @@ def create_app():
     user_datastore = SQLAlchemyUserDatastore(db, User, Role)
     security.init_app(app, user_datastore)
 
+    @app.before_first_request
+    def create_user():
+        db.create_all()
+        user_datastore.find_or_create_role(name='user', description='Regular user')
+        user_datastore.find_or_create_role(name='moderator', description='Moderator')
+        user_datastore.find_or_create_role(name='admin', description='Administrator')
+        db.session.commit()
 
 
     with app.app_context():
