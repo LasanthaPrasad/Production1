@@ -41,7 +41,7 @@
                     {{ current_user.email }}
                   </a>
                   <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                    <li><a class="dropdown-item" href="{{ url_for('main.index') }}">Profile</a></li>
+                    <li><a class="dropdown-item" href="{{ url_for_security('profile') }}">Profile</a></li>
                     {% if current_user.has_role('admin') %}
                       <li><a class="dropdown-item" href="{{ url_for('main.admin') }}">Admin</a></li>
                     {% endif %}
