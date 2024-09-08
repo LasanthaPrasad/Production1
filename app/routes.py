@@ -12,9 +12,11 @@ from flask import render_template, redirect, url_for, request, flash
 
 from flask_security.views import reset_password, forgot_password
 from flask_security.utils import hash_password
-from app import user_datastore  # Import your app and user_datastore
 
 
+from . import create_app
+
+app, user_datastore = create_app()
 
 
 from .extensions import db

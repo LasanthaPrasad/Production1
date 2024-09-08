@@ -18,3 +18,5 @@ class Config:
     SECURITY_UNAUTHORIZED_VIEW = None
     SECURITY_RECOVERABLE = True
     SECURITY_RESET_PASSWORD_WITHIN = '5 days'  # User has 5 days to reset password
+
+    
