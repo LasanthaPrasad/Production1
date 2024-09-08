@@ -40,10 +40,15 @@ class User(db.Model, UserMixin):
         if self.fs_uniquifier is None:
             self.fs_uniquifier = str(uuid.uuid4())
 
-roles_users = db.Table('roles_users',
-    db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
-    db.Column('role_id', db.Integer, db.ForeignKey('role.id'), primary_key=True)
-)
+    roles_users = db.Table('roles_users',
+        db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
+        db.Column('role_id', db.Integer, db.ForeignKey('role.id'), primary_key=True)
+    )
+    
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
 
 
 class IrradiationForecast(db.Model):
