@@ -34,6 +34,9 @@ class User(db.Model, UserMixin):
         super().__init__(*args, **kwargs)
         if self.fs_uniquifier is None:
             self.fs_uniquifier = str(uuid.uuid4())
+            
+    active = db.Column(db.Boolean(), default=True)
+
 
 roles_users = db.Table('roles_users',
     db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),

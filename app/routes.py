@@ -1,5 +1,5 @@
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, current_app
 #from . import db
 from .models import ForecastLocation, IrradiationForecast, SolarPlant, GridSubstation, Feeder, User, Role
 from datetime import datetime, timedelta, timezone
@@ -16,7 +16,8 @@ from flask_security.utils import hash_password
 
 
 from .extensions import db, security
-
+import string
+import random
 
 
 
@@ -46,6 +47,36 @@ def manage_users():
 
 
 
+
+
+
+
+
+
+@main.route('/toggle_user_status/<int:user_id>', methods=['POST'])
+@roles_required('admin')
+def toggle_user_status(user_id):
+    user = User.query.get_or_404(user_id)
+    user.active = not user.active
+    db.session.commit()
+    status = 'activated' if user.active else 'deactivated'
+    flash(f'User {user.email} has been {status}', 'success')
+    return redirect(url_for('main.manage_users'))
+
+@main.route('/reset_user_password/<int:user_id>', methods=['POST'])
+@roles_required('admin')
+def reset_user_password(user_id):
+    user = User.query.get_or_404(user_id)
+    new_password = ''.join(random.choices(string.ascii_letters + string.digits, k=12))
+    user.password = hash_password(new_password)
+    db.session.commit()
+    
+    # Here you would typically send an email to the user with their new password
+    # For this example, we'll just flash it (not secure for production!)
+    flash(f'Password for {user.email} has been reset. New password: {new_password}', 'success')
+    return redirect(url_for('main.manage_users'))
+
+# Update the existing change_user_role function
 @main.route('/change_user_role/<int:user_id>', methods=['POST'])
 @roles_required('admin')
 def change_user_role(user_id):
@@ -67,6 +98,17 @@ def change_user_role(user_id):
     else:
         flash(f'Invalid role specified', 'error')
     return redirect(url_for('main.manage_users'))
+
+
+
+
+
+
+
+
+
+
+
 
 
 
