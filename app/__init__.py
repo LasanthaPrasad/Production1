@@ -28,7 +28,7 @@ from flask_mail import Mail
 scheduler = BackgroundScheduler()
 mail = Mail()
 security = Security()
-user_datastore = None
+#user_datastore = None
 
 
 def create_app():
@@ -48,7 +48,7 @@ def create_app():
     from .models import User, Role  # Import your User and Role models
 
     
-    
+
 
     user_datastore = SQLAlchemyUserDatastore(db, User, Role)
     security.init_app(app, user_datastore)
@@ -70,14 +70,14 @@ def create_app():
         db.create_all()  # Create tables if they don't exist
         
  #       # Create roles
- #       user_role = user_datastore.find_or_create_role(name='user', description='Regular user')
- #       admin_role = user_datastore.find_or_create_role(name='admin', description='Administrator')
+        user_role = user_datastore.find_or_create_role(name='user', description='Regular user')
+        admin_role = user_datastore.find_or_create_role(name='admin', description='Administrator')
         
         # Create users
- #       if not user_datastore.get_user('praasad@geoclipz.com'):
- #           user_datastore.create_user(email='praasad@geoclipz.com', password='admin', roles=[admin_role])
- #       if not user_datastore.get_user('ee.prasad@gmail.com'):
- #           user_datastore.create_user(email='ee.prasad@gmail.com', password='userq', roles=[user_role])
+        if not user_datastore.get_user('praasad@geoclipz.com'):
+            user_datastore.create_user(email='praasad@geoclipz.com', password='admin', roles=[admin_role])
+        if not user_datastore.get_user('ee.prasad@gmail.com'):
+            user_datastore.create_user(email='ee.prasad@gmail.com', password='userq', roles=[user_role])
         
 
 
