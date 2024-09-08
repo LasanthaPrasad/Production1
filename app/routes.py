@@ -23,7 +23,7 @@ from .extensions import db, security
 
 main = Blueprint('main', __name__)
 
-user_datastore = security.datastore
+
 
 @main.route('/view_data')
 @login_required
@@ -47,6 +47,7 @@ def manage_users():
 @main.route('/change_user_role/<int:user_id>', methods=['POST'])
 @roles_required('admin')
 def change_user_role(user_id):
+    user_datastore = security.datastore
     user = User.query.get_or_404(user_id)
     new_role = request.form.get('role')
     if new_role in ['user', 'moderator', 'admin']:
@@ -61,7 +62,7 @@ def change_user_role(user_id):
 
 
 def init_routes(app):
-
+    user_datastore = security.datastore
 
     @app.route('/reset', methods=['GET', 'POST'])
     def reset():
