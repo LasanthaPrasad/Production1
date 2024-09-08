@@ -1,5 +1,5 @@
 from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+
 from apscheduler.schedulers.background import BackgroundScheduler
 from flask_security import Security, SQLAlchemyUserDatastore
 from .models import User, Role
@@ -16,6 +16,10 @@ from flask_mail import Mail
 
 
 
+from flask_security import SQLAlchemyUserDatastore
+from .extensions import db, security, mail
+from .models import User, Role  # Make sure this import is correct
+
 
 
 
@@ -26,8 +30,7 @@ from flask_mail import Mail
 
 #db = SQLAlchemy()
 scheduler = BackgroundScheduler()
-mail = Mail()
-security = Security()
+
 #user_datastore = None
 
 
@@ -49,19 +52,8 @@ def create_app():
 
     
 
-
     user_datastore = SQLAlchemyUserDatastore(db, User, Role)
     security.init_app(app, user_datastore)
-
-    from .routes import main as main_blueprint
-    app.register_blueprint(main_blueprint)
-
-
-
-
-
-
-
 
 
 

@@ -15,37 +15,88 @@ from flask_security.utils import hash_password
 
 
 
+from .extensions import db, security
 
-from .extensions import db
-from . import user_datastore
+
 
 
 
 main = Blueprint('main', __name__)
 
 
-# Route for requesting a password reset
-@main.route('/reset', methods=['GET', 'POST'])
-def reset():
-    return forgot_password()
 
-# Route for resetting the password
-@main.route('/reset/<token>', methods=['GET', 'POST'])
-def reset_with_token(token):
-    return reset_password(token)
 
-# Custom route for password change (optional, for logged-in users)
-@main.route('/change-password', methods=['GET', 'POST'])
-@login_required
-def change_password():
-    if request.method == 'POST':
-        password = request.form.get('password')
-        if password:
-            current_user.password = hash_password(password)
-            user_datastore.put(current_user)
-            flash('Password updated successfully.', 'success')
-            return redirect(url_for('profile'))
-    return render_template('change_password.html')
+
+def init_routes(app):
+    user_datastore = security.datastore
+
+    @app.route('/reset', methods=['GET', 'POST'])
+    def reset():
+        return security.forgot_password_view()
+
+    @app.route('/reset/<token>', methods=['GET', 'POST'])
+    def reset_with_token(token):
+        return security.reset_password_view(token)
+
+    @app.route('/change-password', methods=['GET', 'POST'])
+    @login_required
+    def change_password():
+        if request.method == 'POST':
+            password = request.form.get('password')
+            if password:
+                current_user.password = hash_password(password)
+                user_datastore.put(current_user)
+                db.session.commit()
+                flash('Password updated successfully.', 'success')
+                return redirect(url_for('profile'))
+        return render_template('change_password.html')
+
+
+
+def init_app(app):
+    init_routes(app)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

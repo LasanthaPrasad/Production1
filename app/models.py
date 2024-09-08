@@ -1,10 +1,9 @@
 #from . import db
 from datetime import datetime
 import uuid
-from flask_sqlalchemy import SQLAlchemy
 from flask_security import UserMixin, RoleMixin
 from .extensions import db
-from flask_security import UserMixin, RoleMixin
+
 
 #db = SQLAlchemy()
 
