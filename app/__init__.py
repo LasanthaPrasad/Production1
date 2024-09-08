@@ -20,6 +20,7 @@ from flask_security import SQLAlchemyUserDatastore
 from .extensions import db, security, mail
 from .models import User, Role  # Make sure this import is correct
 
+from .forms import ExtendedRegisterForm
 
 
 
@@ -54,7 +55,9 @@ def create_app():
 
     user_datastore = SQLAlchemyUserDatastore(db, User, Role)
     security.init_app(app, user_datastore)
-
+   
+    #security = Security(app, user_datastore,
+    #                register_form=ExtendedRegisterForm)
 
 
     with app.app_context():

@@ -18,12 +18,22 @@ from flask_security.utils import hash_password
 from .extensions import db, security
 
 
+from .forms import EditProfileForm
 
 
 
 main = Blueprint('main', __name__)
 
-
+@main.route('/edit_profile', methods=['GET', 'POST'])
+@login_required
+def edit_profile():
+    form = EditProfileForm(obj=current_user)
+    if form.validate_on_submit():
+        form.populate_obj(current_user)
+        db.session.commit()
+        flash('Your profile has been updated.')
+        return redirect(url_for('profile'))
+    return render_template('edit_profile.html', form=form)
 
 
 

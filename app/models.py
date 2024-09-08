@@ -24,6 +24,14 @@ class User(db.Model, UserMixin):
     active = db.Column(db.Boolean())
     confirmed_at = db.Column(db.DateTime, default=datetime.utcnow)
     fs_uniquifier = db.Column(db.String(255), unique=True, nullable=False)
+
+    first_name = db.Column(db.String(100))
+    last_name = db.Column(db.String(100))
+    company = db.Column(db.String(255))
+    designation = db.Column(db.String(255))
+    phone_number = db.Column(db.String(20))
+
+
     roles = db.relationship('Role', secondary='roles_users',
                             backref=db.backref('users', lazy='dynamic'))
 
