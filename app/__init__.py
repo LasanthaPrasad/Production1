@@ -43,7 +43,13 @@ def create_app():
     app.config['MAIL_USERNAME'] = '419506dea731b2f9'
     app.config['MAIL_PASSWORD'] = 'hTaBwGSQbfNVdin9WrdeMJnt'
     app.config['SECURITY_EMAIL_SENDER'] = 'sales@abc.com'
-    
+    app.config['SECURITY_EMAIL_TEMPLATES'] = 'security/email'
+    app.config['SECURITY_EMAIL_SUBJECT_PASSWORD_RESET'] = 'GeoClipz Password Reset Instructions'
+    app.config['SECURITY_LOGIN_USER_TEMPLATE'] = 'security/login_user.html'
+    app.config['SECURITY_REGISTER_USER_TEMPLATE'] = 'security/register_user.html'
+    app.config['SECURITY_FORGOT_PASSWORD_TEMPLATE'] = 'security/forgot_password.html'
+    app.config['SECURITY_RESET_PASSWORD_TEMPLATE'] = 'security/reset_password.html'
+
     db.init_app(app)
 
     mail.init_app(app)
