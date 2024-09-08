@@ -7,7 +7,15 @@ from sqlalchemy.orm import joinedload
 import uuid
 from .auth import require_api_key
 from flask_security import login_required, roles_required, current_user
-from flask_security.views import forgot_password as security_forgot_password
+
+from flask import render_template, redirect, url_for, request, flash
+
+from flask_security.views import reset_password, forgot_password
+from flask_security.utils import hash_password
+from app import user_datastore  # Import your app and user_datastore
+
+
+
 
 from .extensions import db
 
@@ -16,12 +24,34 @@ main = Blueprint('main', __name__)
 
 
 
+# Route for requesting a password reset
+@main.route('/reset', methods=['GET', 'POST'])
+def reset():
+    return forgot_password()
+
+# Route for resetting the password
+@main.route('/reset/<token>', methods=['GET', 'POST'])
+def reset_with_token(token):
+    return reset_password(token)
+
+# Custom route for password change (optional, for logged-in users)
+@main.route('/change-password', methods=['GET', 'POST'])
+@login_required
+def change_password():
+    if request.method == 'POST':
+        password = request.form.get('password')
+        if password:
+            current_user.password = hash_password(password)
+            user_datastore.put(current_user)
+            flash('Password updated successfully.', 'success')
+            return redirect(url_for('profile'))
+    return render_template('change_password.html')
 
 
 
-@main.route('/forgot-password', endpoint='security_forgot_password')
-def forgot_password():
-    return security_forgot_password()
+#@main.route('/forgot-password', endpoint='security_forgot_password')
+#def forgot_password():
+#    return security_forgot_password()
 
 
 

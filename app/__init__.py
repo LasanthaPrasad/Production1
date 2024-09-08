@@ -11,6 +11,8 @@ from flask_security import SQLAlchemyUserDatastore
 
 
 from .routes import main as main_blueprint
+from flask_mail import Mail
+
 
 
 
@@ -28,15 +30,24 @@ scheduler = BackgroundScheduler()
 def create_app():
     app = Flask(__name__)
     app.config.from_object('config.Config')
+    app.config['MAIL_SERVER'] = 'smtp.mailgun.org'
+    app.config['MAIL_PORT'] = 587
+    app.config['MAIL_USE_TLS'] = True
+    app.config['MAIL_USERNAME'] = 'postmaster@sandbox9a55f0d19a734d3b8d7dffb6eacee8e7.mailgun.org'
+    app.config['MAIL_PASSWORD'] = 'f9a943428b0cb263bd5f9fb50b2b1bfc-2b755df8-b3abe6d6'
+    app.config['SECURITY_EMAIL_SENDER'] = 'sales@geoclipz.com'
     
+    mail = Mail(app)
+
+
+
     db.init_app(app)
     
     # Setup Flask-Security
     user_datastore = SQLAlchemyUserDatastore(db, User, Role)
     security = Security(app, user_datastore)
 
-    # In your config
-    SECURITY_RECOVERABLE = True
+
 
 
 
