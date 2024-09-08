@@ -19,7 +19,7 @@ main = Blueprint('main', __name__)
 
 
 
-@main.route('/forgot-password', endpoint='security.forgot_password')
+@main.route('/forgot-password', endpoint='forgot_password')
 def forgot_password():
     return security_forgot_password()
 
