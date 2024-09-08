@@ -48,6 +48,7 @@ def create_app():
     from .models import User, Role  # Import your User and Role models
 
     
+    
 
     user_datastore = SQLAlchemyUserDatastore(db, User, Role)
     security.init_app(app, user_datastore)
