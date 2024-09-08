@@ -7,6 +7,7 @@ from sqlalchemy.orm import joinedload
 import uuid
 from .auth import require_api_key
 from flask_security import login_required, roles_required, current_user
+from flask_security.views import forgot_password as security_forgot_password
 
 from .extensions import db
 
@@ -15,6 +16,12 @@ main = Blueprint('main', __name__)
 
 
 
+
+
+
+@main.route('/forgot-password', endpoint='security.forgot_password')
+def forgot_password():
+    return security_forgot_password()
 
 
 
