@@ -23,7 +23,6 @@ from .extensions import db
 main = Blueprint('main', __name__)
 
 
-
 # Route for requesting a password reset
 @main.route('/reset', methods=['GET', 'POST'])
 def reset():
