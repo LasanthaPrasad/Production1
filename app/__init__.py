@@ -77,10 +77,10 @@ def create_app():
         from . import solcast_api
         
         # Fetch forecasts on startup
-        if solcast_api.fetch_solcast_forecasts():
-            print("Initial forecast fetch successful")
-        else:
-            print("Initial forecast fetch failed")
+#        if solcast_api.fetch_solcast_forecasts():
+#            print("Initial forecast fetch successful")
+#        else:
+#            print("Initial forecast fetch failed")
         
         # Set up scheduler for periodic updates
         scheduler.add_job(func=solcast_api.fetch_solcast_forecasts, trigger="interval", hours=1)
