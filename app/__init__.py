@@ -55,13 +55,13 @@ def create_app():
     user_datastore = SQLAlchemyUserDatastore(db, User, Role)
     security.init_app(app, user_datastore)
 
-    @app.before_first_request
-    def create_user():
-        db.create_all()
-        user_datastore.find_or_create_role(name='user', description='Regular user')
-        user_datastore.find_or_create_role(name='moderator', description='Moderator')
-        user_datastore.find_or_create_role(name='admin', description='Administrator')
-        db.session.commit()
+    #@app.before_first_request
+    #def create_user():
+    #    db.create_all()
+    #    user_datastore.find_or_create_role(name='user', description='Regular user')
+    #    user_datastore.find_or_create_role(name='moderator', description='Moderator')
+    #    user_datastore.find_or_create_role(name='admin', description='Administrator')
+    #    db.session.commit()
 
 
     with app.app_context():
