@@ -1,6 +1,18 @@
 function initMap() {
-    var map = new google.maps.Map(document.getElementById('map'), {
+
+    var mapOptions = {
         zoom: 7,
+        center: { lat: 7.873054, lng: 80.771797 }
+    };
+
+    if (window.innerWidth <= 768) {
+        mapOptions.zoom = 6;
+    }
+
+
+
+    var map = new google.maps.Map(document.getElementById('map'), {
+        mapOptions,
         center: { lat: 7.873054, lng: 80.771797 }
     });
 

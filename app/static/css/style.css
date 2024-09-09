@@ -130,3 +130,72 @@ body {
 @keyframes spinner-border {
     to { transform: rotate(360deg); }
 }
+
+
+@media (max-width: 768px) {
+    .container {
+        padding: 10px;
+    }
+
+    .navbar-nav {
+        flex-direction: column;
+    }
+
+    .navbar-nav .nav-link {
+        margin-right: 0;
+        margin-bottom: 10px;
+    }
+
+    .table {
+        font-size: 14px;
+    }
+
+    .table th, .table td {
+        padding: 8px 10px;
+    }
+
+    .btn {
+        font-size: 14px;
+        padding: 6px 12px;
+    }
+}
+
+@media (max-width: 576px) {
+    .navbar-brand {
+        font-size: 20px;
+    }
+
+    .table {
+        font-size: 12px;
+    }
+
+    .table th, .table td {
+        padding: 6px 8px;
+    }
+
+    .form-control {
+        font-size: 14px;
+    }
+
+    .btn {
+        font-size: 12px;
+        padding: 5px 10px;
+    }
+}
+
+#map {
+    width: 100%;
+    height: 400px;
+}
+
+@media (max-width: 768px) {
+    #map {
+        height: 300px;
+    }
+}
+
+@media (max-width: 576px) {
+    #map {
+        height: 250px;
+    }
+}
