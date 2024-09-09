@@ -254,6 +254,16 @@ function showForecast(plantId, plantName) {
 }
 
 document.addEventListener("DOMContentLoaded", initMap);
+document.addEventListener('click', function(event) {
+    // Check if the clicked element is a close button inside a modal
+    if (event.target.matches('.modal .btn-close') || event.target.matches('.modal .close')) {
+        var modal = event.target.closest('.modal');
+        var modalInstance = bootstrap.Modal.getInstance(modal);
+        if (modalInstance) {
+            modalInstance.hide();
+        }
+    }
+});
 </script>
 {% endblock %}
 
