@@ -42,7 +42,7 @@ def create_app():
     app.config['MAIL_USE_TLS'] = True
     app.config['MAIL_USERNAME'] = '419506dea731b2f9'
     app.config['MAIL_PASSWORD'] = 'hTaBwGSQbfNVdin9WrdeMJnt'
-    app.config['SECURITY_EMAIL_SENDER'] = 'sales@abc.com'
+    app.config['SECURITY_EMAIL_SENDER'] = 'no_reply@geoclipz.com'
     app.config['SECURITY_EMAIL_TEMPLATES'] = 'security/email'
     app.config['SECURITY_EMAIL_SUBJECT_PASSWORD_RESET'] = 'GeoClipz Password Reset Instructions'
     app.config['SECURITY_LOGIN_USER_TEMPLATE'] = 'security/login_user.html'
