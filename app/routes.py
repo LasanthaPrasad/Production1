@@ -564,17 +564,7 @@ def delete_feeder(id):
 def feeders():
     feeders = Feeder.query.options(db.joinedload(Feeder.grid_substation_rel)).all()
     return render_template('feeders.html', feeders=feeders)
-#@app.route('/feeders')
-#def feeders():
-#    feeders = Feeder.query.all()
-#    return render_template('feeders.html', feeders=feeders)
 
-
-#@main.route('/solar_plants')
-#def solar_plants():
-#   plants = SolarPlant.query.options(db.joinedload(SolarPlant.grid_substation_rel), 
-#                                      db.joinedload(SolarPlant.feeder_rel)).all()
-#    return render_template('solar_plants.html', plants=plants)
 
 
 @main.route('/solar_plants')
