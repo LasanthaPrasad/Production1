@@ -10,7 +10,6 @@ class ForecastService:
         self.providers = {
             'solcast': SolcastProvider(),
             'visualcrossing': VisualCrossingProvider(),
-            # 'openweather': OpenWeatherProvider() will be added later
         }
 
     def fetch_forecasts(self, location):
@@ -37,11 +36,10 @@ class ForecastService:
                     forecast.forecast_location_id = location.id
                     db.session.add(forecast)
                 
+                db.session.commit()
                 logger.info(f"Updated forecasts for location {location.id}")
             except Exception as e:
-                logger.error(f"Error updating forecasts for location {location.id}: {str(e)}")
                 db.session.rollback()
-            else:
-                db.session.commit()
+                logger.error(f"Error updating forecasts for location {location.id}: {str(e)}")
         
         logger.info("Forecast update complete")
