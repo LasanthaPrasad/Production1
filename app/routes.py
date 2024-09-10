@@ -16,7 +16,7 @@ from flask_security.utils import hash_password
 from flask_wtf import FlaskForm
 from wtforms import StringField, FloatField, SelectField
 from wtforms.validators import DataRequired, NumberRange
-from config import FORECAST_PROVIDERS  # or from wherever you defined the providers
+from forecast_providers import FORECAST_PROVIDERS  # or from wherever you defined the providers
 
 
 
