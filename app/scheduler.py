@@ -40,6 +40,7 @@ def start_scheduler():
 
     )
     
+    
     scheduler.start()
     print("Initial forecast fetch successful")
     logger.info("Scheduler started")
