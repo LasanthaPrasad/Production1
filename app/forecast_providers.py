@@ -9,6 +9,14 @@ SOLCAST_BASE_URL = 'https://api.solcast.com.au/world_radiation/forecasts'
 
 
 
+
+
+
+
+
+
+
+
 class BaseForecastProvider(ABC):
     @abstractmethod
     def fetch_forecast(self, location):
