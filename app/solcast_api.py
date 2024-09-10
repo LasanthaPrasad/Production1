@@ -1,4 +1,4 @@
-import os
+""" import os
 import requests
 from datetime import datetime
 from . import db
@@ -61,4 +61,4 @@ def fetch_solcast_forecasts():
         return True
     except Exception as e:
         print(f"Error updating forecasts: {str(e)}")
-        return False
+        return False """

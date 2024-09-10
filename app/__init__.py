@@ -1,6 +1,6 @@
 from flask import Flask
 
-from apscheduler.schedulers.background import BackgroundScheduler
+##from apscheduler.schedulers.background import BackgroundScheduler
 from flask_security import Security, SQLAlchemyUserDatastore
 from .models import User, Role
 
@@ -22,14 +22,14 @@ from .models import User, Role  # Make sure this import is correct
 
 
 
-
-
-
+from .extensions import db
+from .models import ForecastLocation
+from .scheduler import start_scheduler
 
 
 
 #db = SQLAlchemy()
-scheduler = BackgroundScheduler()
+##scheduler = BackgroundScheduler()
 
 #user_datastore = None
 
@@ -84,24 +84,13 @@ def create_app():
   #      if not user_datastore.get_user('ee.prasad@gmail.com'):
    #         user_datastore.create_user(email='ee.prasad@gmail.com', password='userq', roles=[user_role])
         
+        # Start the scheduler
+        start_scheduler()
 
-
-
-        from . import solcast_api
         
-        # Fetch forecasts on startup
-#        if solcast_api.fetch_solcast_forecasts():
-#            print("Initial forecast fetch successful")
-#        else:
-#            print("Initial forecast fetch failed")
-        
-        # Set up scheduler for periodic updates
-        scheduler.add_job(func=solcast_api.fetch_solcast_forecasts, trigger="interval", hours=1)
-        scheduler.start()
-    
-    # Import and register blueprints/routes here
-    from .routes import main as main_blueprint
-    app.register_blueprint(main_blueprint)
+        # Import and register blueprints/routes here
+        from .routes import main as main_blueprint
+        app.register_blueprint(main_blueprint)
     
     
 
