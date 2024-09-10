@@ -16,9 +16,14 @@ from flask_security.utils import hash_password
 from flask_wtf import FlaskForm
 from wtforms import StringField, FloatField, SelectField
 from wtforms.validators import DataRequired, NumberRange
-from forecast_providers import FORECAST_PROVIDERS  # or from wherever you defined the providers
+#from config import FORECAST_PROVIDERS  # or from wherever you defined the providers
 
-
+    # config.py or a new file like providers.py
+FORECAST_PROVIDERS = [
+    ('solcast', 'Solcast'),
+    ('visualcrossing', 'Visual Crossing'),
+    #('openweather', 'OpenWeather')
+    ]
 
 from .extensions import db, security
 import string
@@ -388,7 +393,6 @@ def edit_forecast_location(id):
         flash('Forecast location updated successfully', 'success')
         return redirect(url_for('main.forecast_locations'))
     return render_template('edit_forecast_location.html', form=form, location=location)
-
 
 
 
