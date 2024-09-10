@@ -3,10 +3,8 @@ from logging.handlers import RotatingFileHandler
 import os
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
-from app.models import ForecastLocation
-from app.forecast_providers import SolcastProvider, VisualCrossingProvider
-from app import db
 from flask import current_app
+from .forecast_service import ForecastService
 
 # Set up logging
 logger = logging.getLogger('forecast_updater')
@@ -25,34 +23,12 @@ logger.addHandler(file_handler)
 def update_forecast_locations():
     with current_app.app_context():
         logger.info("Starting forecast update process")
-        locations = ForecastLocation.query.all()
-        providers = {
-            'solcast': SolcastProvider(),
-            'visualcrossing': VisualCrossingProvider(),
-            # Add other providers here as needed
-        }
-
-        for location in locations:
-            provider = providers.get(location.provider_name.lower())
-            if provider:
-                try:
-                    data = provider.fetch_forecast(location)
-                    forecasts = provider.parse_forecast(data)
-                    
-                    # Clear existing forecasts for this location
-                    location.irradiation_forecasts.delete()
-                    
-                    # Add new forecasts
-                    for forecast in forecasts:
-                        forecast.forecast_location_id = location.id
-                        db.session.add(forecast)
-                    
-                    logger.info(f"Updated forecasts for location {location.id} ({location.provider_name})")
-                except Exception as e:
-                    logger.error(f"Error updating forecasts for location {location.id} ({location.provider_name}): {str(e)}")
-        
-        db.session.commit()
-        logger.info("Forecast update process completed")
+        forecast_service = ForecastService()
+        try:
+            forecast_service.update_forecasts()
+            logger.info("Forecast update process completed successfully")
+        except Exception as e:
+            logger.error(f"Error in forecast update process: {str(e)}")
 
 def start_scheduler():
     scheduler = BackgroundScheduler()
@@ -60,7 +36,7 @@ def start_scheduler():
     # Schedule the job to run every hour
     scheduler.add_job(
         func=update_forecast_locations,
-        trigger=CronTrigger(hour="*/1"),
+        trigger=CronTrigger(hour="*/1"),  # Run every hour
         id="update_forecasts",
         name="Update forecast locations every hour",
         replace_existing=True,
@@ -77,3 +53,7 @@ def start_scheduler():
     
     scheduler.start()
     logger.info("Scheduler started")
+
+def init_app(app):
+    with app.app_context():
+        start_scheduler()

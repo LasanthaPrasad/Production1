@@ -26,7 +26,7 @@ from .extensions import db
 from .models import ForecastLocation
 from .scheduler import start_scheduler
 
-
+from .scheduler import init_app as init_scheduler
 
 #db = SQLAlchemy()
 ##scheduler = BackgroundScheduler()
@@ -85,8 +85,8 @@ def create_app():
    #         user_datastore.create_user(email='ee.prasad@gmail.com', password='userq', roles=[user_role])
         
         # Start the scheduler
-        start_scheduler()
-
+        # Initialize the scheduler
+        init_scheduler(app)
         
         # Import and register blueprints/routes here
         from .routes import main as main_blueprint
