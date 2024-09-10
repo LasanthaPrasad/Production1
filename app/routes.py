@@ -393,6 +393,7 @@ def edit_forecast_location(id):
 
 
 
+
 """ 
 @main.route('/forecast_locations/create', methods=['GET', 'POST'])
 def create_forecast_location():
