@@ -63,12 +63,15 @@ class IrradiationForecast(db.Model):
 
 
 
+
 class ForecastLocation(db.Model):
     __tablename__ = 'forecast_locations'
     id = db.Column(db.Integer, primary_key=True)
     provider_name = db.Column(db.String(255), nullable=False)
     latitude = db.Column(db.Numeric(10, 8), nullable=False)
     longitude = db.Column(db.Numeric(11, 8), nullable=False)
+    api_key = db.Column(db.String(255))  # Make sure this line is present
+
 
     solcast_resource_id = db.Column(db.String(255), unique=True)
 
@@ -81,6 +84,7 @@ class ForecastLocation(db.Model):
     cloud_opacity = db.Column(db.Numeric(5, 2))
     next_hour_forecast = db.Column(db.JSON)
     next_24_hours_forecast = db.Column(db.JSON)
+
 
 class GridSubstation(db.Model):
     __tablename__ = 'grid_substations'

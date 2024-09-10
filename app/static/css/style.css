@@ -199,3 +199,24 @@ body {
         height: 250px;
     }
 }
+
+.row {
+    display: flex;
+    flex-wrap: wrap;
+    margin-right: -15px;
+    margin-left: -15px;
+}
+
+.col {
+    flex: 1;
+    padding-right: 15px;
+    padding-left: 15px;
+}
+
+@media (max-width: 768px) {
+    .col {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
