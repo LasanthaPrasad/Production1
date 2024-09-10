@@ -13,6 +13,11 @@ from flask import render_template, redirect, url_for, request, flash
 from flask_security.views import reset_password, forgot_password
 from flask_security.utils import hash_password
 
+from flask_wtf import FlaskForm
+from wtforms import StringField, FloatField, SelectField
+from wtforms.validators import DataRequired, NumberRange
+from config import FORECAST_PROVIDERS  # or from wherever you defined the providers
+
 
 
 from .extensions import db, security
@@ -25,6 +30,12 @@ import random
 main = Blueprint('main', __name__)
 
 
+
+class ForecastLocationForm(FlaskForm):
+    provider_name = SelectField('Provider Name', choices=FORECAST_PROVIDERS, validators=[DataRequired()])
+    latitude = FloatField('Latitude', validators=[DataRequired(), NumberRange(min=-90, max=90)])
+    longitude = FloatField('Longitude', validators=[DataRequired(), NumberRange(min=-180, max=180)])
+    api_key = StringField('API Key', validators=[DataRequired()])
 
 @main.route('/view_data')
 @login_required
@@ -104,17 +115,6 @@ def change_user_role(user_id):
 
 
 
-
-
-
-
-
-
-
-
-
-
-
 def init_routes(app):
     user_datastore = security.datastore
 
@@ -143,44 +143,6 @@ def init_routes(app):
 
 def init_app(app):
     init_routes(app)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
@@ -393,6 +355,45 @@ def forecast_locations():
 
 
 
+
+
+
+
+
+
+
+@main.route('/forecast_locations/create', methods=['GET', 'POST'])
+def create_forecast_location():
+    form = ForecastLocationForm()
+    if form.validate_on_submit():
+        location = ForecastLocation(
+            provider_name=form.provider_name.data,
+            latitude=form.latitude.data,
+            longitude=form.longitude.data,
+            api_key=form.api_key.data
+        )
+        db.session.add(location)
+        db.session.commit()
+        flash('Forecast location created successfully', 'success')
+        return redirect(url_for('main.forecast_locations'))
+    return render_template('create_forecast_location.html', form=form)
+
+@main.route('/forecast_locations/<int:id>/edit', methods=['GET', 'POST'])
+def edit_forecast_location(id):
+    location = ForecastLocation.query.get_or_404(id)
+    form = ForecastLocationForm(obj=location)
+    if form.validate_on_submit():
+        form.populate_obj(location)
+        db.session.commit()
+        flash('Forecast location updated successfully', 'success')
+        return redirect(url_for('main.forecast_locations'))
+    return render_template('edit_forecast_location.html', form=form, location=location)
+
+
+
+
+
+""" 
 @main.route('/forecast_locations/create', methods=['GET', 'POST'])
 def create_forecast_location():
     if request.method == 'POST':
@@ -427,6 +428,8 @@ def delete_forecast_location(id):
     db.session.commit()
     flash('Forecast Location deleted successfully!', 'success')
     return redirect(url_for('main.forecast_locations'))
+ """
+
 
 # Grid Substations
 @main.route('/grid_substations')

@@ -20,4 +20,9 @@ class Config:
     SECURITY_RECOVERABLE = True
     SECURITY_RESET_PASSWORD_WITHIN = '5 days'  # User has 5 days to reset password
 
-    
+    # config.py or a new file like providers.py
+F   ORECAST_PROVIDERS = [
+    ('solcast', 'Solcast'),
+    ('visualcrossing', 'Visual Crossing'),
+    #('openweather', 'OpenWeather')
+    ]
