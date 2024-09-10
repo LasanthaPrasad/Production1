@@ -40,7 +40,7 @@ class ForecastLocationForm(FlaskForm):
     provider_name = SelectField('Provider Name', choices=FORECAST_PROVIDERS, validators=[DataRequired()])
     latitude = FloatField('Latitude', validators=[DataRequired(), NumberRange(min=-90, max=90)])
     longitude = FloatField('Longitude', validators=[DataRequired(), NumberRange(min=-180, max=180)])
-#    api_key = StringField('API Key', validators=[DataRequired()])
+    api_key = StringField('API Key')
 
 @main.route('/view_data')
 @login_required
