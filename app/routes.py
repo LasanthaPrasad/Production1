@@ -425,7 +425,7 @@ def edit_forecast_location(id):
         flash('Forecast Location updated successfully!', 'success')
         return redirect(url_for('main.forecast_locations'))
     return render_template('edit_forecast_location.html', location=location)
-
+ """
 @main.route('/forecast_locations/<int:id>/delete', methods=['POST'])
 def delete_forecast_location(id):
     location = ForecastLocation.query.get_or_404(id)
@@ -433,7 +433,7 @@ def delete_forecast_location(id):
     db.session.commit()
     flash('Forecast Location deleted successfully!', 'success')
     return redirect(url_for('main.forecast_locations'))
- """
+
 
 
 # Grid Substations
