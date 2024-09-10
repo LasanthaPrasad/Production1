@@ -37,7 +37,7 @@ def start_scheduler():
         id="initial_update",
         name="Initial forecast update",
         run_date='2023-05-20 00:00:00'  # This date is in the past, so it will run immediately
-        print("initial forecast is running")
+
     )
     
     scheduler.start()
