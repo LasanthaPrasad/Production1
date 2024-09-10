@@ -48,7 +48,7 @@ def start_scheduler():
         trigger='date',
         id="initial_update",
         name="Initial forecast update",
-        run_date='2023-05-20 00:00:00'  # This date is in the past, so it will run immediately
+        run_date='2024-09-11 00:00:00'  # This date is in the past, so it will run immediately
     )
     
     scheduler.start()
