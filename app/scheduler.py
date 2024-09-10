@@ -12,9 +12,11 @@ def update_forecast_locations():
         forecast_service = ForecastService()
         try:
             forecast_service.update_forecasts()
+            print("forecast fetch successful")
             logger.info("Forecast update process completed successfully")
         except Exception as e:
             logger.error(f"Error in forecast update process: {str(e)}")
+            print("Error in forecast update process: {str(e)}")
 
 def start_scheduler():
     scheduler = BackgroundScheduler()
@@ -35,9 +37,11 @@ def start_scheduler():
         id="initial_update",
         name="Initial forecast update",
         run_date='2023-05-20 00:00:00'  # This date is in the past, so it will run immediately
+        print("initial forecast is running")
     )
     
     scheduler.start()
+    print("Initial forecast fetch successful")
     logger.info("Scheduler started")
 
 def init_app(app):
