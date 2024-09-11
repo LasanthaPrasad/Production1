@@ -4,18 +4,18 @@ from apscheduler.triggers.cron import CronTrigger
 from flask import current_app
 from .forecast_service import ForecastService
 
-logger = logging.getLogger(__name__)
+#logger = logging.getLogger(__name__)
 
 def update_forecast_locations():
     with current_app.app_context():
-        logger.info("Starting forecast update process")
+        print("Starting forecast update process")
         forecast_service = ForecastService()
         try:
             forecast_service.update_forecasts()
             print("forecast fetch successful")
-            logger.info("Forecast update process completed successfully")
+            #logger.info("Forecast update process completed successfully")
         except Exception as e:
-            logger.error(f"Error in forecast update process: {str(e)}")
+            #logger.error(f"Error in forecast update process: {str(e)}")
             print("Error in forecast update process: {str(e)}")
 
 def start_scheduler():
@@ -40,10 +40,10 @@ def start_scheduler():
 
     )
     
-    
+
     scheduler.start()
     print("Initial forecast fetch successful")
-    logger.info("Scheduler started")
+    print("Scheduler started")
 
 def init_app(app):
     with app.app_context():
