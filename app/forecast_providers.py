@@ -72,7 +72,7 @@ class VisualCrossingProvider(BaseForecastProvider):
                 time = datetime.strptime(hour['datetime'], '%H:%M:%S').time()
                 timestamp = datetime.combine(date, time)
                 forecasts.append(IrradiationForecast(
-                    timestamp=datetime.fromisoformat(timestamp.replace('Z', '+00:00'))  ,
+                    timestamp=datetime.fromisoformat(timestamp.replace('Z', '-05:30'))  ,
                     ghi=hour['solarradiation'],
                     air_temp=hour['temp'],
                     cloud_opacity=hour['cloudcover'] / 100  # Convert to 0-1 scale
