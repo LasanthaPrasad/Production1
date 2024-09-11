@@ -82,8 +82,7 @@ const providerColors = {
 const defaultColor = '#00FF00';  // Green
 
 
-const providerName = location.provider_name ? "{{ location.provider_name }} : 'unknown';
-const color = providerColors[providerName] || defaultColor;
+
 
 function initMap() {
 
@@ -97,6 +96,7 @@ function initMap() {
     const locations = [
         {% for location in locations %}
         {
+
             position: { lat: {{ location.latitude }}, lng: {{ location.longitude }} },
             title: "{{ location.provider_name }}",
             id: {{ location.id }},
@@ -112,9 +112,10 @@ function initMap() {
 
     locations.forEach(location => {
 
-        
         const position = {lat: location.latitude, lng: location.longitude};
-/*        #print(location.provider_name) */
+        const providerName = location.provider_name ? location.provider_name.toLowerCase() : 'unknown';
+        const color = providerColors[providerName] || defaultColor;
+
         const marker = new google.maps.Marker({
 /*             position: position, */
             position: location.position,
@@ -127,7 +128,7 @@ function initMap() {
                 fillColor: color,
                 fillOpacity: 1,
                 strokeWeight: 0,
-                scale: 10
+                scale: 8
             }
         });
 
