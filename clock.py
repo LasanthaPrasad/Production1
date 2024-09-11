@@ -9,7 +9,7 @@
 
 #sched.start()
 
-
+""" 
 from apscheduler.schedulers.blocking import BlockingScheduler
 from app.forecast_service import ForecastService
 
@@ -21,3 +21,9 @@ def scheduled_job():
     forecast_service.update_forecasts()
 
 sched.start()
+ """
+from app.scheduler import start_scheduler
+
+if __name__ == '__main__':
+    print("Clock process starting")
+    start_scheduler()

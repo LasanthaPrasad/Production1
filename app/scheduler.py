@@ -3,51 +3,45 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from flask import current_app
 from .forecast_service import ForecastService
+from datetime import datetime
 
 #logger = logging.getLogger(__name__)
 
+
+
+from .forecast_service import ForecastService
+
 def update_forecast_locations():
-    with current_app.app_context():
-        print("Starting forecast update process")
-        forecast_service = ForecastService()
-        try:
-            forecast_service.update_forecasts()
-            print("forecast fetch successful")
-            #logger.info("Forecast update process completed successfully")
-        except Exception as e:
-            #logger.error(f"Error in forecast update process: {str(e)}")
-            print("Error in forecast update process: {str(e)}")
+    print("update_forecast_locations function called")
+    forecast_service = ForecastService()
+    forecast_service.update_forecasts()
 
 def start_scheduler():
+    print("start_scheduler function called")
     scheduler = BackgroundScheduler()
     
-    # Schedule the job to run every hour
     scheduler.add_job(
         func=update_forecast_locations,
-        trigger=CronTrigger(hour="*/1"),  # Run every hour
+        trigger=CronTrigger(hour="*/1"),
         id="update_forecasts",
         name="Update forecast locations every hour",
         replace_existing=True,
     )
     
-    # Run the job immediately when the scheduler starts
+    # Run immediately when the scheduler starts
     scheduler.add_job(
         func=update_forecast_locations,
         trigger='date',
+        run_date=datetime.now(),
         id="initial_update",
         name="Initial forecast update",
-        run_date='2023-05-20 00:00:00'  # This date is in the past, so it will run immediately
-
     )
     
-
     scheduler.start()
-    print("Initial forecast fetch successful")
     print("Scheduler started")
 
-def init_app(app):
-    with app.app_context():
-        start_scheduler()
+# Call this function to start the scheduler immediately
+update_forecast_locations()
 
-if __name__ == "__main__":
-    start_scheduler()
+
+
