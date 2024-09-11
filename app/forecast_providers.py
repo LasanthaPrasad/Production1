@@ -60,6 +60,7 @@ class VisualCrossingProvider(BaseForecastProvider):
         response = requests.get(url, params=params)
         print(f"VisualCrossingProvider: API response status code: {response.status_code}")
         response.raise_for_status()
+        print(f"VisualCrossingProvider: API response {response.json()}")
         return response.json()
 
     def parse_forecast(self, data):
