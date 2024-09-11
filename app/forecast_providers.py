@@ -14,6 +14,7 @@ class BaseForecastProvider(ABC):
 
 class SolcastProvider(BaseForecastProvider):
     def fetch_forecast(self, location):
+        print(f"SolcastProvider: Fetching forecast for location {location.id}")
         url = "https://api.solcast.com.au/world_radiation/forecasts"
         params = {
             'latitude': location.latitude,
@@ -23,10 +24,12 @@ class SolcastProvider(BaseForecastProvider):
             'hours': 168  # 7 days
         }
         response = requests.get(url, params=params)
+        print(f"SolcastProvider: API response status code: {response.status_code}")
         response.raise_for_status()
         return response.json()
 
     def parse_forecast(self, data):
+        print("SolcastProvider: Parsing forecast data")
         forecasts = []
         for forecast in data['forecasts']:
             forecasts.append(IrradiationForecast(
@@ -37,10 +40,12 @@ class SolcastProvider(BaseForecastProvider):
                 air_temp=forecast.get('air_temp'),
                 cloud_opacity=forecast.get('cloud_opacity')
             ))
+        print(f"SolcastProvider: Parsed {len(forecasts)} forecast entries")
         return forecasts
 
 class VisualCrossingProvider(BaseForecastProvider):
     def fetch_forecast(self, location):
+        print(f"VisualCrossingProvider: Fetching forecast for location {location.id}")
         url = f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{location.latitude},{location.longitude}"
         params = {
             'key': location.api_key,
@@ -50,10 +55,12 @@ class VisualCrossingProvider(BaseForecastProvider):
             'contentType': 'json'
         }
         response = requests.get(url, params=params)
+        print(f"VisualCrossingProvider: API response status code: {response.status_code}")
         response.raise_for_status()
         return response.json()
 
     def parse_forecast(self, data):
+        print("VisualCrossingProvider: Parsing forecast data")
         forecasts = []
         for day in data['days']:
             for hour in day['hours']:
@@ -63,4 +70,5 @@ class VisualCrossingProvider(BaseForecastProvider):
                     air_temp=hour['temp'],
                     cloud_opacity=hour['cloudcover'] / 100  # Convert to 0-1 scale
                 ))
+        print(f"VisualCrossingProvider: Parsed {len(forecasts)} forecast entries")
         return forecasts
