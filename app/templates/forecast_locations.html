@@ -115,8 +115,8 @@ function initMap() {
         const position = {lat: location.latitude, lng: location.longitude};
 
         const marker = new google.maps.Marker({
-            position: position,
-/*             position: location.position, */
+/*             position: position, */
+            position: location.position,
             map: map,/* 
             title: location.title, */
             title: location.provider_name,
