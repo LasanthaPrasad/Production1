@@ -56,8 +56,8 @@ class IrradiationForecast(db.Model):
     air_temp = db.Column(db.Float)
     cloud_opacity = db.Column(db.Float)
 
-    forecast_location = db.relationship('ForecastLocation', backref='irradiation_forecasts')
 
+    forecast_location = db.relationship('ForecastLocation', back_populates='irradiation_forecasts')
     __table_args__ = (db.UniqueConstraint('forecast_location_id', 'timestamp', name='uix_1'),)
         
 
@@ -87,8 +87,9 @@ class ForecastLocation(db.Model):
     next_hour_forecast = db.Column(db.JSON)
     next_24_hours_forecast = db.Column(db.JSON)
 
-    irradiation_forecasts = db.relationship('IrradiationForecast', backref='location', lazy='dynamic',
-                                            cascade='all, delete-orphan')
+
+    irradiation_forecasts = db.relationship('IrradiationForecast', back_populates='forecast_location', cascade='all, delete-orphan')
+
 
 
 class GridSubstation(db.Model):
