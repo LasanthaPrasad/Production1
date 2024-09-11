@@ -405,6 +405,15 @@ def edit_forecast_location(id):
     if form.validate_on_submit():
         form.populate_obj(location)
         db.session.commit()
+        forecast_service = ForecastService()
+        try:
+            forecast_service.fetch_and_save_forecasts(location)
+            flash('Forecast location created and initial forecast data fetched successfully', 'success')
+        except Exception as e:
+            flash(f'Forecast location created, but failed to fetch initial forecast data: {str(e)}', 'warning')
+
+
+
         flash('Forecast location updated successfully', 'success')
         return redirect(url_for('main.forecast_locations'))
     return render_template('edit_forecast_location.html', form=form, location=location)
