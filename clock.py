@@ -22,7 +22,6 @@ def scheduled_job():
 
 sched.start()
  """
-
 from app import create_app
 from app.scheduler import update_forecast_locations
 

@@ -19,10 +19,3 @@ class Config:
     SECURITY_UNAUTHORIZED_VIEW = None
     SECURITY_RECOVERABLE = True
     SECURITY_RESET_PASSWORD_WITHIN = '5 days'  # User has 5 days to reset password
-
-    # config.py or a new file like providers.py
-    FORECAST_PROVIDERS = [
-    ('solcast', 'Solcast'),
-    ('visualcrossing', 'Visual Crossing'),
-    #('openweather', 'OpenWeather')
-    ]

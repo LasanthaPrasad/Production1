@@ -24,7 +24,7 @@ from .models import User, Role  # Make sure this import is correct
 
 from .extensions import db
 from .models import ForecastLocation
-
+from .scheduler import init_app as init_scheduler
 
 
 
@@ -88,8 +88,8 @@ def create_app():
         
         # Start the scheduler
 
+        # Initialize the scheduler last
         init_scheduler(app)
-
         # Import and register blueprints/routes here
         from .routes import main as main_blueprint
         app.register_blueprint(main_blueprint)

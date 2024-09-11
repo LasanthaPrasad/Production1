@@ -1,22 +1,24 @@
-
 from flask import current_app
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
 from datetime import datetime
-from .forecast_service import ForecastService
 
 def update_forecast_locations():
     print("update_forecast_locations function called")
-    with current_app.app_context():
-        forecast_service = ForecastService()
-        forecast_service.update_forecasts()
+    from .forecast_service import ForecastService
+    forecast_service = ForecastService()
+    forecast_service.update_forecasts()
 
 def start_scheduler(app):
     print("start_scheduler function called")
     scheduler = BackgroundScheduler()
     
+    def run_job():
+        with app.app_context():
+            update_forecast_locations()
+
     scheduler.add_job(
-        func=update_forecast_locations,
+        func=run_job,
         trigger=CronTrigger(hour="*/1"),
         id="update_forecasts",
         name="Update forecast locations every hour",
@@ -25,7 +27,7 @@ def start_scheduler(app):
     
     # Run immediately when the scheduler starts
     scheduler.add_job(
-        func=update_forecast_locations,
+        func=run_job,
         trigger='date',
         run_date=datetime.now(),
         id="initial_update",
@@ -37,5 +39,4 @@ def start_scheduler(app):
 
 def init_app(app):
     print("init_app function called")
-    with app.app_context():
-        start_scheduler(app)
+    start_scheduler(app)
