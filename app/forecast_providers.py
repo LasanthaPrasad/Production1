@@ -27,7 +27,7 @@ class SolcastProvider(BaseForecastProvider):
             'longitude': location.longitude,
             'api_key': api_key,
             'format': 'json',
-            'hours': 168  # 7 days
+            'hours': 72  # 3 days
         }
         response = requests.get(url, params=params)
         print(f"SolcastProvider: API response status code: {response.status_code}")

@@ -450,6 +450,11 @@ def edit_forecast_location(id):
         return redirect(url_for('main.forecast_locations'))
     return render_template('edit_forecast_location.html', location=location)
  """
+
+
+
+""" 
+
 @main.route('/forecast_locations/<int:id>/delete', methods=['POST'])
 def delete_forecast_location(id):
     location = ForecastLocation.query.get_or_404(id)
@@ -457,6 +462,24 @@ def delete_forecast_location(id):
     db.session.commit()
     flash('Forecast Location deleted successfully!', 'success')
     return redirect(url_for('main.forecast_locations'))
+
+ """
+
+@main.route('/forecast_locations/<int:location_id>/delete', methods=['POST'])
+def delete_forecast_location(location_id):
+    location = ForecastLocation.query.get_or_404(location_id)
+    try:
+        # First, delete all associated irradiation forecasts
+        IrradiationForecast.query.filter_by(forecast_location_id=location_id).delete()
+        
+        # Then delete the forecast location
+        db.session.delete(location)
+        db.session.commit()
+        flash('Forecast location and associated forecasts deleted successfully', 'success')
+    except Exception as e:
+        db.session.rollback()
+        flash(f'Error deleting forecast location: {str(e)}', 'error')
+    return redirect(url_for('forecast_locations'))
 
 
 
