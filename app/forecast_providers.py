@@ -70,6 +70,7 @@ class VisualCrossingProvider(BaseForecastProvider):
         response.raise_for_status()
         return response.json()
 
+
     def parse_forecast(self, data):
         print("VisualCrossingProvider: Parsing forecast data")
         forecasts = []
