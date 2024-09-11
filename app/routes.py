@@ -383,12 +383,14 @@ def create_forecast_location():
         )
         db.session.add(location)
         db.session.commit()
-    forecast_service = ForecastService()
-    try:
-        forecast_service.fetch_and_save_forecasts(location)
-        flash('Forecast location created and initial forecast data fetched successfully', 'success')
-    except Exception as e:
-        flash(f'Forecast location created, but failed to fetch initial forecast data: {str(e)}', 'warning')
+
+
+        forecast_service = ForecastService()
+        try:
+            forecast_service.fetch_and_save_forecasts(location)
+            flash('Forecast location created and initial forecast data fetched successfully', 'success')
+        except Exception as e:
+            flash(f'Forecast location created, but failed to fetch initial forecast data: {str(e)}', 'warning')
 
 
 
