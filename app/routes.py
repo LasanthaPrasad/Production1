@@ -16,6 +16,10 @@ from flask_security.utils import hash_password
 from flask_wtf import FlaskForm
 from wtforms import StringField, FloatField, SelectField
 from wtforms.validators import DataRequired, NumberRange
+from .forecast_service import ForecastService
+
+
+
 #from config import FORECAST_PROVIDERS  # or from wherever you defined the providers
 
     # config.py or a new file like providers.py
@@ -379,6 +383,15 @@ def create_forecast_location():
         )
         db.session.add(location)
         db.session.commit()
+    forecast_service = ForecastService()
+    try:
+        forecast_service.fetch_and_save_forecasts(location)
+        flash('Forecast location created and initial forecast data fetched successfully', 'success')
+    except Exception as e:
+        flash(f'Forecast location created, but failed to fetch initial forecast data: {str(e)}', 'warning')
+
+
+
         flash('Forecast location created successfully', 'success')
         return redirect(url_for('main.forecast_locations'))
     return render_template('create_forecast_location.html', form=form)
