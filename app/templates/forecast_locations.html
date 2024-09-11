@@ -117,7 +117,7 @@ function initMap() {
 
         const position = {lat: location.latitude, lng: location.longitude};
         const providerName = location.provider_name ? location.provider_name.toLowerCase() : 'unknown';
-        const color = providerColors[providerName] || defaultColor;
+        const color = providerColors[providerName];
 
         const marker = new google.maps.Marker({
 /*             position: position, */
