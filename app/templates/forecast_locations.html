@@ -72,7 +72,12 @@
 let map;
 let markers = [];
 let currentInfoWindow = null;
-
+const providerColors = {
+    'solcast': '#FF0000',  // Red for Solcast
+    'visualcrossing': '#0000FF',  // Blue for Visual Crossing
+    'geoclipz': '#0000FF',  // Blue for Visual Crossing
+    // Add more providers and colors as needed
+};
 
 
 const providerName = location.provider_name ? location.provider_name.toLowerCase() : 'unknown';
