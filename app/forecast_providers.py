@@ -54,7 +54,7 @@ class VisualCrossingProvider(BaseForecastProvider):
             'key': location.api_key,
             'include': 'hours',
             'elements': 'datetime,solarradiation,temp,cloudcover',
-            'unitGroup': 'metric',
+            'unitGroup': 'us',
             'contentType': 'json'
         }
         response = requests.get(url, params=params)
