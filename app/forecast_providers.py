@@ -43,9 +43,11 @@ class SolcastProvider(BaseForecastProvider):
         print(f"SolcastProvider: Parsed {len(forecasts)} forecast entries")
         return forecasts
 
+
+
 class VisualCrossingProvider(BaseForecastProvider):
     def fetch_forecast(self, location):
-        
+        print(f"VisualCrossingProvider: Fetching forecast for location {location.id}")
         coordinates = f"{location.latitude}%2C%20{location.longitude}"
         url = f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{coordinates}"
         params = {
@@ -55,18 +57,6 @@ class VisualCrossingProvider(BaseForecastProvider):
             'unitGroup': 'metric',
             'contentType': 'json'
         }
-        """ 
-        print(f"VisualCrossingProvider: Fetching forecast for location {location.id}")
-        url = f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{location.latitude},{location.longitude}"
-        params = {
-            'key': location.api_key,
-            'include': 'hours',
-            'elements': 'datetime,solarradiation,temp,cloudcover',
-            'unitGroup': 'metric',
-            'contentType': 'json'
-        }
-        
-         """
         response = requests.get(url, params=params)
         print(f"VisualCrossingProvider: API response status code: {response.status_code}")
         response.raise_for_status()
@@ -76,12 +66,20 @@ class VisualCrossingProvider(BaseForecastProvider):
         print("VisualCrossingProvider: Parsing forecast data")
         forecasts = []
         for day in data['days']:
+            date = datetime.strptime(day['datetime'], '%Y-%m-%d')
             for hour in day['hours']:
+                time = datetime.strptime(hour['datetime'], '%H:%M:%S').time()
+                timestamp = datetime.combine(date, time)
                 forecasts.append(IrradiationForecast(
-                    timestamp=datetime.fromisoformat(hour['datetime'].replace('Z', '+00:00')),
+                    timestamp=timestamp,
                     ghi=hour['solarradiation'],
                     air_temp=hour['temp'],
                     cloud_opacity=hour['cloudcover'] / 100  # Convert to 0-1 scale
                 ))
         print(f"VisualCrossingProvider: Parsed {len(forecasts)} forecast entries")
         return forecasts
+
+
+
+
+
