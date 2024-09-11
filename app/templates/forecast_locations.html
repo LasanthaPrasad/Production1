@@ -114,15 +114,16 @@ function initMap() {
     ];
 
     locations.forEach(location => {
-
-        const color = providerColors[ location.provider_name ] || defaultColor;
+        const providerName = location.provider_name ? location.provider_name.toLowerCase() : 'unknown';
+        const color = providerColors[providerName] || defaultColor;
+        
         const position = {lat: location.latitude, lng: location.longitude};
         print(location.provider_name)
         const marker = new google.maps.Marker({
 /*             position: position, */
             position: location.position,
-            map: map,/* 
-            title: location.title, */
+            map: map,
+ /*           title: location.title, */
             title: location.provider_name,
 
             icon: {
