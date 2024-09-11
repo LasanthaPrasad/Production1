@@ -479,7 +479,7 @@ def delete_forecast_location(location_id):
     except Exception as e:
         db.session.rollback()
         flash(f'Error deleting forecast location: {str(e)}', 'error')
-    return redirect(url_for('forecast_locations'))
+    return redirect(url_for('main.forecast_locations'))
 
 
 
