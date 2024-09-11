@@ -24,12 +24,12 @@ from .models import User, Role  # Make sure this import is correct
 
 from .extensions import db
 from .models import ForecastLocation
-from .scheduler import start_scheduler
+
+
+
 
 from .scheduler import init_app as init_scheduler
 
-
-from .scheduler import start_scheduler
 #db = SQLAlchemy()
 ##scheduler = BackgroundScheduler()
 
@@ -88,7 +88,7 @@ def create_app():
         
         # Start the scheduler
 
-        start_scheduler()  # This line is crucial
+        init_scheduler(app)
 
         # Import and register blueprints/routes here
         from .routes import main as main_blueprint

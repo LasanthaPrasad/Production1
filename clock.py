@@ -22,8 +22,12 @@ def scheduled_job():
 
 sched.start()
  """
-from app.scheduler import start_scheduler
+
+from app import create_app
+from app.scheduler import update_forecast_locations
+
+app = create_app()
 
 if __name__ == '__main__':
-    print("Clock process starting")
-    start_scheduler()
+    with app.app_context():
+        update_forecast_locations()

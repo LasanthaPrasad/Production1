@@ -1,22 +1,17 @@
-import logging
+
+from flask import current_app
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.triggers.cron import CronTrigger
-from flask import current_app
-from .forecast_service import ForecastService
 from datetime import datetime
-
-#logger = logging.getLogger(__name__)
-
-
-
 from .forecast_service import ForecastService
 
 def update_forecast_locations():
     print("update_forecast_locations function called")
-    forecast_service = ForecastService()
-    forecast_service.update_forecasts()
+    with current_app.app_context():
+        forecast_service = ForecastService()
+        forecast_service.update_forecasts()
 
-def start_scheduler():
+def start_scheduler(app):
     print("start_scheduler function called")
     scheduler = BackgroundScheduler()
     
@@ -40,8 +35,7 @@ def start_scheduler():
     scheduler.start()
     print("Scheduler started")
 
-# Call this function to start the scheduler immediately
-update_forecast_locations()
-
-
-
+def init_app(app):
+    print("init_app function called")
+    with app.app_context():
+        start_scheduler(app)

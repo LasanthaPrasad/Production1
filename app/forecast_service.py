@@ -1,6 +1,6 @@
 from .forecast_providers import SolcastProvider, VisualCrossingProvider
 from .models import ForecastLocation, IrradiationForecast
-from . import db
+from .extensions import db
 import logging
 
 logger = logging.getLogger(__name__)
