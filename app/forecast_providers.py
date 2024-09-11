@@ -45,6 +45,17 @@ class SolcastProvider(BaseForecastProvider):
 
 class VisualCrossingProvider(BaseForecastProvider):
     def fetch_forecast(self, location):
+        
+        coordinates = f"{location.latitude}%2C%20{location.longitude}"
+        url = f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{coordinates}"
+        params = {
+            'key': location.api_key,
+            'include': 'hours',
+            'elements': 'datetime,solarradiation,temp,cloudcover',
+            'unitGroup': 'metric',
+            'contentType': 'json'
+        }
+        """ 
         print(f"VisualCrossingProvider: Fetching forecast for location {location.id}")
         url = f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{location.latitude},{location.longitude}"
         params = {
@@ -54,6 +65,8 @@ class VisualCrossingProvider(BaseForecastProvider):
             'unitGroup': 'metric',
             'contentType': 'json'
         }
+        
+         """
         response = requests.get(url, params=params)
         print(f"VisualCrossingProvider: API response status code: {response.status_code}")
         response.raise_for_status()
