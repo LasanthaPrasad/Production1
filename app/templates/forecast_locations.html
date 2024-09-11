@@ -121,13 +121,11 @@ function initMap() {
             map: map,/* 
             title: location.title, */
             title: location.provider_name,
-            icon    :{
-                    path: google.maps.SymbolPath.CIRCLE,
-                    fillColor: color,
-                    fillOpacity: 1,
-                    strokeWeight: 10,
-                   /*  scale: 8 */
-                    }
+
+            icon: {
+                    url: `/static/images/${location.provider_name.toLowerCase()}_marker.png`,
+                    scaledSize: new google.maps.Size(32, 32)
+                }
         });
 
         const infoWindow = new google.maps.InfoWindow({
