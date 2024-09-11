@@ -1,4 +1,4 @@
-from .forecast_providers import SolcastProvider, VisualCrossingProvider
+from .forecast_providers import SolcastProvider, VisualCrossingProvider, GeoclipzProvider
 from .models import ForecastLocation, IrradiationForecast
 from .extensions import db
 import logging
@@ -11,6 +11,7 @@ class ForecastService:
         self.providers = {
             'solcast': SolcastProvider(),
             'visualcrossing': VisualCrossingProvider(),
+            'geoclipz': GeoclipzProvider(),
         }
         print(f"ForecastService: Initialized with providers: {', '.join(self.providers.keys())}")
 
