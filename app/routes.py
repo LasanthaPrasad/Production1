@@ -25,7 +25,7 @@ from .forecast_service import ForecastService
     # config.py or a new file like providers.py
 FORECAST_PROVIDERS = [
     ('solcast', 'Solcast'),
-    ('visualcrossing', 'Visual Crossing'),
+    ('visualcrossing', 'GeoClipz Forcast'),
     #('openweather', 'OpenWeather')
     ]
 
