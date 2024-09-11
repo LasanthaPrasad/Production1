@@ -82,7 +82,7 @@ const providerColors = {
 const defaultColor = '#00FF00';  // Green
 
 
-const providerName = location.provider_name ? location.provider_name.toLowerCase() : 'unknown';
+const providerName = location.provider_name ? location.provider_name : 'unknown';
 const color = providerColors[providerName] || defaultColor;
 
 function initMap() {
