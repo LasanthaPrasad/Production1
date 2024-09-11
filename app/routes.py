@@ -465,7 +465,7 @@ def delete_forecast_location(id):
 
  """
 
-@main.route('/delete_forecast_location/<int:location_id>', methods=['POST'])
+@main.route('/forecast_locations/<int:location_id>/delete', methods=['POST'])
 def delete_forecast_location(location_id):
     location = ForecastLocation.query.get_or_404(location_id)
     try:

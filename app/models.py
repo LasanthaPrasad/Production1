@@ -47,7 +47,8 @@ roles_users = db.Table('roles_users',
 class IrradiationForecast(db.Model):
     __tablename__ = 'irradiation_forecasts'
     id = db.Column(db.Integer, primary_key=True)
-    forecast_location_id = db.Column(db.Integer, db.ForeignKey('forecast_locations.id'), nullable=False)
+    #forecast_location_id = db.Column(db.Integer, db.ForeignKey('forecast_locations.id'), nullable=False)
+    forecast_location_id = db.Column(db.Integer, db.ForeignKey('forecast_locations.id', ondelete='CASCADE'), nullable=False)
     timestamp = db.Column(db.DateTime, nullable=False)
     ghi = db.Column(db.Float)
     dni = db.Column(db.Float)
@@ -58,6 +59,7 @@ class IrradiationForecast(db.Model):
     forecast_location = db.relationship('ForecastLocation', backref='irradiation_forecasts')
 
     __table_args__ = (db.UniqueConstraint('forecast_location_id', 'timestamp', name='uix_1'),)
+        
 
 
 
@@ -84,6 +86,9 @@ class ForecastLocation(db.Model):
     cloud_opacity = db.Column(db.Numeric(5, 2))
     next_hour_forecast = db.Column(db.JSON)
     next_24_hours_forecast = db.Column(db.JSON)
+
+    irradiation_forecasts = db.relationship('IrradiationForecast', backref='location', lazy='dynamic',
+                                            cascade='all, delete-orphan')
 
 
 class GridSubstation(db.Model):
