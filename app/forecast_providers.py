@@ -1,3 +1,4 @@
+import os
 import requests
 from abc import ABC, abstractmethod
 from datetime import datetime
@@ -19,10 +20,12 @@ class SolcastProvider(BaseForecastProvider):
     def fetch_forecast(self, location):
         print(f"SolcastProvider: Fetching forecast for location {location.id}")
         url = "https://api.solcast.com.au/world_radiation/forecasts"
+        api_key = location.api_key or os.environ.get('SOLCAST_API_KEY')
+
         params = {
             'latitude': location.latitude,
             'longitude': location.longitude,
-            'api_key': location.api_key,
+            'api_key': api_key,
             'format': 'json',
             'hours': 168  # 7 days
         }
@@ -54,8 +57,9 @@ class VisualCrossingProvider(BaseForecastProvider):
         print(f"VisualCrossingProvider: Fetching forecast for location {location.id}")
         coordinates = f"{location.latitude}%2C%20{location.longitude}"
         url = f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{coordinates}"
+        api_key = location.api_key or os.environ.get('VISUAL_CROSSING_API_KEY')
         params = {
-            'key': location.api_key,
+            'key': api_key,
             'include': 'hours',
             'elements': 'datetime,solarradiation,temp,cloudcover',
             'unitGroup': 'metric',
