@@ -50,7 +50,6 @@ roles_users = db.Table('roles_users',
  """
 
 
-
 class IrradiationForecast(db.Model):
     __tablename__ = 'irradiation_forecasts'
     id = db.Column(db.Integer, primary_key=True)
