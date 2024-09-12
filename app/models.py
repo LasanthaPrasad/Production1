@@ -39,12 +39,15 @@ class User(db.Model, UserMixin):
             
     active = db.Column(db.Boolean(), default=True)
 
-
+roles_users = db.Table('roles_users',
+    db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
+    db.Column('role_id', db.Integer(), db.ForeignKey('role.id')))
+""" 
 roles_users = db.Table('roles_users',
     db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
     db.Column('role_id', db.Integer, db.ForeignKey('role.id'), primary_key=True)
 )
-
+ """
 
 class IrradiationForecast(db.Model):
     __tablename__ = 'irradiation_forecasts'

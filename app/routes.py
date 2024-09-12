@@ -27,7 +27,7 @@ from .forms import RegistrationForm, LoginForm, ForecastLocationForm
 
     # config.py or a new file like providers.py
 
-from .extensions import db, security
+from .extensions import db, security, user_datastore
 import string
 import random
 
