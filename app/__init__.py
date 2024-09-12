@@ -4,7 +4,7 @@ from flask import Flask
 
 from .models import User, Role
 
-from .extensions import db, security, mail
+from .extensions import db, security, mail, customuserdatastore
 
 from flask_security import SQLAlchemyUserDatastore
 
@@ -35,16 +35,6 @@ from .scheduler import init_app as init_scheduler
 
 
 
-class CustomUserDatastore(SQLAlchemyUserDatastore):
-    def confirm_user(self, user):
-        """Confirms a user, activates them and assigns the 'user' role."""
-        super().confirm_user(user)  # Call the parent method
-        user.active = True
-        user_role = self.find_role('user')
-        if user_role and user_role not in user.roles:
-            user.roles.append(user_role)
-        self.put(user)
-        return user
 
 
 def create_app():
@@ -71,7 +61,7 @@ def create_app():
     
 
 
-    user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+    user_datastore = customuserdatastore(db, User, Role)
     security.init_app(app, user_datastore)
 
 
