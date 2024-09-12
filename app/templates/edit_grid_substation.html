@@ -19,6 +19,19 @@
         <label for="longitude">Longitude</label>
         <input type="number" step="any" class="form-control" id="longitude" name="longitude" value="{{ substation.longitude }}" required>
     </div>
+
+    <div class="form-group">
+        <label for="forecast_location">Forecast Location</label>
+        <select name="forecast_location" id="forecast_location" class="form-control" required>
+            <option value="">Select a Forecast Location</option>
+            {% for location in forecast_locations %}
+                <option value="{{ location.id }}" {% if substation.forecast_location == location.id %}selected{% endif %}>
+                    {{ location.provider_name }} ({{ location.latitude }}, {{ location.longitude }})
+                </option>
+            {% endfor %}
+        </select>
+    </div>
+    
     <div class="form-group">
         <label for="installed_solar_capacity">Installed Solar Capacity (MW)</label>
         <input type="number" step="0.01" class="form-control" id="installed_solar_capacity" name="installed_solar_capacity" value="{{ substation.installed_solar_capacity }}" required>

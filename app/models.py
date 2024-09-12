@@ -104,7 +104,8 @@ class GridSubstation(db.Model):
     api_key = db.Column(db.String(36), unique=True, default=lambda: str(uuid.uuid4()))
     api_status = db.Column(db.String(10), default='disabled')
 
-
+    forecast_location_rel = db.relationship('ForecastLocation', backref='grid_substations')
+    
     def update_installed_capacity(self):
         total_capacity = sum(feeder.installed_solar_capacity 
                              for feeder in self.feeders 

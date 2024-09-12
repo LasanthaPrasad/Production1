@@ -507,7 +507,10 @@ def create_grid_substation():
         db.session.commit()
         flash('Grid Substation created successfully!', 'success')
         return redirect(url_for('main.grid_substations'))
-    return render_template('create_grid_substation.html')
+    forecast_locations = ForecastLocation.query.all()
+    return render_template('create_grid_substation.html', forecast_locations=forecast_locations)
+
+
 
 @main.route('/grid_substations/<int:id>/edit', methods=['GET', 'POST'])
 def edit_grid_substation(id):
@@ -522,7 +525,9 @@ def edit_grid_substation(id):
         db.session.commit()
         flash('Grid Substation updated successfully!', 'success')
         return redirect(url_for('main.grid_substations'))
-    return render_template('edit_grid_substation.html', substation=substation)
+
+    forecast_locations = ForecastLocation.query.all()
+    return render_template('edit_grid_substation.html', substation=substation, forecast_locations=forecast_locations)
 
 @main.route('/grid_substations/<int:id>/delete', methods=['POST'])
 def delete_grid_substation(id):
