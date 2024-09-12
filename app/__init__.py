@@ -71,7 +71,7 @@ def create_app():
     
 
 
-    user_datastore = CustomUserDatastore(db, User, Role)
+    user_datastore = SQLAlchemyUserDatastore(db, User, Role)
     security.init_app(app, user_datastore)
 
 
@@ -108,7 +108,7 @@ def create_app():
         from .routes import main as main_blueprint
         app.register_blueprint(main_blueprint)
     
-    
+
     
 
     return app
