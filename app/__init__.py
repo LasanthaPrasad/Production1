@@ -49,7 +49,7 @@ def create_app():
     app.config['SECURITY_EMAIL_TEMPLATES'] = 'security/email'
     app.config['SECURITY_EMAIL_SUBJECT_PASSWORD_RESET'] = 'GeoClipz Password Reset Instructions'
     app.config['SECURITY_LOGIN_USER_TEMPLATE'] = 'security/login_user.html'
-    app.config['SECURITY_REGISTER_USER_TEMPLATE'] = 'security/register_user.html'
+    app.config['SECURITY_REGISTER_USER_TEMPLATE'] = 'security/register.html'
     app.config['SECURITY_FORGOT_PASSWORD_TEMPLATE'] = 'security/forgot_password.html'
     app.config['SECURITY_RESET_PASSWORD_TEMPLATE'] = 'security/reset_password.html'
 
@@ -66,7 +66,7 @@ def create_app():
     # Store user_datastore in app.extensions for global access
     app.extensions['user_datastore'] = user_datastore
 
-    
+
 #user_datastore = CustomUserDatastore(db, User, Role)
 #security = Security(app, user_datastore)
     #@app.before_first_request
