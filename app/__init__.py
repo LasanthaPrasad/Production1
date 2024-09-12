@@ -4,7 +4,7 @@ from flask import Flask
 
 from .models import User, Role
 
-from .extensions import db
+from .extensions import db, security, mail
 
 from flask_security import SQLAlchemyUserDatastore
 
@@ -16,12 +16,10 @@ from flask_mail import Mail
 
 
 
-from .extensions import db, security, mail
-from .models import User, Role  # Make sure this import is correct
 
 from datetime import datetime, timedelta, timezone
 
-from .extensions import db
+
 from .models import ForecastLocation
 from .scheduler import init_app as init_scheduler
 
@@ -69,7 +67,6 @@ def create_app():
 
     mail.init_app(app)
     
-    from .models import User, Role  # Import your User and Role models
 
     
 
