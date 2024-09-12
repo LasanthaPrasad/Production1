@@ -159,7 +159,7 @@ function showForecast(locationId) {
                 window.forecastChart.destroy();
             }
             
-            
+
             window.forecastChart = new Chart(ctx, {
                 type: 'line',
                 data: {
@@ -211,7 +211,7 @@ function showForecast(locationId) {
             console.error('Error fetching forecast data:', error);
             $('#loadingSpinner').hide();
             $('#forecastChart').hide();
-            alert('Failed to fetch forecast data. Please try again.');
+            alert('Failed to fetch forecast data. Please check API key and try again.');
         });
 }
 

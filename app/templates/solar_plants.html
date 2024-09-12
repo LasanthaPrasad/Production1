@@ -250,7 +250,7 @@ function showForecast(plantId, plantName) {
             console.error('Error fetching forecast data:', error);
             $('#loadingSpinner').hide();
             $('#forecastChart').hide();
-            alert('Failed to fetch forecast data. Please try again.');
+            alert('Failed to fetch forecast data. Please check API key and try again.');
         });
 }
 
