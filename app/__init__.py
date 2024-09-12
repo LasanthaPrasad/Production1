@@ -60,7 +60,7 @@ def create_app():
 
 
 
-    user_datastore = sqlalchm(db, User, Role)
+    user_datastore = SQLAlchemyUserDatastore(db, User, Role)
     security.init_app(app, user_datastore)
 
 
