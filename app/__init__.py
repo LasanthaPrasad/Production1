@@ -63,7 +63,10 @@ def create_app():
     #user_datastore = SQLAlchemyUserDatastore(db, User, Role)
     security.init_app(app, user_datastore)
 
+    # Store user_datastore in app.extensions for global access
+    app.extensions['user_datastore'] = user_datastore
 
+    
 #user_datastore = CustomUserDatastore(db, User, Role)
 #security = Security(app, user_datastore)
     #@app.before_first_request
