@@ -39,6 +39,11 @@ main = Blueprint('main', __name__)
 
 
 
+
+
+
+
+
 @main.route('/confirm/<token>')
 def confirm_email(token):
     user_datastore = current_app.extensions['user_datastore']
@@ -77,10 +82,13 @@ def manage_users():
 
 @main.route('/register', methods=['GET', 'POST'])
 def register():
+    print("Entering register route")
     if current_user.is_authenticated:
         return redirect(url_for('main.index'))
     form = RegistrationForm()
+    print(f"Form created: {form}")
     if form.validate_on_submit():
+        print(f"Rendering template with form: {form}")
         user = User(email=form.email.data)
         user.set_password(form.password.data)
         db.session.add(user)
@@ -89,7 +97,6 @@ def register():
         flash('A confirmation email has been sent to your email address. Please check your inbox to activate your account.', 'info')
         return redirect(url_for('main.login'))
     return render_template('register.html', title='Register', form=form)
-
 
 
 
