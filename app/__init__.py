@@ -4,7 +4,7 @@ from flask import Flask
 
 from .models import User, Role
 
-from .extensions import db, security, mail, customuserdatastore, sqlalchm
+from .extensions import db, security, mail, CustomUserDatastore
 
 from flask_security import SQLAlchemyUserDatastore
 
@@ -59,8 +59,8 @@ def create_app():
     
 
 
-
-    user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+    user_datastore = CustomUserDatastore(db, User, Role)
+    #user_datastore = SQLAlchemyUserDatastore(db, User, Role)
     security.init_app(app, user_datastore)
 
 

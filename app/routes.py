@@ -18,7 +18,7 @@ from flask_security.confirmable import confirm_user
 #from wtforms import StringField, FloatField, SelectField, PasswordField, BooleanField, SubmitField
 #from wtforms.validators import DataRequired, NumberRange, Email, EqualTo, Length
 from .forecast_service import ForecastService
-from . import user_datastore  # Assuming user_datastore is defined in __init__.py
+#from . import user_datastore  # Assuming user_datastore is defined in __init__.py
 
 from .forms import RegistrationForm, LoginForm, ForecastLocationForm
 
@@ -137,7 +137,7 @@ def reset_user_password(user_id):
 @main.route('/change_user_role/<int:user_id>', methods=['POST'])
 @roles_required('admin')
 def change_user_role(user_id):
-    #user_datastore = security.datastore
+    user_datastore = current_app.extensions['security'].datastore
     user = User.query.get_or_404(user_id)
     new_role = request.form.get('role')
     if new_role in ['user', 'moderator', 'admin']:
@@ -162,7 +162,7 @@ def change_user_role(user_id):
 
 
 def init_routes(app):
-    #user_datastore = security.datastore
+    user_datastore = current_app.extensions['security'].datastore
 
     @app.route('/reset', methods=['GET', 'POST'])
     def reset():

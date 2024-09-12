@@ -1,4 +1,3 @@
-# app/extensions.py
 from flask_sqlalchemy import SQLAlchemy
 from flask_security import Security, SQLAlchemyUserDatastore
 from flask_mail import Mail
@@ -6,8 +5,12 @@ from flask_mail import Mail
 db = SQLAlchemy()
 security = Security()
 mail = Mail()
-sqlalchm= SQLAlchemyUserDatastore()
 
+# Remove these lines
+# sqlalchm = SQLAlchemyUserDatastore()
+# customuserdatastore = CustomUserDatastore(sqlalchm)
+
+# We'll initialize user_datastore in create_app function
 
 class CustomUserDatastore(SQLAlchemyUserDatastore):
     def confirm_user(self, user):
@@ -20,5 +23,4 @@ class CustomUserDatastore(SQLAlchemyUserDatastore):
         self.put(user)
         return user
 
-
-customuserdatastore = CustomUserDatastore(sqlalchm)
+# We'll create an instance of CustomUserDatastore in create_app function
