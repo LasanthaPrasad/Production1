@@ -35,18 +35,18 @@ from .scheduler import init_app as init_scheduler
 #user_datastore = None
 
 
+
+
 class CustomUserDatastore(SQLAlchemyUserDatastore):
     def confirm_user(self, user):
         """Confirms a user, activates them and assigns the 'user' role."""
-        user.confirmed_at = datetime.now(timezone.utc)()
+        super().confirm_user(user)  # Call the parent method
         user.active = True
         user_role = self.find_role('user')
         if user_role and user_role not in user.roles:
             user.roles.append(user_role)
         self.put(user)
         return user
-
-
 
 
 def create_app():

@@ -24,3 +24,6 @@ class Config:
     SECURITY_SEND_REGISTER_EMAIL = True
     SECURITY_EMAIL_SUBJECT_REGISTER = "Welcome to GeoClipz Forecast Platform - Confirm Your Account"
     MAIL_DEFAULT_SENDER = 'GeoClipz <noreply@geoclipz.com>'    
+
+
+ 

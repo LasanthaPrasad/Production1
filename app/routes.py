@@ -6,7 +6,7 @@ from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import joinedload
 import uuid
 from .auth import require_api_key
-from flask_security import login_required, roles_required, roles_accepted, , login_user, current_user
+from flask_security import login_required, roles_required, roles_accepted, login_user, current_user
 
 from flask import render_template, redirect, url_for, request, flash
 
