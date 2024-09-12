@@ -79,7 +79,6 @@ def manage_users():
     users = User.query.all()
     return render_template('manage_users.html', users=users)
 
-
 @main.route('/register', methods=['GET', 'POST'])
 def register():
     print("Entering register route")
@@ -88,7 +87,6 @@ def register():
     form = RegistrationForm()
     print(f"Form created: {form}")
     if form.validate_on_submit():
-        print(f"Rendering template with form: {form}")
         user = User(email=form.email.data)
         user.set_password(form.password.data)
         db.session.add(user)
@@ -96,6 +94,7 @@ def register():
         flash('Your account has been created! You can now log in.', 'success')
         flash('A confirmation email has been sent to your email address. Please check your inbox to activate your account.', 'info')
         return redirect(url_for('main.login'))
+    print(f"Rendering template with form: {form}")
     return render_template('register.html', title='Register', form=form)
 
 
