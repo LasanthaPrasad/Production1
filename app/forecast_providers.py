@@ -91,3 +91,45 @@ class VisualCrossingProvider(BaseForecastProvider):
                 ))
         print(f"VisualCrossingProvider: Parsed {len(forecasts)} forecast entries")
         return forecasts
+
+
+class GeoclipzProvider(BaseForecastProvider):
+    def fetch_forecast(self, location):
+        print(f"GeoClipzProvider: Fetching forecast for location {location.id}")
+        coordinates = f"{location.latitude}%2C%20{location.longitude}"
+        url = f"https://weather.visualcrossing.com/VisualCrossingWebServices/rest/services/timeline/{coordinates}"
+        api_key = location.api_key or os.environ.get('VISUAL_CROSSING_API_KEY')
+        params = {
+            'key': api_key,
+            'include': 'hours',
+            'elements': 'datetime,solarradiation,temp,cloudcover',
+            'unitGroup': 'metric',
+            'contentType': 'json'
+        }
+        response = requests.get(url, params=params)
+        print(f"GeoClipzProvider: API response status code: {response.status_code}")
+        response.raise_for_status()
+        return response.json()
+
+
+
+    def parse_forecast(self, data):
+        print("GeoClipzProvider: Parsing forecast data")
+        forecasts = []
+        timezone = ZoneInfo(data['timezone'])
+        for day in data['days']:
+            date = datetime.strptime(day['datetime'], '%Y-%m-%d').date()
+            for hour in day['hours']:
+                time = datetime.strptime(hour['datetime'], '%H:%M:%S').time()
+                local_dt = datetime.combine(date, time)
+                local_dt = local_dt.replace(tzinfo=timezone)
+                utc_dt = local_dt.astimezone(ZoneInfo('UTC'))
+                
+                forecasts.append(IrradiationForecast(
+                    timestamp=utc_dt,
+                    ghi=hour['solarradiation'],
+                    air_temp=hour['temp'],
+                    cloud_opacity=hour['cloudcover'] / 100  # Convert to 0-1 scale
+                ))
+        print(f"GeoClipzProvider: Parsed {len(forecasts)} forecast entries")
+        return forecasts
