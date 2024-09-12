@@ -33,6 +33,11 @@ import string
 import random
 
 
+from flask import render_template, flash, redirect, url_for, current_app
+from . import db
+from .models import User
+from .forms import RegistrationForm
+from flask_security import current_user
 
 
 main = Blueprint('main', __name__)
@@ -40,6 +45,24 @@ main = Blueprint('main', __name__)
 
 
 
+
+@main.route('/register', methods=['GET', 'POST'])
+def register():
+    current_app.logger.info("Entering register route")
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+    form = RegistrationForm()
+    current_app.logger.info(f"Form created: {form}")
+    if form.validate_on_submit():
+        user = User(email=form.email.data)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        flash('Your account has been created! You can now log in.', 'success')
+        flash('A confirmation email has been sent to your email address. Please check your inbox to activate your account.', 'info')
+        return redirect(url_for('main.login'))
+    current_app.logger.info(f"Rendering template with form: {form}")
+    return render_template('register.html', title='Register', form=form)
 
 
 
@@ -78,24 +101,6 @@ def manage_users():
     # Only admins can access this
     users = User.query.all()
     return render_template('manage_users.html', users=users)
-
-@main.route('/register', methods=['GET', 'POST'])
-def register():
-    print("Entering register route")
-    if current_user.is_authenticated:
-        return redirect(url_for('main.index'))
-    form = RegistrationForm()
-    print(f"Form created: {form}")
-    if form.validate_on_submit():
-        user = User(email=form.email.data)
-        user.set_password(form.password.data)
-        db.session.add(user)
-        db.session.commit()
-        flash('Your account has been created! You can now log in.', 'success')
-        flash('A confirmation email has been sent to your email address. Please check your inbox to activate your account.', 'info')
-        return redirect(url_for('main.login'))
-    print(f"Rendering template with form: {form}")
-    return render_template('register.html', title='Register', form=form)
 
 
 
