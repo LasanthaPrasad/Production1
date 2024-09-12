@@ -27,7 +27,8 @@ from .forms import RegistrationForm, LoginForm, ForecastLocationForm
 
     # config.py or a new file like providers.py
 
-from .extensions import db, security, user_datastore
+#from .extensions import db, security, user_datastore
+from .extensions import db, security
 import string
 import random
 
@@ -40,6 +41,7 @@ main = Blueprint('main', __name__)
 
 @main.route('/confirm/<token>')
 def confirm_email(token):
+    user_datastore = current_app.extensions['user_datastore']
     try:
         user = confirm_user(token)
         if user:
@@ -137,7 +139,7 @@ def reset_user_password(user_id):
 @main.route('/change_user_role/<int:user_id>', methods=['POST'])
 @roles_required('admin')
 def change_user_role(user_id):
-    user_datastore = current_app.extensions['security'].datastore
+    user_datastore = current_app.extensions['user_datastore']
     user = User.query.get_or_404(user_id)
     new_role = request.form.get('role')
     if new_role in ['user', 'moderator', 'admin']:
@@ -162,8 +164,8 @@ def change_user_role(user_id):
 
 
 def init_routes(app):
-    user_datastore = current_app.extensions['security'].datastore
 
+    user_datastore = current_app.extensions['user_datastore']
     @app.route('/reset', methods=['GET', 'POST'])
     def reset():
         return security.forgot_password_view()
