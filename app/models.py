@@ -1,5 +1,5 @@
 #from . import db
-from datetime import datetime
+from datetime import datetime, timezone
 import uuid
 from flask_security import UserMixin, RoleMixin
 from .extensions import db
@@ -22,8 +22,10 @@ class User(db.Model, UserMixin):
     email = db.Column(db.String(255), unique=True)
     password = db.Column(db.String(255))
     active = db.Column(db.Boolean())
-    confirmed_at = db.Column(db.DateTime, default=datetime.utcnow)
+    confirmed_at = db.Column(db.DateTime, default=datetime.now(timezone.utc))
     fs_uniquifier = db.Column(db.String(255), unique=True, nullable=False)
+    confirmed_at = db.Column(db.DateTime())
+    
     roles = db.relationship('Role', secondary='roles_users',
                             backref=db.backref('users', lazy='dynamic'))
 
@@ -105,7 +107,7 @@ class GridSubstation(db.Model):
     api_status = db.Column(db.String(10), default='disabled')
 
     forecast_location_rel = db.relationship('ForecastLocation', backref='grid_substations')
-    
+
     def update_installed_capacity(self):
         total_capacity = sum(feeder.installed_solar_capacity 
                              for feeder in self.feeders 

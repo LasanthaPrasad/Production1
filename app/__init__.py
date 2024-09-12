@@ -1,7 +1,7 @@
 from flask import Flask
 
 ##from apscheduler.schedulers.background import BackgroundScheduler
-from flask_security import Security, SQLAlchemyUserDatastore
+
 from .models import User, Role
 
 from .extensions import db
@@ -16,11 +16,10 @@ from flask_mail import Mail
 
 
 
-from flask_security import SQLAlchemyUserDatastore
 from .extensions import db, security, mail
 from .models import User, Role  # Make sure this import is correct
 
-
+from datetime import datetime, timedelta, timezone
 
 from .extensions import db
 from .models import ForecastLocation
@@ -34,6 +33,20 @@ from .scheduler import init_app as init_scheduler
 ##scheduler = BackgroundScheduler()
 
 #user_datastore = None
+
+
+class CustomUserDatastore(SQLAlchemyUserDatastore):
+    def confirm_user(self, user):
+        """Confirms a user, activates them and assigns the 'user' role."""
+        user.confirmed_at = datetime.now(timezone.utc)()
+        user.active = True
+        user_role = self.find_role('user')
+        if user_role and user_role not in user.roles:
+            user.roles.append(user_role)
+        self.put(user)
+        return user
+
+
 
 
 def create_app():
@@ -60,9 +73,13 @@ def create_app():
 
     
 
-    user_datastore = SQLAlchemyUserDatastore(db, User, Role)
+
+    user_datastore = CustomUserDatastore(db, User, Role)
     security.init_app(app, user_datastore)
 
+
+#user_datastore = CustomUserDatastore(db, User, Role)
+#security = Security(app, user_datastore)
     #@app.before_first_request
     #def create_user():
     #    db.create_all()

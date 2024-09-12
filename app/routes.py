@@ -47,6 +47,23 @@ class ForecastLocationForm(FlaskForm):
     longitude = FloatField('Longitude', validators=[DataRequired(), NumberRange(min=-180, max=180)])
     api_key = StringField('API Key')
 
+
+
+@main.route('/confirm/<token>')
+def confirm_email(token):
+    try:
+        user = user_datastore.confirm_user(token)
+        if user:
+            flash('Thank you for confirming your email address. Your account is now active.', 'success')
+            return redirect(url_for('main.login'))
+        else:
+            flash('The confirmation link is invalid or has expired.', 'danger')
+    except Exception as e:
+        flash('An error occurred while confirming your email.', 'danger')
+    return redirect(url_for('main.index'))
+
+
+
 @main.route('/view_data')
 @login_required
 def view_data():
@@ -67,7 +84,37 @@ def manage_users():
     return render_template('manage_users.html', users=users)
 
 
+@main.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        user = User(email=form.email.data)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        flash('A confirmation email has been sent to your email address. Please check your inbox to activate your account.', 'info')
+        return redirect(url_for('main.login'))
+    return render_template('register.html', title='Register', form=form)
 
+
+@main.route('/login', methods=['GET', 'POST'])
+def login():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+    form = LoginForm()
+    if form.validate_on_submit():
+        user = User.query.filter_by(email=form.email.data).first()
+        if user and user.check_password(form.password.data):
+            if not user.confirmed_at:
+                flash('Please confirm your account. Check your email for the confirmation link.', 'warning')
+                return redirect(url_for('main.login'))
+            login_user(user, remember=form.remember_me.data)
+            return redirect(url_for('main.index'))
+        else:
+            flash('Invalid email or password', 'danger')
+    return render_template('login.html', title='Sign In', form=form)
 
 
 
