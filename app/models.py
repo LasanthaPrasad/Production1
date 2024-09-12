@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 import uuid
 from flask_security import UserMixin, RoleMixin
 from .extensions import db
-
+from werkzeug.security import generate_password_hash, check_password_hash
 
 #db = SQLAlchemy()
 
@@ -39,9 +39,15 @@ class User(db.Model, UserMixin):
             
     active = db.Column(db.Boolean(), default=True)
 
-roles_users = db.Table('roles_users',
+    roles_users = db.Table('roles_users',
     db.Column('user_id', db.Integer(), db.ForeignKey('users.id')),
     db.Column('role_id', db.Integer(), db.ForeignKey('role.id')))
+    
+    def set_password(self, password):
+        self.password = generate_password_hash(password)
+
+    def check_password(self, password):
+        return check_password_hash(self.password, password)
 """ 
 roles_users = db.Table('roles_users',
     db.Column('user_id', db.Integer, db.ForeignKey('users.id'), primary_key=True),
