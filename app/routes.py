@@ -6,29 +6,26 @@ from datetime import datetime, timedelta, timezone
 from sqlalchemy.orm import joinedload
 import uuid
 from .auth import require_api_key
-from flask_security import login_required, roles_required, roles_accepted, current_user
+from flask_security import login_required, roles_required, roles_accepted, , login_user, current_user
 
 from flask import render_template, redirect, url_for, request, flash
 
 from flask_security.views import reset_password, forgot_password
 from flask_security.utils import hash_password
+from flask_security.confirmable import confirm_user
 
-from flask_wtf import FlaskForm
-from wtforms import StringField, FloatField, SelectField
-from wtforms.validators import DataRequired, NumberRange
+#from flask_wtf import FlaskForm
+#from wtforms import StringField, FloatField, SelectField, PasswordField, BooleanField, SubmitField
+#from wtforms.validators import DataRequired, NumberRange, Email, EqualTo, Length
 from .forecast_service import ForecastService
+from . import user_datastore  # Assuming user_datastore is defined in __init__.py
 
+from .forms import RegistrationForm, LoginForm, ForecastLocationForm
 
 
 #from config import FORECAST_PROVIDERS  # or from wherever you defined the providers
 
     # config.py or a new file like providers.py
-FORECAST_PROVIDERS = [
-    ('solcast', 'Solcast'),
-    #('visualcrossing', 'Visual Crossing'),
-    ('geoclipz', 'GeoClipz Forecast'),
-    #('openweather', 'OpenWeather')
-    ]
 
 from .extensions import db, security
 import string
@@ -41,27 +38,19 @@ main = Blueprint('main', __name__)
 
 
 
-class ForecastLocationForm(FlaskForm):
-    provider_name = SelectField('Provider Name', choices=FORECAST_PROVIDERS, validators=[DataRequired()])
-    latitude = FloatField('Latitude', validators=[DataRequired(), NumberRange(min=-90, max=90)])
-    longitude = FloatField('Longitude', validators=[DataRequired(), NumberRange(min=-180, max=180)])
-    api_key = StringField('API Key')
-
-
-
 @main.route('/confirm/<token>')
 def confirm_email(token):
     try:
-        user = user_datastore.confirm_user(token)
+        user = confirm_user(token)
         if user:
+            user_datastore.commit()
             flash('Thank you for confirming your email address. Your account is now active.', 'success')
-            return redirect(url_for('main.login'))
+            return redirect(url_for('security.login'))
         else:
             flash('The confirmation link is invalid or has expired.', 'danger')
     except Exception as e:
         flash('An error occurred while confirming your email.', 'danger')
     return redirect(url_for('main.index'))
-
 
 
 @main.route('/view_data')
