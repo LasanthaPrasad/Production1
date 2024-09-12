@@ -75,7 +75,25 @@ def manage_users():
     return render_template('manage_users.html', users=users)
 
 
+@main.route('/register', methods=['GET', 'POST'])
+def register():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.index'))
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        user = User(email=form.email.data)
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        flash('Your account has been created! You can now log in.', 'success')
+        flash('A confirmation email has been sent to your email address. Please check your inbox to activate your account.', 'info')
+        return redirect(url_for('main.login'))
+    return render_template('register.html', title='Register', form=form)
 
+
+
+
+""" 
 @main.route('/register', methods=['GET', 'POST'])
 def register():
     if current_user.is_authenticated:
@@ -91,7 +109,7 @@ def register():
         return redirect(url_for('main.login'))
     return render_template('register.html', title='Register', form=form)
 
-
+ """
 
 """ 
 
