@@ -49,7 +49,7 @@ def create_app():
     app.config['SECURITY_EMAIL_TEMPLATES'] = 'security/email'
     app.config['SECURITY_EMAIL_SUBJECT_PASSWORD_RESET'] = 'GeoClipz Password Reset Instructions'
     app.config['SECURITY_LOGIN_USER_TEMPLATE'] = 'security/login_user.html'
-    app.config['SECURITY_REGISTER_USER_TEMPLATE'] = 'register.html'
+    app.config['SECURITY_REGISTER_USER_TEMPLATE'] = 'security/register.html'
     app.config['SECURITY_FORGOT_PASSWORD_TEMPLATE'] = 'security/forgot_password.html'
     app.config['SECURITY_RESET_PASSWORD_TEMPLATE'] = 'security/reset_password.html'
 
