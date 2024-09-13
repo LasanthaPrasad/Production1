@@ -9,6 +9,9 @@ from flask_wtf.file import FileField, FileAllowed
 from wtforms import SelectField
 
 
+
+
+
 FORECAST_PROVIDERS = [
     ('solcast', 'Solcast'),
     #('visualcrossing', 'Visual Crossing'),
@@ -80,3 +83,21 @@ class ForecastLocationForm(FlaskForm):
     longitude = FloatField('Longitude', validators=[DataRequired(), NumberRange(min=-180, max=180)])
     api_key = StringField('API Key')
 
+
+
+class SolarPlantForm(FlaskForm):
+    name = StringField('Name', validators=[DataRequired()])
+    latitude = FloatField('Latitude', validators=[DataRequired(), NumberRange(min=-90, max=90)])
+    longitude = FloatField('Longitude', validators=[DataRequired(), NumberRange(min=-180, max=180)])
+    grid_substation = SelectField('Grid Substation', coerce=int, validators=[DataRequired()])
+    feeder = SelectField('Feeder', coerce=int, validators=[DataRequired()])
+    forecast_location = SelectField('Forecast Location', coerce=int, validators=[DataRequired()])
+    installed_capacity = FloatField('Installed Capacity (MW)', validators=[DataRequired(), NumberRange(min=0)])
+    panel_capacity = FloatField('Panel Capacity (MW)', validators=[DataRequired(), NumberRange(min=0)])
+    inverter_capacity = FloatField('Inverter Capacity (MW)', validators=[DataRequired(), NumberRange(min=0)])
+    plant_angle = FloatField('Plant Angle', validators=[DataRequired()])
+    company = StringField('Company', validators=[DataRequired()])
+    api_status = SelectField('API Status', choices=[('enabled', 'Enabled'), ('disabled', 'Disabled')], validators=[DataRequired()])
+    plant_efficiency = FloatField('Plant Efficiency', validators=[DataRequired(), NumberRange(min=0, max=1)])
+    coefficient_factor = FloatField('Coefficient Factor', validators=[DataRequired(), NumberRange(min=0, max=1)])
+    submit = SubmitField('Submit')

@@ -20,7 +20,7 @@ from flask_security.confirmable import confirm_user
 from .forecast_service import ForecastService
 #from . import user_datastore  # Assuming user_datastore is defined in __init__.py
 
-from .forms import RegistrationForm, LoginForm, ForecastLocationForm
+from .forms import RegistrationForm, LoginForm, ForecastLocationForm, SolarPlantForm
 
 
 #from config import FORECAST_PROVIDERS  # or from wherever you defined the providers
@@ -246,7 +246,7 @@ def process_feeders(csv_data):
         )
         db.session.add(feeder)
     db.session.commit()
-    
+
 """ 
 def process_solar_plants(csv_data):
     for row in csv_data:
@@ -987,6 +987,47 @@ def solar_plants():
 
 @main.route('/solar_plants/create', methods=['GET', 'POST'])
 def create_solar_plant():
+    form = SolarPlantForm()
+    
+    # Populate the choices for grid_substation and forecast_location
+    form.grid_substation.choices = [(s.id, s.name) for s in GridSubstation.query.all()]
+    form.forecast_location.choices = [(f.id, f"{f.provider_name} ({f.latitude}, {f.longitude})") for f in ForecastLocation.query.all()]
+    
+    if form.validate_on_submit():
+        plant = SolarPlant(
+            name=form.name.data,
+            latitude=form.latitude.data,
+            longitude=form.longitude.data,
+            grid_substation=form.grid_substation.data,
+            feeder=form.feeder.data,
+            forecast_location=form.forecast_location.data,
+            installed_capacity=form.installed_capacity.data,
+            panel_capacity=form.panel_capacity.data,
+            inverter_capacity=form.inverter_capacity.data,
+            plant_angle=form.plant_angle.data,
+            company=form.company.data,
+            api_status=form.api_status.data,
+            plant_efficiency=form.plant_efficiency.data,
+            coefficient_factor=form.coefficient_factor.data
+        )
+        db.session.add(plant)
+        db.session.commit()
+        flash('Solar Plant created successfully!', 'success')
+        return redirect(url_for('main.solar_plants'))
+    
+    return render_template('create_solar_plant.html', form=form)
+
+
+
+
+
+
+
+""" 
+
+
+@main.route('/solar_plants/create', methods=['GET', 'POST'])
+def create_solar_plant():
     if request.method == 'POST':
         try:
             plant = SolarPlant(
@@ -1016,6 +1057,7 @@ def create_solar_plant():
     substations = GridSubstation.query.all()
     forecast_locations = ForecastLocation.query.all()
     return render_template('create_solar_plant.html', substations=substations, forecast_locations=forecast_locations)
+ """
 
 @main.route('/solar_plants/<int:id>/edit', methods=['GET', 'POST'])
 def edit_solar_plant(id):

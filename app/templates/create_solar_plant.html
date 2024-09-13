@@ -4,75 +4,62 @@
 <form method="POST">
     {{ form.hidden_tag() }}
     <div class="form-group">
-        <label for="name">Name</label>
-        <input type="text" class="form-control" id="name" name="name" required>
+        {{ form.name.label }}
+        {{ form.name(class="form-control") }}
     </div>
     <div class="form-group">
-        <label for="latitude">Latitude</label>
-        <input type="number" step="any" class="form-control" id="latitude" name="latitude" required>
+        {{ form.latitude.label }}
+        {{ form.latitude(class="form-control") }}
     </div>
     <div class="form-group">
-        <label for="longitude">Longitude</label>
-        <input type="number" step="any" class="form-control" id="longitude" name="longitude" required>
+        {{ form.longitude.label }}
+        {{ form.longitude(class="form-control") }}
     </div>
     <div class="form-group">
-        <label for="grid_substation">Grid Substation</label>
-        <select class="form-control" id="grid_substation" name="grid_substation" required>
-            {% for substation in substations %}
-            <option value="{{ substation.id }}">{{ substation.name }}</option>
-            {% endfor %}
-        </select>
+        {{ form.grid_substation.label }}
+        {{ form.grid_substation(class="form-control") }}
     </div>
     <div class="form-group">
-        <label for="feeder">Feeder</label>
-        <select class="form-control" id="feeder" name="feeder" required>
-            <!-- Options will be populated dynamically based on selected substation -->
-        </select>
+        {{ form.feeder.label }}
+        {{ form.feeder(class="form-control") }}
     </div>
     <div class="form-group">
-        <label for="forecast_location">Forecast Location</label>
-        <select class="form-control" id="forecast_location" name="forecast_location" required>
-            {% for location in forecast_locations %}
-            <option value="{{ location.id }}">{{ location.provider_name }} ({{ location.latitude }}, {{ location.longitude }})</option>
-            {% endfor %}
-        </select>
+        {{ form.forecast_location.label }}
+        {{ form.forecast_location(class="form-control") }}
     </div>
     <div class="form-group">
-        <label for="installed_capacity">Installed Capacity (MW)</label>
-        <input type="number" step="0.01" class="form-control" id="installed_capacity" name="installed_capacity" required>
+        {{ form.installed_capacity.label }}
+        {{ form.installed_capacity(class="form-control") }}
     </div>
     <div class="form-group">
-        <label for="panel_capacity">Panel Capacity (MW)</label>
-        <input type="number" step="0.01" class="form-control" id="panel_capacity" name="panel_capacity" required>
+        {{ form.panel_capacity.label }}
+        {{ form.panel_capacity(class="form-control") }}
     </div>
     <div class="form-group">
-        <label for="inverter_capacity">Inverter Capacity (MW)</label>
-        <input type="number" step="0.01" class="form-control" id="inverter_capacity" name="inverter_capacity" required>
+        {{ form.inverter_capacity.label }}
+        {{ form.inverter_capacity(class="form-control") }}
     </div>
     <div class="form-group">
-        <label for="plant_angle">Plant Angle</label>
-        <input type="number" step="0.01" class="form-control" id="plant_angle" name="plant_angle" required>
+        {{ form.plant_angle.label }}
+        {{ form.plant_angle(class="form-control") }}
     </div>
     <div class="form-group">
-        <label for="company">Company</label>
-        <input type="text" class="form-control" id="company" name="company" required>
+        {{ form.company.label }}
+        {{ form.company(class="form-control") }}
     </div>
     <div class="form-group">
-        <label for="api_status">API Status</label>
-        <select class="form-control" id="api_status" name="api_status" required>
-            <option value="enabled">Enabled</option>
-            <option value="disabled">Disabled</option>
-        </select>
+        {{ form.api_status.label }}
+        {{ form.api_status(class="form-control") }}
     </div>
     <div class="form-group">
-        <label for="plant_efficiency">Plant Efficiency</label>
-        <input type="number" step="0.01" class="form-control" id="plant_efficiency" name="plant_efficiency" required>
+        {{ form.plant_efficiency.label }}
+        {{ form.plant_efficiency(class="form-control") }}
     </div>
     <div class="form-group">
-        <label for="coefficient_factor">Coefficient Factor</label>
-        <input type="number" step="0.01" class="form-control" id="coefficient_factor" name="coefficient_factor" required>
+        {{ form.coefficient_factor.label }}
+        {{ form.coefficient_factor(class="form-control") }}
     </div>
-    <button type="submit" class="btn btn-primary">Create Solar Plant</button>
+    {{ form.submit(class="btn btn-primary") }}
 </form>
 {% endblock %}
 
