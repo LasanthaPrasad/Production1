@@ -981,7 +981,7 @@ def solar_plants():
     plants = SolarPlant.query.options(
         joinedload(SolarPlant.grid_substation_rel),
         joinedload(SolarPlant.feeder_rel)
-    ).all()
+    ).order_by(SolarPlant.id).all()
     return render_template('solar_plants.html', plants=plants)
 
 # Solar Plants
@@ -1258,73 +1258,6 @@ def edit_solar_plant(id):
 
 
 
-
-
-
-
-
-
-""" 
-
-
-@main.route('/solar_plants/create', methods=['GET', 'POST'])
-def create_solar_plant():
-    if request.method == 'POST':
-        try:
-            plant = SolarPlant(
-                name=request.form['name'],
-                latitude=float(request.form['latitude']),
-                longitude=float(request.form['longitude']),
-                grid_substation=int(request.form['grid_substation']),
-                feeder=int(request.form['feeder']),
-                forecast_location=int(request.form['forecast_location']),
-                installed_capacity=float(request.form['installed_capacity']),
-                panel_capacity=float(request.form['panel_capacity']),
-                inverter_capacity=float(request.form['inverter_capacity']),
-                plant_angle=float(request.form['plant_angle']),
-                company=request.form['company'],
-                api_status=request.form['api_status']
-            )
-            db.session.add(plant)
-            db.session.commit()
-            flash('Solar Plant created successfully!', 'success')
-            return redirect(url_for('main.solar_plants'))
-        except Exception as e:
-            db.session.rollback()
-            flash(f'Error creating Solar Plant: {str(e)}', 'danger')
-
-    substations = GridSubstation.query.all()
-    forecast_locations = ForecastLocation.query.all()
-    return render_template('create_solar_plant.html', substations=substations, forecast_locations=forecast_locations)
-
-@main.route('/solar_plants/<int:id>/edit', methods=['GET', 'POST'])
-def edit_solar_plant(id):
-    plant = SolarPlant.query.get_or_404(id)
-    if request.method == 'POST':
-        try:
-            plant.name = request.form['name']
-            plant.latitude = float(request.form['latitude'])
-            plant.longitude = float(request.form['longitude'])
-            plant.grid_substation = int(request.form['grid_substation'])
-            plant.feeder = int(request.form['feeder'])
-            plant.forecast_location = int(request.form['forecast_location'])
-            plant.installed_capacity = float(request.form['installed_capacity'])
-            plant.panel_capacity = float(request.form['panel_capacity'])
-            plant.inverter_capacity = float(request.form['inverter_capacity'])
-            plant.plant_angle = float(request.form['plant_angle'])
-            plant.company = request.form['company']
-            plant.api_status = request.form['api_status']           
-            db.session.commit()
-            flash('Solar Plant updated successfully!', 'success')
-            return redirect(url_for('main.solar_plants'))
-        except Exception as e:
-            db.session.rollback()
-            flash(f'Error updating Solar Plant: {str(e)}', 'danger')
-
-    substations = GridSubstation.query.all()
-    forecast_locations = ForecastLocation.query.all()
-    return render_template('edit_solar_plant.html', plant=plant, substations=substations, forecast_locations=forecast_locations)
- """
 
 
 
