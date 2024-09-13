@@ -38,7 +38,7 @@ from flask import render_template, flash, redirect, url_for, current_app
 #from .models import User
 #from .forms import RegistrationForm
 #from flask_security import current_user
-
+from sqlalchemy import text
 
 import csv
 import io
@@ -989,12 +989,21 @@ def solar_plants():
 def create_solar_plant():
     form = SolarPlantForm()
     
+    substations = GridSubstation.query.all()
+    form.grid_substation.choices = [(s.id, s.name) for s in substations]
+    current_app.logger.info(f"Grid substation choices: {form.grid_substation.choices}")
+
+    form.forecast_location.choices = [(f.id, f"{f.provider_name} ({f.latitude}, {f.longitude})") for f in ForecastLocation.query.all()]
+   
+    """ 
     # Populate the choices for grid_substation and forecast_location
     form.grid_substation.choices = [(s.id, s.name) for s in GridSubstation.query.all()]
     form.forecast_location.choices = [(f.id, f"{f.provider_name} ({f.latitude}, {f.longitude})") for f in ForecastLocation.query.all()]
-    
+    """
     # We'll populate feeder choices dynamically with JavaScript
     form.feeder.choices = []
+
+
 
     if form.validate_on_submit():
         plant = SolarPlant(
@@ -1019,24 +1028,21 @@ def create_solar_plant():
         return redirect(url_for('main.solar_plants'))
     
     return render_template('create_solar_plant.html', form=form)
-""" 
-@main.route('/get_feeders/<int:substation_id>')
-def get_feeders(substation_id):
-    feeders = Feeder.query.filter_by(grid_substation=substation_id).all()
-    return jsonify([{'id': f.id, 'name': f.name} for f in feeders])
- """
+
 
 @main.route('/get_feeders/<int:substation_id>')
 def get_feeders(substation_id):
     current_app.logger.info(f"Fetching feeders for substation ID: {substation_id}")
+    
+    # Get the SQL query as a string
+    query = Feeder.query.filter_by(grid_substation=substation_id).statement
+    current_app.logger.info(f"SQL Query: {query}")
+    
     feeders = Feeder.query.filter_by(grid_substation=substation_id).all()
     current_app.logger.info(f"Found {len(feeders)} feeders")
     feeder_list = [{'id': f.id, 'name': f.name} for f in feeders]
     current_app.logger.info(f"Feeder list: {feeder_list}")
     return jsonify(feeder_list)
-
-
-
 
 
 
@@ -1211,12 +1217,7 @@ def edit_solar_plant(id):
     return render_template('edit_solar_plant.html', plant=plant, substations=substations, forecast_locations=forecast_locations)
  """
 
-""" 
-@main.route('/get_feeders/<int:substation_id>')
-def get_feeders(substation_id):
-    feeders = Feeder.query.filter_by(grid_substation=substation_id).all()
-    return jsonify([{'id': f.id, 'name': f.name} for f in feeders])
- """
+
 
 @main.route('/solar_plants/<int:id>/delete', methods=['POST'])
 def delete_solar_plant(id):
