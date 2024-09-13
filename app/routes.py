@@ -993,6 +993,56 @@ def create_solar_plant():
     form.grid_substation.choices = [(s.id, s.name) for s in GridSubstation.query.all()]
     form.forecast_location.choices = [(f.id, f"{f.provider_name} ({f.latitude}, {f.longitude})") for f in ForecastLocation.query.all()]
     
+    # We'll populate feeder choices dynamically with JavaScript
+    form.feeder.choices = []
+
+    if form.validate_on_submit():
+        plant = SolarPlant(
+            name=form.name.data,
+            latitude=form.latitude.data,
+            longitude=form.longitude.data,
+            grid_substation=form.grid_substation.data,
+            feeder=form.feeder.data,
+            forecast_location=form.forecast_location.data,
+            installed_capacity=form.installed_capacity.data,
+            panel_capacity=form.panel_capacity.data,
+            inverter_capacity=form.inverter_capacity.data,
+            plant_angle=form.plant_angle.data,
+            company=form.company.data,
+            api_status=form.api_status.data,
+            plant_efficiency=form.plant_efficiency.data,
+            coefficient_factor=form.coefficient_factor.data
+        )
+        db.session.add(plant)
+        db.session.commit()
+        flash('Solar Plant created successfully!', 'success')
+        return redirect(url_for('main.solar_plants'))
+    
+    return render_template('create_solar_plant.html', form=form)
+
+@main.route('/get_feeders/<int:substation_id>')
+def get_feeders(substation_id):
+    feeders = Feeder.query.filter_by(grid_substation=substation_id).all()
+    return jsonify([{'id': f.id, 'name': f.name} for f in feeders])
+
+
+
+
+
+
+
+
+
+""" 
+
+@main.route('/solar_plants/create', methods=['GET', 'POST'])
+def create_solar_plant():
+    form = SolarPlantForm()
+    
+    # Populate the choices for grid_substation and forecast_location
+    form.grid_substation.choices = [(s.id, s.name) for s in GridSubstation.query.all()]
+    form.forecast_location.choices = [(f.id, f"{f.provider_name} ({f.latitude}, {f.longitude})") for f in ForecastLocation.query.all()]
+    
     if form.validate_on_submit():
         plant = SolarPlant(
             name=form.name.data,
@@ -1019,7 +1069,7 @@ def create_solar_plant():
 
 
 
-
+ """
 
 
 
@@ -1153,11 +1203,13 @@ def edit_solar_plant(id):
     forecast_locations = ForecastLocation.query.all()
     return render_template('edit_solar_plant.html', plant=plant, substations=substations, forecast_locations=forecast_locations)
  """
+
+""" 
 @main.route('/get_feeders/<int:substation_id>')
 def get_feeders(substation_id):
     feeders = Feeder.query.filter_by(grid_substation=substation_id).all()
     return jsonify([{'id': f.id, 'name': f.name} for f in feeders])
-
+ """
 
 @main.route('/solar_plants/<int:id>/delete', methods=['POST'])
 def delete_solar_plant(id):
