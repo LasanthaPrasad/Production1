@@ -34,13 +34,118 @@ import random
 
 
 from flask import render_template, flash, redirect, url_for, current_app
-from . import db
-from .models import User
-from .forms import RegistrationForm
-from flask_security import current_user
+#from . import db
+#from .models import User
+#from .forms import RegistrationForm
+#from flask_security import current_user
+
+
+import csv
+import io
+from flask import request, flash
+from flask_security import roles_required
+from .forms import BulkUploadForm
+from .models import ForecastLocation, GridSubstation, Feeder, SolarPlant
+
+
+
 
 
 main = Blueprint('main', __name__)
+
+
+
+@main.route('/admin/bulk_upload', methods=['GET', 'POST'])
+@roles_required('admin')
+def admin_bulk_upload():
+    form = BulkUploadForm()
+    if form.validate_on_submit():
+        csv_file = request.files['file']
+        data_type = form.data_type.data
+        
+        if csv_file:
+            csv_file = csv_file.read().decode('utf-8')
+            csv_data = csv.DictReader(io.StringIO(csv_file))
+            
+            try:
+                if data_type == 'forecast_locations':
+                    process_forecast_locations(csv_data)
+                elif data_type == 'grid_substations':
+                    process_grid_substations(csv_data)
+                elif data_type == 'feeders':
+                    process_feeders(csv_data)
+                elif data_type == 'solar_plants':
+                    process_solar_plants(csv_data)
+                
+                flash(f'Bulk upload for {data_type} completed successfully!', 'success')
+            except Exception as e:
+                flash(f'Error during bulk upload: {str(e)}', 'error')
+        
+    return render_template('admin/bulk_upload.html', form=form)
+
+def process_forecast_locations(csv_data):
+    for row in csv_data:
+        location = ForecastLocation(
+            provider_name=row['provider_name'],
+            latitude=float(row['latitude']),
+            longitude=float(row['longitude']),
+            api_key=row.get('api_key')
+        )
+        db.session.add(location)
+    db.session.commit()
+
+def process_grid_substations(csv_data):
+    for row in csv_data:
+        substation = GridSubstation(
+            name=row['name'],
+            code=row['code'],
+            latitude=float(row['latitude']),
+            longitude=float(row['longitude']),
+            installed_solar_capacity=float(row['installed_solar_capacity']),
+            api_status=row['api_status']
+        )
+        db.session.add(substation)
+    db.session.commit()
+
+def process_feeders(csv_data):
+    for row in csv_data:
+        feeder = Feeder(
+            name=row['name'],
+            code=row['code'],
+            grid_substation=int(row['grid_substation']),
+            installed_solar_capacity=float(row['installed_solar_capacity']),
+            status=row['status']
+        )
+        db.session.add(feeder)
+    db.session.commit()
+
+def process_solar_plants(csv_data):
+    for row in csv_data:
+        plant = SolarPlant(
+            name=row['name'],
+            latitude=float(row['latitude']),
+            longitude=float(row['longitude']),
+            grid_substation=int(row['grid_substation']),
+            feeder=int(row['feeder']),
+            forecast_location=int(row['forecast_location']),
+            installed_capacity=float(row['installed_capacity']),
+            panel_capacity=float(row['panel_capacity']),
+            inverter_capacity=float(row['inverter_capacity']),
+            plant_angle=float(row['plant_angle']),
+            company=row['company'],
+            api_status=row['api_status']
+        )
+        db.session.add(plant)
+    db.session.commit()
+
+
+
+
+
+
+
+
+
 
 
 
