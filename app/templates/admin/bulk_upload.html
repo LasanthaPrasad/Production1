@@ -1,0 +1,26 @@
+
+{% extends "base.html" %}
+{% block content %}
+    <h1>Bulk Data Upload</h1>
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <div>
+            {{ form.file.label }}
+            {{ form.file() }}
+        </div>
+        <div>
+            {{ form.data_type.label }}
+            {{ form.data_type() }}
+        </div>
+        <div>
+            {{ form.submit() }}
+        </div>
+    </form>
+    <h2>Download Sample CSVs:</h2>
+    <ul>
+        <li><a href="{{ url_for('main.sample_csv', data_type='forecast_locations') }}">Forecast Locations Sample</a></li>
+        <li><a href="{{ url_for('main.sample_csv', data_type='grid_substations') }}">Grid Substations Sample</a></li>
+        <li><a href="{{ url_for('main.sample_csv', data_type='feeders') }}">Feeders Sample</a></li>
+        <li><a href="{{ url_for('main.sample_csv', data_type='solar_plants') }}">Solar Plants Sample</a></li>
+    </ul>
+{% endblock %}

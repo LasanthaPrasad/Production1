@@ -5,6 +5,9 @@ from .models import User
 from wtforms import StringField, FloatField, SelectField, PasswordField, BooleanField, SubmitField
 from wtforms.validators import DataRequired, NumberRange, Email, EqualTo, Length,  ValidationError
 import re
+from flask_wtf.file import FileField, FileAllowed
+from wtforms import SelectField
+
 
 FORECAST_PROVIDERS = [
     ('solcast', 'Solcast'),
@@ -14,6 +17,18 @@ FORECAST_PROVIDERS = [
     ]
 
 
+
+class BulkUploadForm(FlaskForm):
+    file = FileField('CSV File', validators=[
+        FileAllowed(['csv'], 'CSV files only!')
+    ])
+    data_type = SelectField('Data Type', choices=[
+        ('forecast_locations', 'Forecast Locations'),
+        ('grid_substations', 'Grid Substations'),
+        ('feeders', 'Feeders'),
+        ('solar_plants', 'Solar Plants')
+    ])
+    submit = SubmitField('Upload')
 
 
 def password_check(form, field):

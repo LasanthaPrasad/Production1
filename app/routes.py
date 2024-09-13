@@ -1,5 +1,5 @@
 
-from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, current_app
+from flask import Blueprint, render_template, request, redirect, url_for, flash, jsonify, current_app,Response
 #from . import db
 from .models import ForecastLocation, IrradiationForecast, SolarPlant, GridSubstation, Feeder, User, Role
 from datetime import datetime, timedelta, timezone
@@ -42,10 +42,10 @@ from flask import render_template, flash, redirect, url_for, current_app
 
 import csv
 import io
-from flask import request, flash
-from flask_security import roles_required
+#from flask import request, flash
+#from flask_security import roles_required
 from .forms import BulkUploadForm
-from .models import ForecastLocation, GridSubstation, Feeder, SolarPlant
+#from .models import ForecastLocation, GridSubstation, Feeder, SolarPlant
 
 
 
@@ -53,6 +53,29 @@ from .models import ForecastLocation, GridSubstation, Feeder, SolarPlant
 
 main = Blueprint('main', __name__)
 
+
+
+
+@main.route('/admin/sample_csv/<data_type>')
+@roles_required('admin')
+def sample_csv(data_type):
+    if data_type == 'forecast_locations':
+        csv_data = "provider_name,latitude,longitude,api_key\nSolcast,40.7128,-74.0060,your_api_key_here\n"
+    elif data_type == 'grid_substations':
+        csv_data = "name,code,latitude,longitude,installed_solar_capacity,api_status\nSubstation A,SUB001,40.7128,-74.0060,100.5,enabled\n"
+    elif data_type == 'feeders':
+        csv_data = "name,code,grid_substation,installed_solar_capacity,status\nFeeder A,FDR001,1,50.25,active\n"
+    elif data_type == 'solar_plants':
+        csv_data = "name,latitude,longitude,grid_substation,feeder,forecast_location,installed_capacity,panel_capacity,inverter_capacity,plant_angle,company,api_status\nPlant A,40.7128,-74.0060,1,1,1,75.5,80.0,70.0,30.0,Company XYZ,enabled\n"
+    else:
+        return "Invalid data type", 400
+
+    return Response(
+        csv_data,
+        mimetype="text/csv",
+        headers={"Content-disposition":
+                 f"attachment; filename={data_type}_sample.csv"}
+    )
 
 
 @main.route('/admin/bulk_upload', methods=['GET', 'POST'])
@@ -83,15 +106,26 @@ def admin_bulk_upload():
         
     return render_template('admin/bulk_upload.html', form=form)
 
+
+
 def process_forecast_locations(csv_data):
     for row in csv_data:
-        location = ForecastLocation(
-            provider_name=row['provider_name'],
-            latitude=float(row['latitude']),
-            longitude=float(row['longitude']),
-            api_key=row.get('api_key')
-        )
-        db.session.add(location)
+        try:
+            location = ForecastLocation(
+                provider_name=row['provider_name'],
+                latitude=float(row['latitude']),
+                longitude=float(row['longitude']),
+                api_key=row.get('api_key')
+            )
+            db.session.add(location)
+        except KeyError as e:
+            flash(f"Missing required field: {str(e)}", 'error')
+            db.session.rollback()
+            return
+        except ValueError as e:
+            flash(f"Invalid data format: {str(e)}", 'error')
+            db.session.rollback()
+            return
     db.session.commit()
 
 def process_grid_substations(csv_data):
