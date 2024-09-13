@@ -1,13 +1,16 @@
 {% extends "base.html" %}
-
 {% block content %}
+
 <h1>Admin Dashboard</h1>
 <!-- Add admin-specific content here -->
-<a href="{{ url_for('main.admin_bulk_upload') }}">Bulk Data Upload</a>
+<div class="form-group">
+<a href="{{ url_for('main.admin_bulk_upload') }}" class="btn btn-primary mb-3">Bulk Data Upload</a>
+</div>
 
 
+<div class="form-group">
 <button id="assignForecastLocations" class="btn btn-primary">Assign Nearest Forecast Locations</button>
-
+</div>
 
 
 {% endblock %}
