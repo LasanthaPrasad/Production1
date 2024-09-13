@@ -60,6 +60,45 @@ logger = logging.getLogger(__name__)
 main = Blueprint('main', __name__)
 
 
+from .utils import calculate_distance
+
+
+
+@main.route('/assign_forecast_locations', methods=['POST'])
+@roles_required('admin')  # Ensure only admins can trigger this
+def trigger_assign_forecast_locations():
+    try:
+        assign_nearest_forecast_locations()
+        return jsonify({"message": "Successfully assigned nearest forecast locations to all grid substations."}), 200
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+    
+
+def assign_nearest_forecast_locations():
+    grid_substations = GridSubstation.query.all()
+    forecast_locations = ForecastLocation.query.all()
+
+    for substation in grid_substations:
+        nearest_location = None
+        min_distance = float('inf')
+
+        for location in forecast_locations:
+            distance = calculate_distance(
+                substation.latitude, substation.longitude,
+                location.latitude, location.longitude
+            )
+
+            if distance < min_distance:
+                min_distance = distance
+                nearest_location = location
+
+        if nearest_location:
+            substation.forecast_location = nearest_location.id
+            print(f"Assigned forecast location {nearest_location.id} to substation {substation.id}")
+
+    db.session.commit()
+    print("Finished assigning nearest forecast locations to all grid substations.")
+
 
 
 

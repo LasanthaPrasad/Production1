@@ -4,4 +4,26 @@
 <h1>Admin Dashboard</h1>
 <!-- Add admin-specific content here -->
 <a href="{{ url_for('main.admin_bulk_upload') }}">Bulk Data Upload</a>
+
+
+<button id="assignForecastLocations" class="btn btn-primary">Assign Nearest Forecast Locations</button>
+
+
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('assignForecastLocations').addEventListener('click', function() {
+    fetch('/assign_forecast_locations', { method: 'POST' })
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message || data.error);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred while assigning forecast locations.');
+        });
+});
+</script>
 {% endblock %}
