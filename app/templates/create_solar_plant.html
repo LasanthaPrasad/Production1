@@ -74,7 +74,7 @@
 
     document.addEventListener('DOMContentLoaded', function() {
 
-        print('DOM content loaded');
+      
 
         var gridSubstationSelect = document.getElementById('grid_substation');
         var feederSelect = document.getElementById('feeder');
@@ -86,7 +86,7 @@
             
             fetch('/get_feeders/' + substationId)
                 .then(response => {
-                    print('Response status:', response.status);
+                   
                     return response.json();
                 })
                 .then(data => {
