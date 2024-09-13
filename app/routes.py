@@ -1001,11 +1001,14 @@ def create_solar_plant():
     form = SolarPlantForm()
 
     substations = GridSubstation.query.all()
+    print(f"Number of Gridss : {len(substations)}")
+
     form.grid_substation.choices = [(s.id, s.name) for s in substations]
     form.forecast_location.choices = [(f.id, f"{f.provider_name} ({f.latitude}, {f.longitude})") for f in ForecastLocation.query.all()]
-    
+    print(f"Grid substation choices: {form.grid_substation.choices}")
     # Initialize feeder choices with an empty option
     form.feeder.choices = [('', 'Select a Grid Substation first')]
+
 
     if form.validate_on_submit():
         try:

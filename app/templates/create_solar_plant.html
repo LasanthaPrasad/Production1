@@ -71,7 +71,11 @@
 
 
 {% block scripts %}
+
+
+<!-- 
 <script>
+
     document.addEventListener('DOMContentLoaded', function() {
         var gridSubstationSelect = document.getElementById('grid_substation');
         var feederSelect = document.getElementById('feeder');
@@ -108,4 +112,57 @@
         }
     });
     </script>
+
+ -->
+
+
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const gridSubstationSelect = document.getElementById('grid_substation');
+        const feederSelect = document.getElementById('feeder');
+    
+        function updateFeeders() {
+            const substationId = gridSubstationSelect.value;
+            feederSelect.innerHTML = '<option value="">Select a Feeder</option>';
+            
+            if (substationId) {
+                fetch(`/get_feeders/${substationId}`)
+                    .then(response => response.json())
+                    .then(feeders => {
+                        feeders.forEach(feeder => {
+                            const option = document.createElement('option');
+                            option.value = feeder.id;
+                            option.textContent = feeder.name;
+                            feederSelect.appendChild(option);
+                        });
+                        {% if plant %}
+                        feederSelect.value = "{{ plant.feeder }}";
+                        {% endif %}
+                    });
+            }
+        }
+    
+        gridSubstationSelect.addEventListener('change', updateFeeders);
+    
+        // Call updateFeeders on page load for edit page
+        {% if plant %}
+        updateFeeders();
+        {% endif %}
+    });
+    </script>
+
+
+
+
+
+
+
+
+
 {% endblock %}
+
+
+
