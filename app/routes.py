@@ -1019,14 +1019,21 @@ def create_solar_plant():
         return redirect(url_for('main.solar_plants'))
     
     return render_template('create_solar_plant.html', form=form)
-
+""" 
 @main.route('/get_feeders/<int:substation_id>')
 def get_feeders(substation_id):
     feeders = Feeder.query.filter_by(grid_substation=substation_id).all()
     return jsonify([{'id': f.id, 'name': f.name} for f in feeders])
+ """
 
-
-
+@main.route('/get_feeders/<int:substation_id>')
+def get_feeders(substation_id):
+    current_app.logger.info(f"Fetching feeders for substation ID: {substation_id}")
+    feeders = Feeder.query.filter_by(grid_substation=substation_id).all()
+    current_app.logger.info(f"Found {len(feeders)} feeders")
+    feeder_list = [{'id': f.id, 'name': f.name} for f in feeders]
+    current_app.logger.info(f"Feeder list: {feeder_list}")
+    return jsonify(feeder_list)
 
 
 

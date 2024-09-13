@@ -144,6 +144,7 @@ class Feeder(db.Model):
     name = db.Column(db.String(255), nullable=False)
     code = db.Column(db.String(50), unique=True, nullable=False)
     grid_substation = db.Column(db.Integer, db.ForeignKey('grid_substations.id'), nullable=False)
+
     installed_solar_capacity = db.Column(db.Numeric(10, 2))
     status = db.Column(db.String(50), default='active')
     outage_start = db.Column(db.DateTime)

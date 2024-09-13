@@ -63,6 +63,7 @@
 </form>
 {% endblock %}
 
+
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
@@ -71,12 +72,20 @@
 
         function updateFeeders() {
             var substationId = gridSubstationSelect.value;
+            console.log('Selected substation ID:', substationId);
             feederSelect.innerHTML = '<option value="">Loading...</option>';
             
             fetch('/get_feeders/' + substationId)
-                .then(response => response.json())
+                .then(response => {
+                    console.log('Response status:', response.status);
+                    return response.json();
+                })
                 .then(data => {
+                    console.log('Received feeder data:', data);
                     feederSelect.innerHTML = '<option value="">Select a Feeder</option>';
+                    if (data.length === 0) {
+                        console.log('No feeders found for this substation');
+                    }
                     data.forEach(feeder => {
                         var option = document.createElement('option');
                         option.value = feeder.id;
