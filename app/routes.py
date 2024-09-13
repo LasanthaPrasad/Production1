@@ -1008,9 +1008,10 @@ def create_solar_plant():
     form.grid_substation.choices = [(s.id, s.name) for s in GridSubstation.query.all()]
     form.forecast_location.choices = [(f.id, f"{f.provider_name} ({f.latitude}, {f.longitude})") for f in ForecastLocation.query.all()]
     """
-    # We'll populate feeder choices dynamically with JavaScript
-    form.feeder.choices = []
 
+    # Initialize feeder choices with an empty option
+    form.feeder.choices = [('', 'Select a Grid Substation first')]
+    print("feeders route")
 
 
     if form.validate_on_submit():
