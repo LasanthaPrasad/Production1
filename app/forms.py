@@ -85,12 +85,17 @@ class ForecastLocationForm(FlaskForm):
 
 
 
+def int_or_empty(value):
+    if value == '':
+        return None
+    return int(value)
+
 class SolarPlantForm(FlaskForm):
     name = StringField('Name', validators=[DataRequired()])
     latitude = FloatField('Latitude', validators=[DataRequired(), NumberRange(min=-90, max=90)])
     longitude = FloatField('Longitude', validators=[DataRequired(), NumberRange(min=-180, max=180)])
     grid_substation = SelectField('Grid Substation', coerce=int, validators=[DataRequired()])
-    feeder = SelectField('Feeder', coerce=int, validators=[Optional()])
+    feeder = SelectField('Feeder', coerce=int_or_empty, validators=[Optional()])
     forecast_location = SelectField('Forecast Location', coerce=int, validators=[DataRequired()])
     installed_capacity = FloatField('Installed Capacity (MW)', validators=[DataRequired(), NumberRange(min=0)])
     panel_capacity = FloatField('Panel Capacity (MW)', validators=[DataRequired(), NumberRange(min=0)])

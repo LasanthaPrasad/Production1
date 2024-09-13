@@ -996,9 +996,6 @@ def solar_plants():
 
 
 
-
-
-
 @main.route('/solar_plants/create', methods=['GET', 'POST'])
 def create_solar_plant():
     form = SolarPlantForm()
@@ -1017,7 +1014,7 @@ def create_solar_plant():
                 latitude=form.latitude.data,
                 longitude=form.longitude.data,
                 grid_substation=form.grid_substation.data,
-                feeder=form.feeder.data,
+                feeder=form.feeder.data if form.feeder.data is not None else None,
                 forecast_location=form.forecast_location.data,
                 installed_capacity=form.installed_capacity.data,
                 panel_capacity=form.panel_capacity.data,
@@ -1032,19 +1029,11 @@ def create_solar_plant():
             db.session.commit()
             flash('Solar Plant created successfully!', 'success')
             return redirect(url_for('main.solar_plants'))
-        except ValueError as e:
-            flash(f'Invalid input: {str(e)}', 'danger')
         except Exception as e:
             db.session.rollback()
             flash(f'Error creating Solar Plant: {str(e)}', 'danger')
     
     return render_template('create_solar_plant.html', form=form)
-
-
-
-
-
-
 
 
 
