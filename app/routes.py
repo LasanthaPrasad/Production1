@@ -791,7 +791,7 @@ def delete_forecast_location(location_id):
 # Grid Substations
 @main.route('/grid_substations')
 def grid_substations():
-    substations = GridSubstation.query.all()
+    substations = GridSubstation.query.order_by(GridSubstation.name).all()
     return render_template('grid_substations.html', substations=substations)
 
 
