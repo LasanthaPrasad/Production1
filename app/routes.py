@@ -701,7 +701,9 @@ def index():
 # Forecast Locations
 @main.route('/forecast_locations')
 def forecast_locations():
+
     locations = ForecastLocation.query.all()
+
     return render_template('forecast_locations.html', locations=locations)
 
 
@@ -1033,11 +1035,11 @@ def create_solar_plant():
 @main.route('/get_feeders/<int:substation_id>')
 def get_feeders(substation_id):
     current_app.logger.info(f"Fetching feeders for substation ID: {substation_id}")
-    
+    print("feeders route")
     # Get the SQL query as a string
     query = Feeder.query.filter_by(grid_substation=substation_id).statement
     current_app.logger.info(f"SQL Query: {query}")
-    
+    print(f"SQL Query: {query}") 
     feeders = Feeder.query.filter_by(grid_substation=substation_id).all()
     current_app.logger.info(f"Found {len(feeders)} feeders")
     feeder_list = [{'id': f.id, 'name': f.name} for f in feeders]
