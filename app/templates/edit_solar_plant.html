@@ -65,56 +65,56 @@
 
 {% block scripts %}
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOM content loaded');
-    var gridSubstationSelect = document.getElementById('grid_substation');
-    var feederSelect = document.getElementById('feeder');
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('DOM content loaded');
+        var gridSubstationSelect = document.getElementById('grid_substation');
+        var feederSelect = document.getElementById('feeder');
 
-    function updateFeeders() {
-        var substationId = gridSubstationSelect.value;
-        console.log('Updating feeders for substation ID:', substationId);
-        
-        if (!substationId) {
-            feederSelect.innerHTML = '<option value="">Select a Grid Substation first</option>';
-            return;
+        function updateFeeders() {
+            var substationId = gridSubstationSelect.value;
+            console.log('Updating feeders for substation ID:', substationId);
+            
+            if (!substationId) {
+                feederSelect.innerHTML = '<option value="">Select a Grid Substation first</option>';
+                return;
+            }
+
+            feederSelect.innerHTML = '<option value="">Loading...</option>';
+            
+            fetch('/get_feeders/' + substationId)
+                .then(response => {
+                    console.log('Fetch response received:', response.status);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Feeder data received:', data);
+                    feederSelect.innerHTML = '<option value="">Select a Feeder</option>';
+                    data.forEach(feeder => {
+                        var option = document.createElement('option');
+                        option.value = feeder.id;
+                        option.textContent = feeder.name;
+/*                         if (feeder.id == {{ plant.feeder }}) {
+                            option.selected = true;
+                        } */
+                        feederSelect.appendChild(option);
+                    });
+                })
+                .catch(error => {
+                    console.error('Error fetching feeders:', error);
+                    feederSelect.innerHTML = '<option value="">Error loading feeders</option>';
+                });
         }
 
-        feederSelect.innerHTML = '<option value="">Loading...</option>';
-        
-        fetch('/get_feeders/' + substationId)
-            .then(response => {
-                console.log('Fetch response received:', response.status);
-                return response.json();
-            })
-            .then(data => {
-                console.log('Feeder data received:', data);
-                feederSelect.innerHTML = '<option value="">Select a Feeder</option>';
-                data.forEach(feeder => {
-                    var option = document.createElement('option');
-                    option.value = feeder.id;
-                    option.textContent = feeder.name;
-                    if (feeder.id == {{ plant.feeder }}) {
-                        option.selected = true;
-                    }
-                    feederSelect.appendChild(option);
-                });
-            })
-            .catch(error => {
-                console.error('Error fetching feeders:', error);
-                feederSelect.innerHTML = '<option value="">Error loading feeders</option>';
-            });
-    }
+        gridSubstationSelect.addEventListener('change', function(event) {
+            console.log('Grid substation changed:', event.target.value);
+            updateFeeders();
+        });
 
-    gridSubstationSelect.addEventListener('change', function(event) {
-        console.log('Grid substation changed:', event.target.value);
-        updateFeeders();
+            // Initial call to set up feeder options if a grid substation is already selected
+        if (gridSubstationSelect.value) {
+            console.log('Initial grid substation value:', gridSubstationSelect.value);
+            updateFeeders();
+        }
     });
-
-    // Initial call to set up feeder options if a grid substation is already selected
-    if (gridSubstationSelect.value) {
-        console.log('Initial grid substation value:', gridSubstationSelect.value);
-        updateFeeders();
-    }
-});
 </script>
 {% endblock %}
