@@ -100,6 +100,7 @@
                     });
                     console.log('Final feeder select HTML:', feederSelect.innerHTML);
                 })
+                
                 .catch(error => {
                     console.error('Error:', error);
                     feederSelect.innerHTML = '<option value="">Error loading feeders</option>';
