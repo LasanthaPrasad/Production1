@@ -64,13 +64,17 @@
 {% endblock %}
 
 
+
+
+
+
 {% block scripts %}
 <script>
         console.log('Script loaded');
 
     document.addEventListener('DOMContentLoaded', function() {
 
-        console.log('DOM content loaded');
+        print('DOM content loaded');
 
         var gridSubstationSelect = document.getElementById('grid_substation');
         var feederSelect = document.getElementById('feeder');
@@ -82,7 +86,7 @@
             
             fetch('/get_feeders/' + substationId)
                 .then(response => {
-                    console.log('Response status:', response.status);
+                    print('Response status:', response.status);
                     return response.json();
                 })
                 .then(data => {
@@ -100,7 +104,7 @@
                     });
                     console.log('Final feeder select HTML:', feederSelect.innerHTML);
                 })
-                
+
                 .catch(error => {
                     console.error('Error:', error);
                     feederSelect.innerHTML = '<option value="">Error loading feeders</option>';
