@@ -990,10 +990,12 @@ def solar_plants():
 @main.route('/solar_plants/create', methods=['GET', 'POST'])
 def create_solar_plant():
     form = SolarPlantForm()
-    
+
     substations = GridSubstation.query.all()
+    print(f"Number of Gridss : {len(substations)}")
     form.grid_substation.choices = [(s.id, s.name) for s in substations]
     current_app.logger.info(f"Grid substation choices: {form.grid_substation.choices}")
+    print(f"Grid substation choices: {form.grid_substation.choices}")
 
     form.forecast_location.choices = [(f.id, f"{f.provider_name} ({f.latitude}, {f.longitude})") for f in ForecastLocation.query.all()]
    
@@ -1042,6 +1044,7 @@ def get_feeders(substation_id):
     print(f"SQL Query: {query}") 
     feeders = Feeder.query.filter_by(grid_substation=substation_id).all()
     current_app.logger.info(f"Found {len(feeders)} feeders")
+    print(f"Found {len(feeders)} feeders")
     feeder_list = [{'id': f.id, 'name': f.name} for f in feeders]
     current_app.logger.info(f"Feeder list: {feeder_list}")
     return jsonify(feeder_list)
