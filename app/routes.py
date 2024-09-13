@@ -33,6 +33,8 @@ import string
 import random
 
 
+
+
 from flask import render_template, flash, redirect, url_for, current_app
 #from . import db
 #from .models import User
@@ -49,7 +51,9 @@ from .forms import BulkUploadForm
 
 import pandas as pd
 from io import StringIO, BytesIO
+import logging
 
+logger = logging.getLogger(__name__)
 
 
 
