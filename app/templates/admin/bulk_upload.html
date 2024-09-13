@@ -2,6 +2,7 @@
 {% extends "base.html" %}
 {% block content %}
     <h1>Bulk Data Upload</h1>
+    <div class="form-group">
     <form method="POST" enctype="multipart/form-data">
         {{ form.hidden_tag() }}
         <div>
@@ -16,11 +17,13 @@
             {{ form.submit() }}
         </div>
     </form>
+    </div>
+
     <h2>Download Sample CSVs:</h2>
     <ul>
-        <li><a href="{{ url_for('main.sample_csv', data_type='forecast_locations') }}">Forecast Locations Sample</a></li>
-        <li><a href="{{ url_for('main.sample_csv', data_type='grid_substations') }}">Grid Substations Sample</a></li>
-        <li><a href="{{ url_for('main.sample_csv', data_type='feeders') }}">Feeders Sample</a></li>
-        <li><a href="{{ url_for('main.sample_csv', data_type='solar_plants') }}">Solar Plants Sample</a></li>
+        <li><a href="{{ url_for('main.sample_csv', data_type='forecast_locations') }}" class="btn btn-primary" >Forecast Locations Sample</a></li>
+        <li><a href="{{ url_for('main.sample_csv', data_type='grid_substations') }}"  class="btn btn-primary" >Grid Substations Sample</a></li>
+        <li><a href="{{ url_for('main.sample_csv', data_type='feeders') }}" class="btn btn-primary" >Feeders Sample</a></li>
+        <li><a href="{{ url_for('main.sample_csv', data_type='solar_plants') }}"  class="btn btn-primary" >Solar Plants Sample</a></li>
     </ul>
 {% endblock %}
