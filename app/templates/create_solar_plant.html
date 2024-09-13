@@ -70,54 +70,40 @@
 
 {% block scripts %}
 <script>
-        console.log('Script loaded');
-
     document.addEventListener('DOMContentLoaded', function() {
-
-      
-
         var gridSubstationSelect = document.getElementById('grid_substation');
         var feederSelect = document.getElementById('feeder');
-
+    
         function updateFeeders() {
             var substationId = gridSubstationSelect.value;
-            console.log('Selected substation ID:', substationId);
-            feederSelect.innerHTML = '<option value="">Loading...</option>';
-            
+            if (!substationId) {
+                feederSelect.innerHTML = '<option value="">Select a Grid Substation first</option>';
+                return;
+            }
+    
             fetch('/get_feeders/' + substationId)
-                .then(response => {
-                   
-                    return response.json();
-                })
+                .then(response => response.json())
                 .then(data => {
-                    console.log('Received feeder data:', data);
                     feederSelect.innerHTML = '<option value="">Select a Feeder</option>';
-                    if (data.length === 0) {
-                        console.log('No feeders found for this substation');
-                    }
                     data.forEach(feeder => {
-                        console.log('Adding feeder:', feeder);
                         var option = document.createElement('option');
                         option.value = feeder.id;
                         option.textContent = feeder.name;
                         feederSelect.appendChild(option);
                     });
-                    console.log('Final feeder select HTML:', feederSelect.innerHTML);
                 })
-
                 .catch(error => {
                     console.error('Error:', error);
                     feederSelect.innerHTML = '<option value="">Error loading feeders</option>';
                 });
         }
-
+    
         gridSubstationSelect.addEventListener('change', updateFeeders);
-
-        // Initial load of feeders if a substation is already selected
+    
+        // Initial call to set up feeder options if a grid substation is already selected
         if (gridSubstationSelect.value) {
-            console.log('Grid substation changed:', event.target.value);
             updateFeeders();
         }
     });
-</script>
+    </script>
 {% endblock %}

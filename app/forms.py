@@ -3,7 +3,7 @@ from flask_wtf import FlaskForm
 #from wtforms.validators import DataRequired, Email, EqualTo, Length
 from .models import User
 from wtforms import StringField, FloatField, SelectField, PasswordField, BooleanField, SubmitField
-from wtforms.validators import DataRequired, NumberRange, Email, EqualTo, Length,  ValidationError
+from wtforms.validators import DataRequired, NumberRange, Email, EqualTo, Length,  ValidationError, Optional
 import re
 from flask_wtf.file import FileField, FileAllowed
 from wtforms import SelectField
@@ -90,7 +90,7 @@ class SolarPlantForm(FlaskForm):
     latitude = FloatField('Latitude', validators=[DataRequired(), NumberRange(min=-90, max=90)])
     longitude = FloatField('Longitude', validators=[DataRequired(), NumberRange(min=-180, max=180)])
     grid_substation = SelectField('Grid Substation', coerce=int, validators=[DataRequired()])
-    feeder = SelectField('Feeder', coerce=int, validators=[DataRequired()])
+    feeder = SelectField('Feeder', coerce=int, validators=[Optional()])
     forecast_location = SelectField('Forecast Location', coerce=int, validators=[DataRequired()])
     installed_capacity = FloatField('Installed Capacity (MW)', validators=[DataRequired(), NumberRange(min=0)])
     panel_capacity = FloatField('Panel Capacity (MW)', validators=[DataRequired(), NumberRange(min=0)])

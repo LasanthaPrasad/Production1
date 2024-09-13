@@ -991,6 +991,67 @@ def solar_plants():
 #    return render_template('solar_plants.html', plants=plants)
 
 
+
+
+
+
+
+
+
+
+@main.route('/solar_plants/create', methods=['GET', 'POST'])
+def create_solar_plant():
+    form = SolarPlantForm()
+
+    substations = GridSubstation.query.all()
+    form.grid_substation.choices = [(s.id, s.name) for s in substations]
+    form.forecast_location.choices = [(f.id, f"{f.provider_name} ({f.latitude}, {f.longitude})") for f in ForecastLocation.query.all()]
+    
+    # Initialize feeder choices with an empty option
+    form.feeder.choices = [('', 'Select a Grid Substation first')]
+
+    if form.validate_on_submit():
+        try:
+            plant = SolarPlant(
+                name=form.name.data,
+                latitude=form.latitude.data,
+                longitude=form.longitude.data,
+                grid_substation=form.grid_substation.data,
+                feeder=form.feeder.data,
+                forecast_location=form.forecast_location.data,
+                installed_capacity=form.installed_capacity.data,
+                panel_capacity=form.panel_capacity.data,
+                inverter_capacity=form.inverter_capacity.data,
+                plant_angle=form.plant_angle.data,
+                company=form.company.data,
+                api_status=form.api_status.data,
+                plant_efficiency=form.plant_efficiency.data,
+                coefficient_factor=form.coefficient_factor.data
+            )
+            db.session.add(plant)
+            db.session.commit()
+            flash('Solar Plant created successfully!', 'success')
+            return redirect(url_for('main.solar_plants'))
+        except ValueError as e:
+            flash(f'Invalid input: {str(e)}', 'danger')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error creating Solar Plant: {str(e)}', 'danger')
+    
+    return render_template('create_solar_plant.html', form=form)
+
+
+
+
+
+
+
+
+
+
+
+
+""" 
 @main.route('/solar_plants/create', methods=['GET', 'POST'])
 def create_solar_plant():
     form = SolarPlantForm()
@@ -1003,11 +1064,11 @@ def create_solar_plant():
 
     form.forecast_location.choices = [(f.id, f"{f.provider_name} ({f.latitude}, {f.longitude})") for f in ForecastLocation.query.all()]
    
-    """ 
+
     # Populate the choices for grid_substation and forecast_location
     form.grid_substation.choices = [(s.id, s.name) for s in GridSubstation.query.all()]
     form.forecast_location.choices = [(f.id, f"{f.provider_name} ({f.latitude}, {f.longitude})") for f in ForecastLocation.query.all()]
-    """
+
 
     # Initialize feeder choices with an empty option
     form.feeder.choices = [('', 'Select a Grid Substation first')]
@@ -1038,7 +1099,7 @@ def create_solar_plant():
     
     return render_template('create_solar_plant.html', form=form)
 
-
+ """
 @main.route('/get_feeders/<int:substation_id>')
 def get_feeders(substation_id):
     current_app.logger.info(f"Fetching feeders for substation ID: {substation_id}")
