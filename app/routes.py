@@ -1035,7 +1035,8 @@ def create_solar_plant():
         except Exception as e:
             db.session.rollback()
             flash(f'Error creating Solar Plant: {str(e)}', 'danger')
-    
+        
+
     return render_template('create_solar_plant.html', form=form)
 
 
