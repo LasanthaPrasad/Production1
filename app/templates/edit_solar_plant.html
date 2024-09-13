@@ -4,112 +4,117 @@
 <form method="POST">
     {{ form.hidden_tag() }}
     <div class="form-group">
-        <label for="name">Name</label>
-        <input type="text" class="form-control" id="name" name="name" value="{{ plant.name }}" required>
+        {{ form.name.label }}
+        {{ form.name(class="form-control") }}
     </div>
     <div class="form-group">
-        <label for="latitude">Latitude</label>
-        <input type="number" step="any" class="form-control" id="latitude" name="latitude" value="{{ plant.latitude }}" required>
+        {{ form.latitude.label }}
+        {{ form.latitude(class="form-control") }}
     </div>
     <div class="form-group">
-        <label for="longitude">Longitude</label>
-        <input type="number" step="any" class="form-control" id="longitude" name="longitude" value="{{ plant.longitude }}" required>
+        {{ form.longitude.label }}
+        {{ form.longitude(class="form-control") }}
     </div>
     <div class="form-group">
-        <label for="grid_substation">Grid Substation</label>
-        <select class="form-control" id="grid_substation" name="grid_substation" required>
-            {% for substation in substations %}
-            <option value="{{ substation.id }}" {% if substation.id == plant.grid_substation %}selected{% endif %}>{{ substation.name }}</option>
-            {% endfor %}
-        </select>
+        {{ form.grid_substation.label }}
+        {{ form.grid_substation(class="form-control", id="grid_substation") }}
     </div>
     <div class="form-group">
-        <label for="feeder">Feeder</label>
-        <select class="form-control" id="feeder" name="feeder" required>
-            <!-- Options will be populated dynamically based on selected substation -->
-        </select>
+        {{ form.feeder.label }}
+        {{ form.feeder(class="form-control", id="feeder") }}
     </div>
     <div class="form-group">
-        <label for="forecast_location">Forecast Location</label>
-        <select class="form-control" id="forecast_location" name="forecast_location" required>
-            {% for location in forecast_locations %}
-            <option value="{{ location.id }}" {% if location.id == plant.forecast_location %}selected{% endif %}>{{ location.provider_name }} ({{ location.latitude }}, {{ location.longitude }})</option>
-            {% endfor %}
-        </select>
+        {{ form.forecast_location.label }}
+        {{ form.forecast_location(class="form-control") }}
     </div>
     <div class="form-group">
-        <label for="installed_capacity">Installed Capacity (MW)</label>
-        <input type="number" step="0.01" class="form-control" id="installed_capacity" name="installed_capacity" value="{{ plant.installed_capacity }}" required>
+        {{ form.installed_capacity.label }}
+        {{ form.installed_capacity(class="form-control") }}
     </div>
     <div class="form-group">
-        <label for="panel_capacity">Panel Capacity (MW)</label>
-        <input type="number" step="0.01" class="form-control" id="panel_capacity" name="panel_capacity" value="{{ plant.panel_capacity }}" required>
+        {{ form.panel_capacity.label }}
+        {{ form.panel_capacity(class="form-control") }}
     </div>
     <div class="form-group">
-        <label for="inverter_capacity">Inverter Capacity (MW)</label>
-        <input type="number" step="0.01" class="form-control" id="inverter_capacity" name="inverter_capacity" value="{{ plant.inverter_capacity }}" required>
+        {{ form.inverter_capacity.label }}
+        {{ form.inverter_capacity(class="form-control") }}
     </div>
     <div class="form-group">
-        <label for="plant_angle">Plant Angle</label>
-        <input type="number" step="0.01" class="form-control" id="plant_angle" name="plant_angle" value="{{ plant.plant_angle }}" required>
+        {{ form.plant_angle.label }}
+        {{ form.plant_angle(class="form-control") }}
     </div>
     <div class="form-group">
-        <label for="company">Company</label>
-        <input type="text" class="form-control" id="company" name="company" value="{{ plant.company }}" required>
+        {{ form.company.label }}
+        {{ form.company(class="form-control") }}
     </div>
     <div class="form-group">
-        <label for="api_status">API Status</label>
-        <select class="form-control" id="api_status" name="api_status" required>
-            <option value="enabled" {% if plant.api_status == 'enabled' %}selected{% endif %}>Enabled</option>
-            <option value="disabled" {% if plant.api_status == 'disabled' %}selected{% endif %}>Disabled</option>
-        </select>
+        {{ form.api_status.label }}
+        {{ form.api_status(class="form-control") }}
     </div>
     <div class="form-group">
-        <label for="plant_efficiency">Plant Efficiency</label>
-        <input type="number" step="0.01" class="form-control" id="plant_efficiency" name="plant_efficiency" value="{{ plant.plant_efficiency }}" required>
+        {{ form.plant_efficiency.label }}
+        {{ form.plant_efficiency(class="form-control") }}
     </div>
     <div class="form-group">
-        <label for="coefficient_factor">Coefficient Factor</label>
-        <input type="number" step="0.01" class="form-control" id="coefficient_factor" name="coefficient_factor" value="{{ plant.coefficient_factor }}" required>
+        {{ form.coefficient_factor.label }}
+        {{ form.coefficient_factor(class="form-control") }}
     </div>
-    <button type="submit" class="btn btn-primary">Update Solar Plant</button>
+    {{ form.submit(class="btn btn-primary") }}
 </form>
 {% endblock %}
 
 {% block scripts %}
 <script>
-    // Function to populate feeders
-    function populateFeeders(substationId, selectedFeederId) {
-        var feederSelect = document.getElementById('feeder');
-        // Clear current options
-        feederSelect.innerHTML = '';
-        // Fetch feeders for selected substation
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('DOM content loaded');
+    var gridSubstationSelect = document.getElementById('grid_substation');
+    var feederSelect = document.getElementById('feeder');
+
+    function updateFeeders() {
+        var substationId = gridSubstationSelect.value;
+        console.log('Updating feeders for substation ID:', substationId);
+        
+        if (!substationId) {
+            feederSelect.innerHTML = '<option value="">Select a Grid Substation first</option>';
+            return;
+        }
+
+        feederSelect.innerHTML = '<option value="">Loading...</option>';
+        
         fetch('/get_feeders/' + substationId)
-            .then(response => response.json())
+            .then(response => {
+                console.log('Fetch response received:', response.status);
+                return response.json();
+            })
             .then(data => {
+                console.log('Feeder data received:', data);
+                feederSelect.innerHTML = '<option value="">Select a Feeder</option>';
                 data.forEach(feeder => {
                     var option = document.createElement('option');
                     option.value = feeder.id;
                     option.textContent = feeder.name;
-                    if (feeder.id == selectedFeederId) {
+                    if (feeder.id == {{ plant.feeder }}) {
                         option.selected = true;
                     }
                     feederSelect.appendChild(option);
                 });
+            })
+            .catch(error => {
+                console.error('Error fetching feeders:', error);
+                feederSelect.innerHTML = '<option value="">Error loading feeders</option>';
             });
     }
 
-    // Populate feeders on page load
-    document.addEventListener('DOMContentLoaded', function() {
-        var substationId = document.getElementById('grid_substation').value;
-        var selectedFeederId = {{ plant.feeder }};
-        populateFeeders(substationId, selectedFeederId);
+    gridSubstationSelect.addEventListener('change', function(event) {
+        console.log('Grid substation changed:', event.target.value);
+        updateFeeders();
     });
 
-    // Update feeders when substation changes
-    document.getElementById('grid_substation').addEventListener('change', function() {
-        var substationId = this.value;
-        populateFeeders(substationId);
-    });
+    // Initial call to set up feeder options if a grid substation is already selected
+    if (gridSubstationSelect.value) {
+        console.log('Initial grid substation value:', gridSubstationSelect.value);
+        updateFeeders();
+    }
+});
 </script>
 {% endblock %}

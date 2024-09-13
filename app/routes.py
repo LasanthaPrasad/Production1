@@ -1185,9 +1185,12 @@ def create_solar_plant():
     forecast_locations = ForecastLocation.query.all()
     return render_template('create_solar_plant.html', substations=substations, forecast_locations=forecast_locations)
  """
-
+""" 
 @main.route('/solar_plants/<int:id>/edit', methods=['GET', 'POST'])
 def edit_solar_plant(id):
+    form = SolarPlantForm(obj=plant)
+    plant = SolarPlant.query.get_or_404(id)
+
     plant = SolarPlant.query.get_or_404(id)
     if request.method == 'POST':
         try:
@@ -1215,6 +1218,48 @@ def edit_solar_plant(id):
     substations = GridSubstation.query.all()
     forecast_locations = ForecastLocation.query.all()
     return render_template('edit_solar_plant.html', plant=plant, substations=substations, forecast_locations=forecast_locations)
+
+ """
+
+
+
+
+@main.route('/solar_plants/<int:id>/edit', methods=['GET', 'POST'])
+def edit_solar_plant(id):
+    plant = SolarPlant.query.get_or_404(id)
+    form = SolarPlantForm(obj=plant)
+
+    # Populate the choices for grid_substation and forecast_location
+    form.grid_substation.choices = [(s.id, s.name) for s in GridSubstation.query.all()]
+    form.forecast_location.choices = [(f.id, f"{f.provider_name} ({f.latitude}, {f.longitude})") for f in ForecastLocation.query.all()]
+    
+    # Initially populate feeder choices based on the current grid substation
+    if plant.grid_substation:
+        feeders = Feeder.query.filter_by(grid_substation=plant.grid_substation).all()
+        form.feeder.choices = [(f.id, f.name) for f in feeders]
+    else:
+        form.feeder.choices = [('', 'Select a Grid Substation first')]
+
+    if form.validate_on_submit():
+        try:
+            form.populate_obj(plant)
+            db.session.commit()
+            flash('Solar Plant updated successfully!', 'success')
+            return redirect(url_for('main.solar_plants'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error updating Solar Plant: {str(e)}', 'danger')
+
+    return render_template('edit_solar_plant.html', form=form, plant=plant)
+
+
+
+
+
+
+
+
+
 
 
 
