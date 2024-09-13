@@ -706,7 +706,7 @@ def index():
 @main.route('/forecast_locations')
 def forecast_locations():
 
-    locations = ForecastLocation.query.all()
+    locations = ForecastLocation.query.order_by(ForecastLocation.id).all()
 
     return render_template('forecast_locations.html', locations=locations)
 
@@ -769,50 +769,6 @@ def edit_forecast_location(id):
 
 
 
-
-
-""" 
-@main.route('/forecast_locations/create', methods=['GET', 'POST'])
-def create_forecast_location():
-    if request.method == 'POST':
-        location = ForecastLocation(
-            provider_name=request.form['provider_name'],
-            latitude=float(request.form['latitude']),
-            longitude=float(request.form['longitude'])
-        )
-        db.session.add(location)
-        db.session.commit()
-        flash('Forecast Location created successfully!', 'success')
-        return redirect(url_for('main.forecast_locations'))
-    return render_template('create_forecast_location.html')
-
-
-@main.route('/forecast_locations/<int:id>/edit', methods=['GET', 'POST'])
-def edit_forecast_location(id):
-    location = ForecastLocation.query.get_or_404(id)
-    if request.method == 'POST':
-        location.provider_name = request.form['provider_name']
-        location.latitude = float(request.form['latitude'])
-        location.longitude = float(request.form['longitude'])
-        db.session.commit()
-        flash('Forecast Location updated successfully!', 'success')
-        return redirect(url_for('main.forecast_locations'))
-    return render_template('edit_forecast_location.html', location=location)
- """
-
-
-
-""" 
-
-@main.route('/forecast_locations/<int:id>/delete', methods=['POST'])
-def delete_forecast_location(id):
-    location = ForecastLocation.query.get_or_404(id)
-    db.session.delete(location)
-    db.session.commit()
-    flash('Forecast Location deleted successfully!', 'success')
-    return redirect(url_for('main.forecast_locations'))
-
- """
 
 @main.route('/forecast_locations/<int:location_id>/delete', methods=['POST'])
 def delete_forecast_location(location_id):
@@ -944,7 +900,7 @@ def edit_feeder(id):
             db.session.rollback()
             flash(f'Error updating Feeder: {str(e)}', 'danger')
 
-    substations = GridSubstation.query.all()
+    substations = GridSubstation.query.order_by(GridSubstation.name).all()
     return render_template('edit_feeder.html', feeder=feeder, substations=substations)
 
 @main.route('/feeders/<int:id>/delete', methods=['POST'])
@@ -971,7 +927,7 @@ def delete_feeder(id):
 # Feeders
 @main.route('/feeders')
 def feeders():
-    feeders = Feeder.query.options(db.joinedload(Feeder.grid_substation_rel)).all()
+    feeders = Feeder.query.options(db.joinedload(Feeder.grid_substation_rel)).order_by(Feeder.name).all()
     return render_template('feeders.html', feeders=feeders)
 
 
