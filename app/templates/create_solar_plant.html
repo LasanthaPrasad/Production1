@@ -59,6 +59,18 @@
         <label for="plant_angle">Plant Angle</label>
         <input type="number" step="0.1" class="form-control" id="plant_angle" name="plant_angle" value="{{ plant.plant_angle if plant else '' }}" required>
     </div>
+
+    <div class="form-group">
+        <label for="plant_efficiency">Plant Efficiency</label>
+        <input type="number" step="0.01" class="form-control" id="plant_efficiency" name="plant_efficiency" required
+               {% if plant %}value="{{ plant.plant_efficiency }}"{% endif %}>
+    </div>
+    <div class="form-group">
+        <label for="coefficient_factor">Coefficient Factor</label>
+        <input type="number" step="0.01" class="form-control" id="coefficient_factor" name="coefficient_factor" required
+               {% if plant %}value="{{ plant.coefficient_factor }}"{% endif %}>
+    </div> 
+    
     <div class="form-group">
         <label for="company">Company</label>
         <input type="text" class="form-control" id="company" name="company" value="{{ plant.company if plant else '' }}" required>

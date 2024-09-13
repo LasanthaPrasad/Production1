@@ -47,11 +47,58 @@ import io
 from .forms import BulkUploadForm
 #from .models import ForecastLocation, GridSubstation, Feeder, SolarPlant
 
+import pandas as pd
+from io import StringIO, BytesIO
 
 
 
 
 main = Blueprint('main', __name__)
+
+
+
+
+
+def check_for_errors(data_type, csv_data):
+    df = pd.read_csv(StringIO(csv_data))
+    errors = []
+
+    if data_type == 'solar_plants':
+        # Check for duplicate locations
+        duplicates = df[df.duplicated(subset=['latitude', 'longitude'], keep=False)]
+        for index, row in duplicates.iterrows():
+            errors.append(f"Row {index + 2}: Duplicate location ({row['latitude']}, {row['longitude']})")
+
+        # Check for invalid grid substation IDs
+        valid_substation_ids = set(GridSubstation.query.with_entities(GridSubstation.id).all())
+        invalid_substations = df[~df['grid_substation'].isin(valid_substation_ids)]
+        for index, row in invalid_substations.iterrows():
+            errors.append(f"Row {index + 2}: Invalid grid substation ID {row['grid_substation']}")
+
+    elif data_type == 'grid_substations':
+        # Check for duplicate names
+        duplicates = df[df.duplicated(subset=['name'], keep=False)]
+        for index, row in duplicates.iterrows():
+            errors.append(f"Row {index + 2}: Duplicate substation name '{row['name']}'")
+
+        # Check for duplicate locations
+        duplicates = df[df.duplicated(subset=['latitude', 'longitude'], keep=False)]
+        for index, row in duplicates.iterrows():
+            errors.append(f"Row {index + 2}: Duplicate location ({row['latitude']}, {row['longitude']})")
+
+    # Add more checks for other data types as needed
+
+    return errors
+
+def create_error_report(errors):
+    df = pd.DataFrame(errors, columns=['Error'])
+    output = BytesIO()
+    df.to_csv(output, index=False, encoding='utf-8')
+    output.seek(0)
+    return output.getvalue()
+
+
+
 
 
 
@@ -66,7 +113,11 @@ def sample_csv(data_type):
     elif data_type == 'feeders':
         csv_data = "name,code,grid_substation,installed_solar_capacity,status\nFeeder A,FDR001,1,50.25,active\n"
     elif data_type == 'solar_plants':
+        csv_data = "name,latitude,longitude,grid_substation,feeder,forecast_location,installed_capacity,panel_capacity,inverter_capacity,plant_angle,company,api_status,plant_efficiency,coefficient_factor\nPlant A,40.7128,-74.0060,1,1,1,75.5,80.0,70.0,30.0,Company XYZ,enabled,0.85,0.9\n"        
+        """ 
+    elif data_type == 'solar_plants':
         csv_data = "name,latitude,longitude,grid_substation,feeder,forecast_location,installed_capacity,panel_capacity,inverter_capacity,plant_angle,company,api_status\nPlant A,40.7128,-74.0060,1,1,1,75.5,80.0,70.0,30.0,Company XYZ,enabled\n"
+        """
     else:
         return "Invalid data type", 400
 
@@ -76,6 +127,49 @@ def sample_csv(data_type):
         headers={"Content-disposition":
                  f"attachment; filename={data_type}_sample.csv"}
     )
+
+
+
+@main.route('/admin/bulk_upload', methods=['GET', 'POST'])
+@roles_required('admin')
+def admin_bulk_upload():
+    form = BulkUploadForm()
+    if form.validate_on_submit():
+        csv_file = request.files['file']
+        data_type = form.data_type.data
+        
+        if csv_file:
+            csv_data = csv_file.read().decode('utf-8')
+            
+            errors = check_for_errors(data_type, csv_data)
+            
+            if errors:
+                error_report = create_error_report(errors)
+                return Response(
+                    error_report,
+                    mimetype="text/csv",
+                    headers={"Content-disposition": f"attachment; filename={data_type}_error_report.csv"}
+                )
+            
+            try:
+                if data_type == 'forecast_locations':
+                    process_forecast_locations(csv_data)
+                elif data_type == 'grid_substations':
+                    process_grid_substations(csv_data)
+                elif data_type == 'feeders':
+                    process_feeders(csv_data)
+                elif data_type == 'solar_plants':
+                    process_solar_plants(csv_data)
+                
+                flash(f'Bulk upload for {data_type} completed successfully!', 'success')
+            except Exception as e:
+                flash(f'Error during bulk upload: {str(e)}', 'error')
+        
+    return render_template('admin/bulk_upload.html', form=form)
+
+
+
+""" 
 
 
 @main.route('/admin/bulk_upload', methods=['GET', 'POST'])
@@ -106,7 +200,7 @@ def admin_bulk_upload():
         
     return render_template('admin/bulk_upload.html', form=form)
 
-
+ """
 
 def process_forecast_locations(csv_data):
     for row in csv_data:
@@ -152,7 +246,8 @@ def process_feeders(csv_data):
         )
         db.session.add(feeder)
     db.session.commit()
-
+    
+""" 
 def process_solar_plants(csv_data):
     for row in csv_data:
         plant = SolarPlant(
@@ -172,8 +267,28 @@ def process_solar_plants(csv_data):
         db.session.add(plant)
     db.session.commit()
 
-
-
+ """
+def process_solar_plants(csv_data):
+    df = pd.read_csv(StringIO(csv_data))
+    for _, row in df.iterrows():
+        plant = SolarPlant(
+            name=row['name'],
+            latitude=float(row['latitude']),
+            longitude=float(row['longitude']),
+            grid_substation=int(row['grid_substation']),
+            feeder=int(row['feeder']),
+            forecast_location=int(row['forecast_location']),
+            installed_capacity=float(row['installed_capacity']),
+            panel_capacity=float(row['panel_capacity']),
+            inverter_capacity=float(row['inverter_capacity']),
+            plant_angle=float(row['plant_angle']),
+            company=row['company'],
+            api_status=row['api_status'],
+            plant_efficiency=float(row['plant_efficiency']),
+            coefficient_factor=float(row['coefficient_factor'])
+        )
+        db.session.add(plant)
+    db.session.commit()
 
 
 
@@ -886,6 +1001,74 @@ def create_solar_plant():
                 inverter_capacity=float(request.form['inverter_capacity']),
                 plant_angle=float(request.form['plant_angle']),
                 company=request.form['company'],
+                api_status=request.form['api_status'],
+                plant_efficiency=float(request.form['plant_efficiency']),
+                coefficient_factor=float(request.form['coefficient_factor'])
+            )
+            db.session.add(plant)
+            db.session.commit()
+            flash('Solar Plant created successfully!', 'success')
+            return redirect(url_for('main.solar_plants'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error creating Solar Plant: {str(e)}', 'danger')
+
+    substations = GridSubstation.query.all()
+    forecast_locations = ForecastLocation.query.all()
+    return render_template('create_solar_plant.html', substations=substations, forecast_locations=forecast_locations)
+
+@main.route('/solar_plants/<int:id>/edit', methods=['GET', 'POST'])
+def edit_solar_plant(id):
+    plant = SolarPlant.query.get_or_404(id)
+    if request.method == 'POST':
+        try:
+            plant.name = request.form['name']
+            plant.latitude = float(request.form['latitude'])
+            plant.longitude = float(request.form['longitude'])
+            plant.grid_substation = int(request.form['grid_substation'])
+            plant.feeder = int(request.form['feeder'])
+            plant.forecast_location = int(request.form['forecast_location'])
+            plant.installed_capacity = float(request.form['installed_capacity'])
+            plant.panel_capacity = float(request.form['panel_capacity'])
+            plant.inverter_capacity = float(request.form['inverter_capacity'])
+            plant.plant_angle = float(request.form['plant_angle'])
+            plant.company = request.form['company']
+            plant.api_status = request.form['api_status']
+            plant.plant_efficiency = float(request.form['plant_efficiency'])
+            plant.coefficient_factor = float(request.form['coefficient_factor'])
+            db.session.commit()
+            flash('Solar Plant updated successfully!', 'success')
+            return redirect(url_for('main.solar_plants'))
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error updating Solar Plant: {str(e)}', 'danger')
+
+    substations = GridSubstation.query.all()
+    forecast_locations = ForecastLocation.query.all()
+    return render_template('edit_solar_plant.html', plant=plant, substations=substations, forecast_locations=forecast_locations)
+
+
+
+
+""" 
+
+
+@main.route('/solar_plants/create', methods=['GET', 'POST'])
+def create_solar_plant():
+    if request.method == 'POST':
+        try:
+            plant = SolarPlant(
+                name=request.form['name'],
+                latitude=float(request.form['latitude']),
+                longitude=float(request.form['longitude']),
+                grid_substation=int(request.form['grid_substation']),
+                feeder=int(request.form['feeder']),
+                forecast_location=int(request.form['forecast_location']),
+                installed_capacity=float(request.form['installed_capacity']),
+                panel_capacity=float(request.form['panel_capacity']),
+                inverter_capacity=float(request.form['inverter_capacity']),
+                plant_angle=float(request.form['plant_angle']),
+                company=request.form['company'],
                 api_status=request.form['api_status']
             )
             db.session.add(plant)
@@ -927,7 +1110,7 @@ def edit_solar_plant(id):
     substations = GridSubstation.query.all()
     forecast_locations = ForecastLocation.query.all()
     return render_template('edit_solar_plant.html', plant=plant, substations=substations, forecast_locations=forecast_locations)
-
+ """
 @main.route('/get_feeders/<int:substation_id>')
 def get_feeders(substation_id):
     feeders = Feeder.query.filter_by(grid_substation=substation_id).all()

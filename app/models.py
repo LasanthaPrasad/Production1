@@ -151,7 +151,7 @@ class Feeder(db.Model):
 
     grid_substation_rel = db.relationship('GridSubstation', backref='feeders')
 
-
+""" 
 class SolarPlant(db.Model):
     __tablename__ = 'solar_plants'
     id = db.Column(db.Integer, primary_key=True)
@@ -173,6 +173,36 @@ class SolarPlant(db.Model):
     grid_substation_rel = db.relationship('GridSubstation', backref='solar_plants')
     feeder_rel = db.relationship('Feeder', backref='solar_plants')
     forecast_location_rel = db.relationship('ForecastLocation', backref='solar_plants')
+
+ """
+
+class SolarPlant(db.Model):
+    __tablename__ = 'solar_plants'
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(255), nullable=False)
+    latitude = db.Column(db.Float, nullable=False)
+    longitude = db.Column(db.Float, nullable=False)
+    grid_substation = db.Column(db.Integer, db.ForeignKey('grid_substations.id'), nullable=False)
+    feeder = db.Column(db.Integer, db.ForeignKey('feeders.id'), nullable=False)
+    forecast_location = db.Column(db.Integer, db.ForeignKey('forecast_locations.id'), nullable=False)
+    installed_capacity = db.Column(db.Float, nullable=False)
+    panel_capacity = db.Column(db.Float, nullable=False)
+    inverter_capacity = db.Column(db.Float, nullable=False)
+    plant_angle = db.Column(db.Float, nullable=False)
+    company = db.Column(db.String(255), nullable=False)
+    api_key = db.Column(db.String(36), unique=True, default=lambda: str(uuid.uuid4()))
+    api_status = db.Column(db.String(10), default='disabled')
+    plant_efficiency = db.Column(db.Float, nullable=False)  # New field
+    coefficient_factor = db.Column(db.Float, nullable=False)  # New field
+
+
+    grid_substation_rel = db.relationship('GridSubstation', backref='solar_plants')
+    feeder_rel = db.relationship('Feeder', backref='solar_plants')
+    forecast_location_rel = db.relationship('ForecastLocation', backref='solar_plants')
+
+
+
+
 #class SolarPlant(db.Model):
 #    __tablename__ = 'solar_plants'
 #    id = db.Column(db.Integer, primary_key=True)
