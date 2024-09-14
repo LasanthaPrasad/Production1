@@ -920,6 +920,7 @@ def create_grid_substation():
             latitude=float(request.form['latitude']),
             longitude=float(request.form['longitude']),
             installed_solar_capacity=float(request.form['installed_solar_capacity']),
+            forecast_location = int(request.form['forecast_location']),
             api_status=request.form['api_status']
         )
         db.session.add(substation)
@@ -940,7 +941,9 @@ def edit_grid_substation(id):
         substation.latitude = float(request.form['latitude'])
         substation.longitude = float(request.form['longitude'])
         substation.installed_solar_capacity = float(request.form['installed_solar_capacity'])
+        substation.forecast_location = int(request.form['forecast_location'])
         substation.api_status=request.form['api_status']
+
         db.session.commit()
         flash('Grid Substation updated successfully!', 'success')
         return redirect(url_for('main.grid_substations'))
