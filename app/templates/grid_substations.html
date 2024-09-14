@@ -78,8 +78,8 @@ function initMap() {
     });
 
     //var substations = {{ substations|tojson }};
-    
-    const substations = [
+    var substations = {{ substations_data|tojson }};
+/*     const substations = [
         {% for substation in substations %}
         {
             position: { lat: {{ substation.latitude }}, lng: {{ substation.longitude }} },
@@ -94,7 +94,7 @@ function initMap() {
             }
         },
         {% endfor %}
-    ];
+    ]; */
 
 
 

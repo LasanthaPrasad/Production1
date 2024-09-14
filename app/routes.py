@@ -664,6 +664,17 @@ def generate_solar_plant_api_key(id):
     flash('New API key generated for Solar Plant', 'success')
     return redirect(url_for('main.solar_plants'))
 
+
+@main.route('/grid_substations')
+def grid_substations():
+    substations = GridSubstation.query.order_by(GridSubstation.name).all()
+    substations_data = [substation.to_dict() for substation in substations]
+    return render_template('grid_substations.html', substations=substations, substations_data=substations_data)
+
+
+
+
+""" 
 @main.route('/grid_substations/<int:id>/generate_api_key', methods=['POST'])
 def generate_grid_substation_api_key(id):
     substation = GridSubstation.query.get_or_404(id)
@@ -672,7 +683,7 @@ def generate_grid_substation_api_key(id):
     flash('New API key generated for Grid Substation', 'success')
     return redirect(url_for('main.grid_substations'))
 
-
+ """
 
 """ 
 

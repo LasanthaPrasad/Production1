@@ -125,7 +125,17 @@ class GridSubstation(db.Model):
         self.installed_solar_capacity = total_capacity
         db.session.commit()
 
-
+    def to_dict(self):
+        return {
+            'id': self.id,
+            'name': self.name,
+            'code': self.code,
+            'latitude': float(self.latitude),
+            'longitude': float(self.longitude),
+            'installed_solar_capacity': float(self.installed_solar_capacity),
+            'forecast_location': self.forecast_location,
+            'api_status': self.api_status
+        }
         
 #class Feeder(db.Model):
 #    __tablename__ = 'feeders'
