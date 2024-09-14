@@ -113,35 +113,92 @@ function showSubstationInfo(substation, marker, map) {
 function showForecast(substationId) {
     $('#loadingSpinner').show();
     $('#forecastModal').modal('show');
+    $('#forecastChart').hide();
 
-    fetch('/api/substation_forecast/' + substationId)
+    fetch('/api/substation_forecast/${substationId}')
         .then(response => response.json())
         .then(data => {
             $('#loadingSpinner').hide();
+            $('#forecastChart').show();
+                       
+            const ctx = document.getElementById('forecastChart').getContext('2d');
             
-            var trace = {
-                x: data.timestamps,
-                y: data.estimated_mw,
-                type: 'scatter',
-                mode: 'lines+markers',
-                name: 'Estimated MW'
-            };
+            // Destroy existing chart if it exists
+            if (window.forecastChart instanceof Chart) {
+                window.forecastChart.destroy();
+            }
+ 
 
-            var layout = {
-                title: 'Grid Substation Generation Forecast',
-                xaxis: {title: 'Time'},
-                yaxis: {title: 'Estimated MW'}
-            };
 
-            Plotly.newPlot('forecastChart', [trace], layout);
+            window.forecastChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data.map(d => new Date(d.timestamp).toLocaleString()),
+                    datasets: [{
+                        label: 'Grid Forecasted MW',
+                        data: data.map(d => d.estimated_mw),
+                        borderColor: 'rgb(75, 192, 192)',
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    title: {
+                        display: true,
+                        text: `Forecast for ${plantName}`
+                    },
+                    scales: {
+                        x: {
+                            type: 'time',
+                            time: {
+                                unit: 'hour'
+                            },
+                            title: {
+                                display: true,
+                                text: 'Time'
+                            }
+                        },
+                        y: {
+                            title: {
+                                display: true,
+                                text: 'Estimated MW'
+                            }
+                        }
+                    }
+                }
+            });
+            
+            $('#forecastModal').modal('show');
+
+
+
+
+
+
+
+
         })
         .catch(error => {
-            console.error('Error:', error);
+            console.error('Error fetching forecast data:', error);
             $('#loadingSpinner').hide();
-            alert('An error occurred while fetching the forecast data.');
+            $('#forecastChart').hide();
+            alert('Failed to fetch forecast data. Please check API key and try again.');
         });
 }
 
-initMap();
+
+document.addEventListener("DOMContentLoaded", initMap);
+document.addEventListener('click', function(event) {
+    // Check if the clicked element is a close button inside a modal
+    if (event.target.matches('.modal .btn-close') || event.target.matches('.modal .close')) {
+        var modal = event.target.closest('.modal');
+        var modalInstance = bootstrap.Modal.getInstance(modal);
+        if (modalInstance) {
+            modalInstance.hide();
+        }
+    }
+});
+
+
 </script>
 {% endblock %}
