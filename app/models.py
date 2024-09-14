@@ -124,6 +124,8 @@ class GridSubstation(db.Model):
                              if feeder.status == 'active')
         self.installed_solar_capacity = total_capacity
         db.session.commit()
+
+
         
 #class Feeder(db.Model):
 #    __tablename__ = 'feeders'

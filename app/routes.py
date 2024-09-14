@@ -947,12 +947,33 @@ def delete_forecast_location(location_id):
     return redirect(url_for('main.forecast_locations'))
 
 
-
+""" 
 # Grid Substations
 @main.route('/grid_substations')
 def grid_substations():
     substations = GridSubstation.query.order_by(GridSubstation.name).all()
     return render_template('grid_substations.html', substations=substations)
+
+ """
+
+@main.route('/grid_substations')
+def grid_substations():
+    substations = GridSubstation.query.order_by(GridSubstation.name).all()
+    substations_data = [{
+        'id': substation.id,
+        'name': substation.name,
+        'code': substation.code,
+        'latitude': float(substation.latitude),
+        'longitude': float(substation.longitude),
+        'installed_solar_capacity': float(substation.installed_solar_capacity),
+        'forecast_location': substation.forecast_location
+    } for substation in substations]
+    return render_template('grid_substations.html', substations=substations, substations_data=substations_data)
+
+
+
+
+
 
 
 
