@@ -1002,7 +1002,7 @@ def get_substation_forecast(substation_id):
 
 def calculate_substation_forecasts(substation):
     now = datetime.now(timezone.utc)
-    three_days_later = now + timedelta(days=3)
+    three_days_later = now + timedelta(days=1)
 
     # Get the forecast location for this substation
     forecast_location = ForecastLocation.query.get(substation.forecast_location)
@@ -1017,8 +1017,18 @@ def calculate_substation_forecasts(substation):
 
     if not forecasts:
         return {"error": "No forecast data available"}
+    
+    return jsonify([{
+        'timestamp': f.timestamp.isoformat(),
+        'ghi': f.ghi,
+        'dni': f.dni,
+        'dhi': f.dhi
+    } for f in forecasts])
 
-    substation_forecasts = []
+
+
+
+"""     substation_forecasts = []
     for forecast in forecasts:
         # Simple calculation: GHI * installed capacity * efficiency factor
         estimated_mw = (forecast.ghi / 1000) * substation.installed_solar_capacity * 0.15  # Assuming 15% efficiency
@@ -1030,7 +1040,7 @@ def calculate_substation_forecasts(substation):
     return {
         'timestamps': [f['timestamp'] for f in substation_forecasts],
         'estimated_mw': [f['estimated_mw'] for f in substation_forecasts]
-    }
+    } """
 
 
 
