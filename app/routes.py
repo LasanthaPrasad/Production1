@@ -193,7 +193,7 @@ def admin_bulk_upload():
                 elif data_type == 'feeders':
                     process_feeders(csv_reader)
                 elif data_type == 'solar_plants':
-                    process_solar_plants(csv_reader)
+                    process_solar_plants(csv_file)
                 
                 flash(f'Bulk upload for {data_type} completed successfully!', 'success')
             except Exception as e:
