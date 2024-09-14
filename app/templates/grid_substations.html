@@ -39,10 +39,32 @@
 
 <div id="map" style="height: 800px; width: 100%;"></div>
 
+<div class="modal fade" id="forecastModal" tabindex="-1" role="dialog" aria-labelledby="forecastModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="forecastModalLabel">Grid Substation Generation Forecast</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="loadingSpinner" class="text-center" style="display: none;">
+                    <div class="spinner-border" role="status">
+                        <span class="sr-only">Loading...</span>
+                    </div>
+                </div>
+                <div id="forecastChart" style="width:100%; height:400px;"></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 {% endblock %}
 
 {% block extra_js %}
-
+<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY"></script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <script>
 function initMap() {
     var map = new google.maps.Map(document.getElementById('map'), {
@@ -81,8 +103,35 @@ function showSubstationInfo(substation, marker, map) {
 }
 
 function showForecast(substationId) {
-    // Implement forecast display logic here
-    alert('Forecast for substation ' + substationId);
+    $('#loadingSpinner').show();
+    $('#forecastModal').modal('show');
+
+    fetch('/api/substation_forecast/' + substationId)
+        .then(response => response.json())
+        .then(data => {
+            $('#loadingSpinner').hide();
+            
+            var trace = {
+                x: data.timestamps,
+                y: data.estimated_mw,
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: 'Estimated MW'
+            };
+
+            var layout = {
+                title: 'Grid Substation Generation Forecast',
+                xaxis: {title: 'Time'},
+                yaxis: {title: 'Estimated MW'}
+            };
+
+            Plotly.newPlot('forecastChart', [trace], layout);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            $('#loadingSpinner').hide();
+            alert('An error occurred while fetching the forecast data.');
+        });
 }
 
 initMap();

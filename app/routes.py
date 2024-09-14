@@ -977,6 +977,57 @@ def grid_substations():
 
 
 
+
+@main.route('/api/substation_forecast/<int:substation_id>')
+def get_substation_forecast(substation_id):
+    substation = GridSubstation.query.get_or_404(substation_id)
+    forecasts = calculate_substation_forecasts(substation)
+    return jsonify(forecasts)
+
+def calculate_substation_forecasts(substation):
+    now = datetime.now(timezone.utc)
+    three_days_later = now + timedelta(days=3)
+
+    # Get the forecast location for this substation
+    forecast_location = ForecastLocation.query.get(substation.forecast_location)
+
+    if not forecast_location:
+        return {"error": "No forecast location associated with this substation"}
+
+    forecasts = IrradiationForecast.query.filter_by(forecast_location_id=forecast_location.id).filter(            
+        IrradiationForecast.timestamp >= now,
+        IrradiationForecast.timestamp <= three_days_later
+    ).order_by(IrradiationForecast.timestamp).all()
+
+    if not forecasts:
+        return {"error": "No forecast data available"}
+
+    substation_forecasts = []
+    for forecast in forecasts:
+        # This is a simplified calculation. You might need a more complex model.
+        estimated_mw = (forecast.ghi / 1000) * substation.installed_solar_capacity * 0.15  # Assuming 15% efficiency
+        substation_forecasts.append({
+            'timestamp': forecast.timestamp.isoformat(),
+            'estimated_mw': estimated_mw
+        })
+
+    return {
+        'timestamps': [f['timestamp'] for f in substation_forecasts],
+        'estimated_mw': [f['estimated_mw'] for f in substation_forecasts]
+    }
+
+
+
+
+
+
+
+
+
+
+
+
+
 @main.route('/grid_substations/create', methods=['GET', 'POST'])
 def create_grid_substation():
     if request.method == 'POST':
