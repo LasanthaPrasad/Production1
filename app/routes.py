@@ -956,27 +956,13 @@ def grid_substations():
 
  """
 
+
+
+
 @main.route('/grid_substations')
 def grid_substations():
     substations = GridSubstation.query.order_by(GridSubstation.name).all()
-    substations_data = [{
-        'id': substation.id,
-        'name': substation.name,
-        'code': substation.code,
-        'latitude': float(substation.latitude),
-        'longitude': float(substation.longitude),
-        'installed_solar_capacity': float(substation.installed_solar_capacity),
-        'forecast_location': substation.forecast_location
-    } for substation in substations]
-    return render_template('grid_substations.html', substations=substations, substations_data=substations_data)
-
-
-
-
-
-
-
-
+    return render_template('grid_substations.html', substations=substations)
 
 @main.route('/api/substation_forecast/<int:substation_id>')
 def get_substation_forecast(substation_id):
@@ -1004,7 +990,7 @@ def calculate_substation_forecasts(substation):
 
     substation_forecasts = []
     for forecast in forecasts:
-        # This is a simplified calculation. You might need a more complex model.
+        # Simple calculation: GHI * installed capacity * efficiency factor
         estimated_mw = (forecast.ghi / 1000) * substation.installed_solar_capacity * 0.15  # Assuming 15% efficiency
         substation_forecasts.append({
             'timestamp': forecast.timestamp.isoformat(),
@@ -1015,13 +1001,6 @@ def calculate_substation_forecasts(substation):
         'timestamps': [f['timestamp'] for f in substation_forecasts],
         'estimated_mw': [f['estimated_mw'] for f in substation_forecasts]
     }
-
-
-
-
-
-
-
 
 
 

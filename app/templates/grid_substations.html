@@ -31,6 +31,7 @@
                 <form action="{{ url_for('main.delete_grid_substation', id=substation.id) }}" method="POST" style="display:inline;">
                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this substation?');">Delete</button>
                 </form>
+                <button onclick="showForecast({{ substation.id }})" class="btn btn-sm btn-info">Show Forecast</button>
             </td>
         </tr>
         {% endfor %}
@@ -72,11 +73,11 @@ function initMap() {
         center: {lat: 28.6139, lng: 77.2090}  // Centered on Delhi, India
     });
 
-    var substations = {{ substations_data|tojson }};
+    var substations = {{ substations|tojson }};
     
     substations.forEach(function(substation) {
         var marker = new google.maps.Marker({
-            position: {lat: substation.latitude, lng: substation.longitude},
+            position: {lat: parseFloat(substation.latitude), lng: parseFloat(substation.longitude)},
             map: map,
             title: substation.name
         });
@@ -132,7 +133,6 @@ function showForecast(substationId) {
             $('#loadingSpinner').hide();
             alert('An error occurred while fetching the forecast data.');
         });
-        
 }
 
 initMap();
