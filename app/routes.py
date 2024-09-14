@@ -1000,16 +1000,15 @@ def get_substation_forecast(substation_id):
     forecasts = calculate_substation_forecasts(substation)
     return jsonify(forecasts)
 
-@main.route('/api/check_forecasts_sub/<int:substation>')
+@main.route('/api/check_forecasts_sub/<substation>')
 def calculate_substation_forecasts(substation):
     now = datetime.now(timezone.utc)
     three_days_later = now + timedelta(days=1)
 
     # Get the forecast location for this substation
-
+    """ 
     forecast_location = ForecastLocation.query.get(substation.forecast_location)
     print(f"FFFFF Location {forecast_location}")
-
 
 
 
@@ -1017,7 +1016,8 @@ def calculate_substation_forecasts(substation):
     if not forecast_location:
         return {"error": "No forecast location associated with this substation"}
 
-    forecasts = IrradiationForecast.query.filter_by(forecast_location_id=forecast_location.id).filter(            
+    """
+    forecasts = IrradiationForecast.query.filter_by(forecast_location_id=substation.forecast_location).filter(            
         IrradiationForecast.timestamp >= now,
         IrradiationForecast.timestamp <= three_days_later
     ).order_by(IrradiationForecast.timestamp).all()
