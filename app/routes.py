@@ -171,7 +171,6 @@ def sample_csv(data_type):
 
 
 
-
 @main.route('/admin/bulk_upload', methods=['GET', 'POST'])
 @roles_required('admin')
 def admin_bulk_upload():
@@ -186,7 +185,8 @@ def admin_bulk_upload():
                 current_app.logger.info(f"CSV Data: {csv_data}")  # Log the CSV data
                 csv_file = StringIO(csv_data)
                 csv_reader = csv.DictReader(csv_file)
-                
+                df = pd.read_csv(csv_file)
+
                 if data_type == 'forecast_locations':
                     process_forecast_locations(csv_reader)
                 elif data_type == 'grid_substations':
@@ -194,7 +194,7 @@ def admin_bulk_upload():
                 elif data_type == 'feeders':
                     process_feeders(csv_reader)
                 elif data_type == 'solar_plants':
-                    process_solar_plants(csv_file)
+                    process_solar_plants(df)
                 
 
 
