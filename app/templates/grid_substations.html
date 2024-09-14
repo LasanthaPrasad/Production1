@@ -1,82 +1,122 @@
 {% extends "base.html" %}
-
 {% block content %}
 <h1>Grid Substations</h1>
-<a href="{{ url_for('main.create_grid_substation') }}" class="btn btn-primary mb-3">Create New Grid Substation</a>
-<table class="table">
-    <thead>
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Code</th>
-            <th>Latitude</th>
-            <th>Longitude</th>
-            <th>Installed Solar Capacity</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for substation in substations %}
-        <tr>
-            <td>{{ substation.id }}</td>
-            <td>{{ substation.name }}</td>
-            <td>{{ substation.code }}</td>
-            <td>{{ substation.latitude }}</td>
-            <td>{{ substation.longitude }}</td>
-            <td>{{ substation.installed_solar_capacity }}</td>
-            <td>
-                <a href="{{ url_for('main.edit_grid_substation', id=substation.id) }}" class="btn btn-sm btn-warning">Edit</a>
-                <form action="{{ url_for('main.delete_grid_substation', id=substation.id) }}" method="POST">
-                    <button type="submit" class="btn btn-danger btn-sm">Delete</button>
-                </form>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
 
-<div id="map" style="height: 800px; width: 100%;"></div>
+<a href="{{ url_for('main.create_grid_substation') }}" class="btn btn-primary mb-3">Create New Grid Substation</a>
+
+<div class="row">
+    <div class="col-md-6">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Code</th>
+                    <th>Installed Solar Capacity</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for substation in substations %}
+                <tr>
+                    <td>{{ substation.id }}</td>
+                    <td>{{ substation.name }}</td>
+                    <td>{{ substation.code }}</td>
+                    <td>{{ substation.installed_solar_capacity }}</td>
+                    <td>
+                        <a href="{{ url_for('main.edit_grid_substation', id=substation.id) }}" class="btn btn-sm btn-warning">Edit</a>
+                        <form action="{{ url_for('main.delete_grid_substation', id=substation.id) }}" method="POST" style="display:inline;">
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this substation?');">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="col-md-6">
+        <div id="map" style="height: 500px; width: 100%;"></div>
+    </div>
+</div>
+
+<div class="modal fade" id="forecastModal" tabindex="-1" role="dialog" aria-labelledby="forecastModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="forecastModalLabel">Grid Substation Forecast</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="forecastChart"></div>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY"></script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <script>
 function initMap() {
-    const map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: 7.8731, lng: 80.7718 },  // Center of Sri Lanka
-        zoom: 8,
+    var map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 7,
+        center: {lat: 28.6139, lng: 77.2090}  // Centered on Delhi, India
     });
 
-    const substations = [
-        {% for substation in substations %}
-        {
-            position: { lat: {{ substation.latitude }}, lng: {{ substation.longitude }} },
-            title: "{{ substation.name }}",
-            content: "<h6>{{ substation.name }}</h6>" +
-                     "<p>Code: {{ substation.code }}<br>" +
-                     "Installed Solar Capacity: {{ substation.installed_solar_capacity }} MW<br>" +
-                     "Latitude: {{ substation.latitude }}<br>" +
-                     "Longitude: {{ substation.longitude }}</p>"
-        },
-        {% endfor %}
-    ];
-
-    const infoWindow = new google.maps.InfoWindow();
-
-    substations.forEach(substation => {
-        const marker = new google.maps.Marker({
-            position: substation.position,
+    var substations = {{ substations|tojson }};
+    
+    substations.forEach(function(substation) {
+        var marker = new google.maps.Marker({
+            position: {lat: substation.latitude, lng: substation.longitude},
             map: map,
-            title: substation.title
+            title: substation.name
         });
 
-        marker.addListener("click", () => {
-            infoWindow.close();
-            infoWindow.setContent(substation.content);
-            infoWindow.open(map, marker);
+        marker.addListener('click', function() {
+            showSubstationInfo(substation);
         });
     });
 }
 
-document.addEventListener("DOMContentLoaded", initMap);
+function showSubstationInfo(substation) {
+    var content = '<h5>' + substation.name + '</h5>' +
+                  '<p>Code: ' + substation.code + '</p>' +
+                  '<p>Latitude: ' + substation.latitude + '</p>' +
+                  '<p>Longitude: ' + substation.longitude + '</p>' +
+                  '<p>Installed Solar Capacity: ' + substation.installed_solar_capacity + ' MW</p>' +
+                  '<button onclick="showForecast(' + substation.id + ')" class="btn btn-primary">Show Forecast</button>';
+
+    var infowindow = new google.maps.InfoWindow({
+        content: content
+    });
+
+    infowindow.open(map, marker);
+}
+
+function showForecast(substationId) {
+    fetch('/api/substation_forecast/' + substationId)
+        .then(response => response.json())
+        .then(data => {
+            var trace = {
+                x: data.timestamps,
+                y: data.estimated_mw,
+                type: 'scatter'
+            };
+
+            var layout = {
+                title: 'Grid Substation Forecast',
+                xaxis: {title: 'Time'},
+                yaxis: {title: 'Estimated MW'}
+            };
+
+            Plotly.newPlot('forecastChart', [trace], layout);
+            $('#forecastModal').modal('show');
+        });
+}
+
+initMap();
 </script>
 {% endblock %}
