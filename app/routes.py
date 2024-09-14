@@ -1027,12 +1027,16 @@ def calculate_substation_forecasts(substation):
     if not forecasts:
         return {"error": "No forecast data available"}
     
-    return jsonify([{
-        'timestamp': f.timestamp.isoformat(),
-        'ghi': f.ghi,
-        'dni': f.dni,
-        'dhi': f.dhi
-    } for f in forecasts])
+    substation_forecasts = []
+    for forecast in forecasts:
+    # This is a simplified calculation. You might need a more complex model.
+        estimated_mw = (forecast.ghi / 150) * substation.installed_capacity * 0.15  # Assuming 15% efficiency
+        substation_forecasts.append({
+        'timestamp': forecast.timestamp.isoformat(),
+        'estimated_mw': estimated_mw
+    })
+
+    return substation_forecasts
 
 
 
