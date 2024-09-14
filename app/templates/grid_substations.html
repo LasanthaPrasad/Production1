@@ -64,25 +64,54 @@
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY"></script>
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+
 <script>
+let map;
+let markers = [];
+let currentInfoWindow = null;
+
+
 function initMap() {
     var map = new google.maps.Map(document.getElementById('map'), {
         zoom: 7,
         center: {lat: 28.6139, lng: 77.2090}  // Centered on Delhi, India
     });
 
-    var substations = {{ substations|tojson }};
+    //var substations = {{ substations|tojson }};
     
-    substations.forEach(function(substation) {
-        var marker = new google.maps.Marker({
-            position: {lat: parseFloat(substation.latitude), lng: parseFloat(substation.longitude)},
+    const substations = [
+        {% for substation in substations %}
+        {
+            position: { lat: {{ substation.latitude }}, lng: {{ substation.longitude }} },
+            title: "{{ substation.name }}",
+            id: {{ substation.id }},
+            details: {
+                name: "{{ substation.name }}",
+                latitude: {{ substation.latitude }},
+                longitude: {{ substation.longitude }},
+            
+                installedCapacity: {{ substation.installed_capacity }},
+            }
+        },
+        {% endfor %}
+    ];
+
+
+
+
+    substations.forEach(substation => {
+        cont marker = new google.maps.Marker({
+            position: substation.position,
             map: map,
             title: substation.name
         });
 
-        marker.addListener('click', function() {
+        marker.addListener('click', () =>  {
+            if (currentInfoWindow) {
+                currentInfoWindow.close();
+            }
+            infoWindow.open(map, marker);
+            currentInfoWindow = infoWindow;
             showSubstationInfo(substation, marker, map);
         });
     });
@@ -95,7 +124,7 @@ function showSubstationInfo(substation, marker, map) {
                   '<p>Latitude: ' + substation.latitude + '</p>' +
                   '<p>Longitude: ' + substation.longitude + '</p>' +
                   '<p>Installed Solar Capacity: ' + substation.installed_solar_capacity + ' MW</p>' +
-                  '<button onclick="showForecast(' + substation.id + ')" class="btn btn-primary">Show Forecast</button>';
+ //                 '<button onclick="showForecast(' + substation.id + ')" class="btn btn-primary">Show Forecast</button>';
 
     var infowindow = new google.maps.InfoWindow({
         content: content
@@ -104,7 +133,7 @@ function showSubstationInfo(substation, marker, map) {
     infowindow.open(map, marker);
 }
 
-function showForecast(substationId) {
+/* function showForecast(substationId) {
     $('#loadingSpinner').show();
     $('#forecastModal').modal('show');
 
@@ -135,7 +164,7 @@ function showForecast(substationId) {
             alert('An error occurred while fetching the forecast data.');
         });
 }
-
+ */
 initMap();
 </script>
 {% endblock %}
