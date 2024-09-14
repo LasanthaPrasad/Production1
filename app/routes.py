@@ -183,6 +183,7 @@ def admin_bulk_upload():
         if csv_file:
             try:
                 csv_data = csv_file.stream.read().decode("UTF-8")
+                current_app.logger.info(f"CSV Data: {csv_data}")  # Log the CSV data
                 csv_file = StringIO(csv_data)
                 csv_reader = csv.DictReader(csv_file)
                 
@@ -195,6 +196,29 @@ def admin_bulk_upload():
                 elif data_type == 'solar_plants':
                     process_solar_plants(csv_file)
                 
+
+
+
+
+
+               # Log the first few rows of the CSV
+                for i, row in enumerate(csv_reader):
+                    if i < 5:  # Log only the first 5 rows
+                        current_app.logger.info(f"Row {i+1}: {row}")
+                    else:
+                        break
+                csv_file.seek(0)  # Reset the file pointer to the beginning
+
+
+
+
+
+
+
+
+
+
+
                 flash(f'Bulk upload for {data_type} completed successfully!', 'success')
             except Exception as e:
                 current_app.logger.error(f'Error during bulk upload: {str(e)}', exc_info=True)
