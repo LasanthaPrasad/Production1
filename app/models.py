@@ -124,7 +124,7 @@ class GridSubstation(db.Model):
                              if feeder.status == 'active')
         self.installed_solar_capacity = total_capacity
         db.session.commit()
-
+""" 
     def to_dict(self):
         return {
             'id': self.id,
@@ -135,7 +135,7 @@ class GridSubstation(db.Model):
             'installed_solar_capacity': float(self.installed_solar_capacity),
             'forecast_location': self.forecast_location,
             'api_status': self.api_status
-        }
+        } """
         
 #class Feeder(db.Model):
 #    __tablename__ = 'feeders'
