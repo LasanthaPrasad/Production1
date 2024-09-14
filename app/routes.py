@@ -61,6 +61,41 @@ main = Blueprint('main', __name__)
 
 
 
+@main.route('/admin/download/<entity_type>')
+@roles_required('admin')
+def download_csv(entity_type):
+    if entity_type == 'forecast_locations':
+        data = ForecastLocation.query.all()
+        fieldnames = ['provider_name', 'latitude', 'longitude', 'api_key']
+    elif entity_type == 'grid_substations':
+        data = GridSubstation.query.all()
+        fieldnames = ['name', 'code', 'latitude', 'longitude', 'installed_solar_capacity', 'api_status', 'forecast_location']
+    elif entity_type == 'feeders':
+        data = Feeder.query.all()
+        fieldnames = ['name', 'code', 'grid_substation', 'installed_solar_capacity', 'status']
+    elif entity_type == 'solar_plants':
+        data = SolarPlant.query.all()
+        fieldnames = ['name', 'latitude', 'longitude', 'grid_substation', 'feeder', 'forecast_location', 
+                      'installed_capacity', 'panel_capacity', 'inverter_capacity', 'plant_angle', 
+                      'company', 'api_status', 'plant_efficiency', 'coefficient_factor']
+    else:
+        return "Invalid entity type", 400
+
+    output = StringIO()
+    writer = csv.DictWriter(output, fieldnames=fieldnames)
+    writer.writeheader()
+
+    for item in data:
+        row = {field: getattr(item, field) for field in fieldnames}
+        writer.writerow(row)
+
+    output.seek(0)
+    return Response(
+        output.getvalue(),
+        mimetype="text/csv",
+        headers={"Content-disposition": f"attachment; filename={entity_type}.csv"}
+    )
+
 
 
 
@@ -602,6 +637,7 @@ def profile():
 def admin():
     """Admin dashboard route"""
     # Here you might want to fetch some admin-specific data
+    form = BulkUploadForm()
     return render_template('admin.html')
 
 
