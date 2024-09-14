@@ -55,12 +55,12 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-
+from .utils import calculate_distance
 
 main = Blueprint('main', __name__)
 
 
-from .utils import calculate_distance
+
 
 
 
@@ -172,7 +172,6 @@ def sample_csv(data_type):
     )
 
 
-
 @main.route('/admin/bulk_upload', methods=['GET', 'POST'])
 @roles_required('admin')
 def admin_bulk_upload():
@@ -183,34 +182,24 @@ def admin_bulk_upload():
         
         if csv_file:
             csv_data = csv_file.read().decode('utf-8')
-            
-            errors = check_for_errors(data_type, csv_data)
-            
-            if errors:
-                error_report = create_error_report(errors)
-                return Response(
-                    error_report,
-                    mimetype="text/csv",
-                    headers={"Content-disposition": f"attachment; filename={data_type}_error_report.csv"}
-                )
+            csv_file = StringIO(csv_data)
+            csv_reader = csv.DictReader(csv_file)
             
             try:
                 if data_type == 'forecast_locations':
-                    process_forecast_locations(csv_data)
+                    process_forecast_locations(csv_reader)
                 elif data_type == 'grid_substations':
-                    process_grid_substations(csv_data)
+                    process_grid_substations(csv_reader)
                 elif data_type == 'feeders':
-                    process_feeders(csv_data)
+                    process_feeders(csv_reader)
                 elif data_type == 'solar_plants':
-                    process_solar_plants(csv_data)
+                    process_solar_plants(csv_reader)
                 
                 flash(f'Bulk upload for {data_type} completed successfully!', 'success')
             except Exception as e:
                 flash(f'Error during bulk upload: {str(e)}', 'error')
         
     return render_template('admin/bulk_upload.html', form=form)
-
-
 
 """ 
 
@@ -244,29 +233,19 @@ def admin_bulk_upload():
     return render_template('admin/bulk_upload.html', form=form)
 
  """
-
-def process_forecast_locations(csv_data):
-    for row in csv_data:
-        try:
-            location = ForecastLocation(
-                provider_name=row['provider_name'],
-                latitude=float(row['latitude']),
-                longitude=float(row['longitude']),
-                api_key=row.get('api_key')
-            )
-            db.session.add(location)
-        except KeyError as e:
-            flash(f"Missing required field: {str(e)}", 'error')
-            db.session.rollback()
-            return
-        except ValueError as e:
-            flash(f"Invalid data format: {str(e)}", 'error')
-            db.session.rollback()
-            return
+def process_forecast_locations(csv_reader):
+    for row in csv_reader:
+        location = ForecastLocation(
+            provider_name=row['provider_name'],
+            latitude=float(row['latitude']),
+            longitude=float(row['longitude']),
+            api_key=row.get('api_key')
+        )
+        db.session.add(location)
     db.session.commit()
 
-def process_grid_substations(csv_data):
-    for row in csv_data:
+def process_grid_substations(csv_reader):
+    for row in csv_reader:
         substation = GridSubstation(
             name=row['name'],
             code=row['code'],
@@ -278,8 +257,8 @@ def process_grid_substations(csv_data):
         db.session.add(substation)
     db.session.commit()
 
-def process_feeders(csv_data):
-    for row in csv_data:
+def process_feeders(csv_reader):
+    for row in csv_reader:
         feeder = Feeder(
             name=row['name'],
             code=row['code'],
@@ -288,6 +267,27 @@ def process_feeders(csv_data):
             status=row['status']
         )
         db.session.add(feeder)
+    db.session.commit()
+
+def process_solar_plants(csv_reader):
+    for row in csv_reader:
+        plant = SolarPlant(
+            name=row['name'],
+            latitude=float(row['latitude']),
+            longitude=float(row['longitude']),
+            grid_substation=int(row['grid_substation']),
+            feeder=int(row['feeder']),
+            forecast_location=int(row['forecast_location']),
+            installed_capacity=float(row['installed_capacity']),
+            panel_capacity=float(row['panel_capacity']),
+            inverter_capacity=float(row['inverter_capacity']),
+            plant_angle=float(row['plant_angle']),
+            company=row['company'],
+            api_status=row['api_status'],
+            plant_efficiency=float(row['plant_efficiency']),
+            coefficient_factor=float(row['coefficient_factor'])
+        )
+        db.session.add(plant)
     db.session.commit()
 
 """ 
