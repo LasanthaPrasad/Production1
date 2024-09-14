@@ -1030,7 +1030,7 @@ def calculate_substation_forecasts(substation):
     substation_forecasts = []
     for forecast in forecasts:
     # This is a simplified calculation. You might need a more complex model.
-        estimated_mw = (forecast.ghi / 150) * substation.installed_solar_capacity * 0.15  # Assuming 15% efficiency
+        estimated_mw = (forecast.ghi / 150) *  float(substation.installed_solar_capacity) * 0.15  # Assuming 15% efficiency
         substation_forecasts.append({
         'timestamp': forecast.timestamp.isoformat(),
         'estimated_mw': estimated_mw
