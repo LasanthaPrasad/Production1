@@ -665,25 +665,40 @@ def generate_solar_plant_api_key(id):
     return redirect(url_for('main.solar_plants'))
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 @main.route('/grid_substations')
 def grid_substations():
     substations = GridSubstation.query.order_by(GridSubstation.name).all()
-    substations_data = [substation.to_dict() for substation in substations]
+    substations_data = [{
+        'id': s.id,
+        'name': s.name,
+        'code': s.code,
+        'latitude': float(s.latitude),
+        'longitude': float(s.longitude),
+        'installed_solar_capacity': float(s.installed_solar_capacity),
+        'api_key': s.api_key,
+        'api_status': s.api_status,
+        'forecast_location': s.forecast_location
+    } for s in substations]
     return render_template('grid_substations.html', substations=substations, substations_data=substations_data)
 
 
-
-
-""" 
-@main.route('/grid_substations/<int:id>/generate_api_key', methods=['POST'])
-def generate_grid_substation_api_key(id):
-    substation = GridSubstation.query.get_or_404(id)
-    substation.api_key = str(uuid.uuid4())
-    db.session.commit()
-    flash('New API key generated for Grid Substation', 'success')
-    return redirect(url_for('main.grid_substations'))
-
- """
 
 """ 
 
@@ -958,22 +973,26 @@ def delete_forecast_location(location_id):
     return redirect(url_for('main.forecast_locations'))
 
 
-""" 
-# Grid Substations
-@main.route('/grid_substations')
-def grid_substations():
-    substations = GridSubstation.query.order_by(GridSubstation.name).all()
-    return render_template('grid_substations.html', substations=substations)
-
- """
 
 
 
 
-@main.route('/grid_substations')
-def grid_substations():
-    substations = GridSubstation.query.order_by(GridSubstation.name).all()
-    return render_template('grid_substations.html', substations=substations)
+@main.route('/grid_substations/<int:id>/generate_api_key', methods=['POST'])
+def generate_grid_substation_api_key(id):
+    substation = GridSubstation.query.get_or_404(id)
+    substation.api_key = str(uuid.uuid4())
+    db.session.commit()
+    flash('New API key generated for Grid Substation', 'success')
+    return redirect(url_for('main.grid_substations'))
+
+
+
+
+
+
+
+
+
 
 @main.route('/api/substation_forecast/<int:substation_id>')
 def get_substation_forecast(substation_id):

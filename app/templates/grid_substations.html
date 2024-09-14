@@ -5,7 +5,7 @@
 
 <a href="{{ url_for('main.create_grid_substation') }}" class="btn btn-primary mb-3">Create New Grid Substation</a>
 
-<table class="table">
+<table class="table table-striped">
     <thead>
         <tr>
             <th>ID</th>
@@ -14,6 +14,8 @@
             <th>Latitude</th>
             <th>Longitude</th>
             <th>Installed Solar Capacity</th>
+            <th>API Key</th>
+            <th>API Status</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -26,12 +28,17 @@
             <td>{{ substation.latitude }}</td>
             <td>{{ substation.longitude }}</td>
             <td>{{ substation.installed_solar_capacity }}</td>
+            <td>{{ substation.api_key }}</td>
+            <td>{{ substation.api_status }}</td>
             <td>
                 <a href="{{ url_for('main.edit_grid_substation', id=substation.id) }}" class="btn btn-sm btn-warning">Edit</a>
-                <form action="{{ url_for('main.delete_grid_substation', id=substation.id) }}" method="POST" style="d-inline">
+                <form action="{{ url_for('main.delete_grid_substation', id=substation.id) }}" method="POST" style="display:inline;">
                     <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Are you sure you want to delete this substation?');">Delete</button>
                 </form>
-                <button onclick="showForecast({{ substation.id }})" class="btn btn-sm btn-info">Show Forecast</button>
+                <form action="{{ url_for('main.generate_grid_substation_api_key', id=substation.id) }}" method="POST" style="display:inline;">
+                    <button type="submit" class="btn btn-sm btn-info">New API Key</button>
+                </form>
+                <button onclick="showForecast({{ substation.id }})" class="btn btn-sm btn-primary">Show Forecast</button>
             </td>
         </tr>
         {% endfor %}
@@ -64,118 +71,37 @@
 {% endblock %}
 
 {% block extra_js %}
-
+<script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY"></script>
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <script>
-let map;
-let markers = [];
-let currentInfoWindow = null;
-
-
 function initMap() {
-    map = new google.maps.Map(document.getElementById('map'), {
+    var map = new google.maps.Map(document.getElementById('map'), {
         zoom: 7,
-        center: { lat: 7.8731, lng: 80.7718 },  // Center of Sri Lanka
+        center: {lat: 28.6139, lng: 77.2090}  // Centered on Delhi, India
     });
 
-    //var substations = {{ substations|tojson }};
     var substations = {{ substations_data|tojson }};
-/*     const substations = [
-        {% for substation in substations %}
-        {
-            position: { lat: {{ substation.latitude }}, lng: {{ substation.longitude }} },
-            title: "{{ substation.name }}",
-            id: {{ substation.id }},
-            details: {
-                name: "{{ substation.name }}",
-                latitude: {{ substation.latitude }},
-                longitude: {{ substation.longitude }},
-            
-                installedCapacity: {{ substation.installed_capacity }},
-            }
-        },
-        {% endfor %}
-    ]; */
-
-
-
-    substations.forEach(substation => {
-        const marker = new google.maps.Marker({
-            position: substation.position,
-            map: map,
-            title: substation.title,
-        
-        });
-
-        const infoWindow = new google.maps.InfoWindow({
-            content: `
-                <div>
-                    <h6>${substation.title}</h6>
-                    <p>Latitude: ${substation.details.latitude}</p>
-                    <p>Longitude: ${substation.details.longitude}</p>
-                
-                    <p>Installed Capacity: ${substation.details.installedCapacity} MW</p>
-                    
-                
-                    </div>
-            `
-        });
-
-        marker.addListener("click", () => {
-            if (currentInfoWindow) {
-                currentInfoWindow.close();
-            }
-            infoWindow.open(map, marker);
-            currentInfoWindow = infoWindow;
-        });
-
-        markers.push(marker);
-    });
-}
-
-
-
-
-
-
-
-
-/* <button onclick="showForecast(${substation.id}')">Show Forecast</button> */
-
-/* 
-
-    substations.forEach(substation => {
-        const marker = new google.maps.Marker({
-            position: substation.position,
+    
+    substations.forEach(function(substation) {
+        var marker = new google.maps.Marker({
+            position: {lat: substation.latitude, lng: substation.longitude},
             map: map,
             title: substation.name
         });
 
-        marker.addListener('click', () =>  {
-            if (currentInfoWindow) {
-                currentInfoWindow.close();
-            }
-            infoWindow.open(map, marker);
-            currentInfoWindow = infoWindow;
+        marker.addListener('click', function() {
             showSubstationInfo(substation, marker, map);
         });
     });
+}
 
-
-
-
-
-
-
-} */
-
-/* 
 function showSubstationInfo(substation, marker, map) {
     var content = '<h5>' + substation.name + '</h5>' +
                   '<p>Code: ' + substation.code + '</p>' +
                   '<p>Latitude: ' + substation.latitude + '</p>' +
                   '<p>Longitude: ' + substation.longitude + '</p>' +
                   '<p>Installed Solar Capacity: ' + substation.installed_solar_capacity + ' MW</p>' +
- //                 '<button onclick="showForecast(' + substation.id + ')" class="btn btn-primary">Show Forecast</button>';
+                  '<button onclick="showForecast(' + substation.id + ')" class="btn btn-primary">Show Forecast</button>';
 
     var infowindow = new google.maps.InfoWindow({
         content: content
@@ -183,8 +109,8 @@ function showSubstationInfo(substation, marker, map) {
 
     infowindow.open(map, marker);
 }
- */
-/* function showForecast(substationId) {
+
+function showForecast(substationId) {
     $('#loadingSpinner').show();
     $('#forecastModal').modal('show');
 
@@ -215,7 +141,7 @@ function showSubstationInfo(substation, marker, map) {
             alert('An error occurred while fetching the forecast data.');
         });
 }
- */
+
 initMap();
 </script>
 {% endblock %}
