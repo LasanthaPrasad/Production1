@@ -150,17 +150,15 @@ def create_error_report(errors):
 @roles_required('admin')
 def sample_csv(data_type):
     if data_type == 'forecast_locations':
-        csv_data = "provider_name,latitude,longitude,api_key\nSolcast,40.7128,-74.0060,your_api_key_here\n"
+        csv_data = "provider_name,latitude,longitude,api_key\nsolcast,40.7128,-74.0060,your_api_key_here\n"
     elif data_type == 'grid_substations':
-        csv_data = "name,code,latitude,longitude,installed_solar_capacity,api_status\nSubstation A,SUB001,40.7128,-74.0060,100.5,enabled\n"
+        csv_data = "name,code,latitude,longitude,installed_solar_capacity,api_status\nSubstation A,SUB001,40.7128,-74.0060,100.5,disabled\n"
     elif data_type == 'feeders':
         csv_data = "name,code,grid_substation,installed_solar_capacity,status\nFeeder A,FDR001,1,50.25,active\n"
+
     elif data_type == 'solar_plants':
-        csv_data = "name,latitude,longitude,grid_substation,feeder,forecast_location,installed_capacity,panel_capacity,inverter_capacity,plant_angle,company,api_status,plant_efficiency,coefficient_factor\nPlant A,40.7128,-74.0060,1,1,1,75.5,80.0,70.0,30.0,Company XYZ,enabled,0.85,0.9\n"        
-        """ 
-    elif data_type == 'solar_plants':
-        csv_data = "name,latitude,longitude,grid_substation,feeder,forecast_location,installed_capacity,panel_capacity,inverter_capacity,plant_angle,company,api_status\nPlant A,40.7128,-74.0060,1,1,1,75.5,80.0,70.0,30.0,Company XYZ,enabled\n"
-        """
+        csv_data = "name,latitude,longitude,grid_substation,feeder,forecast_location,installed_capacity,panel_capacity,inverter_capacity,plant_angle,company,api_status,plant_efficiency,coefficient_factor\nPlant1,40.7128,-74.0060,1,1,1,100.5,110.0,95.0,30.0,Company A,enabled,0.85,0.9\nPlant2,34.0522,-118.2437,2,2,2,75.3,80.0,70.0,25.0,Company B,enabled,0.83,0.88\n"
+
     else:
         return "Invalid data type", 400
 
@@ -172,6 +170,8 @@ def sample_csv(data_type):
     )
 
 
+
+
 @main.route('/admin/bulk_upload', methods=['GET', 'POST'])
 @roles_required('admin')
 def admin_bulk_upload():
@@ -181,11 +181,11 @@ def admin_bulk_upload():
         data_type = form.data_type.data
         
         if csv_file:
-            csv_data = csv_file.read().decode('utf-8')
-            csv_file = StringIO(csv_data)
-            csv_reader = csv.DictReader(csv_file)
-            
             try:
+                csv_data = csv_file.stream.read().decode("UTF-8")
+                csv_file = StringIO(csv_data)
+                csv_reader = csv.DictReader(csv_file)
+                
                 if data_type == 'forecast_locations':
                     process_forecast_locations(csv_reader)
                 elif data_type == 'grid_substations':
@@ -197,9 +197,12 @@ def admin_bulk_upload():
                 
                 flash(f'Bulk upload for {data_type} completed successfully!', 'success')
             except Exception as e:
+                current_app.logger.error(f'Error during bulk upload: {str(e)}', exc_info=True)
                 flash(f'Error during bulk upload: {str(e)}', 'error')
         
     return render_template('admin/bulk_upload.html', form=form)
+
+
 
 """ 
 
@@ -269,26 +272,39 @@ def process_feeders(csv_reader):
         db.session.add(feeder)
     db.session.commit()
 
+
 def process_solar_plants(csv_reader):
     for row in csv_reader:
-        plant = SolarPlant(
-            name=row['name'],
-            latitude=float(row['latitude']),
-            longitude=float(row['longitude']),
-            grid_substation=int(row['grid_substation']),
-            feeder=int(row['feeder']),
-            forecast_location=int(row['forecast_location']),
-            installed_capacity=float(row['installed_capacity']),
-            panel_capacity=float(row['panel_capacity']),
-            inverter_capacity=float(row['inverter_capacity']),
-            plant_angle=float(row['plant_angle']),
-            company=row['company'],
-            api_status=row['api_status'],
-            plant_efficiency=float(row['plant_efficiency']),
-            coefficient_factor=float(row['coefficient_factor'])
-        )
-        db.session.add(plant)
+        try:
+            plant = SolarPlant(
+                name=row['name'],
+                latitude=float(row['latitude']),
+                longitude=float(row['longitude']),
+                grid_substation=int(row['grid_substation']),
+                feeder=int(row['feeder']),
+                forecast_location=int(row['forecast_location']),
+                installed_capacity=float(row['installed_capacity']),
+                panel_capacity=float(row['panel_capacity']),
+                inverter_capacity=float(row['inverter_capacity']),
+                plant_angle=float(row['plant_angle']),
+                company=row['company'],
+                api_status=row['api_status'],
+                plant_efficiency=float(row['plant_efficiency']),
+                coefficient_factor=float(row['coefficient_factor'])
+            )
+            db.session.add(plant)
+        except KeyError as e:
+            current_app.logger.error(f"Missing column in CSV: {str(e)}")
+            db.session.rollback()
+            raise ValueError(f"Missing column in CSV: {str(e)}")
+        except ValueError as e:
+            current_app.logger.error(f"Invalid data in CSV: {str(e)}")
+            db.session.rollback()
+            raise ValueError(f"Invalid data in CSV: {str(e)}")
     db.session.commit()
+
+
+
 
 """ 
 def process_solar_plants(csv_data):
