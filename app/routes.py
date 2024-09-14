@@ -638,7 +638,7 @@ def admin():
     """Admin dashboard route"""
     # Here you might want to fetch some admin-specific data
     form = BulkUploadForm()
-    return render_template('admin.html')
+    return render_template('admin.html', form=form)
 
 
 
