@@ -674,7 +674,7 @@ def generate_grid_substation_api_key(id):
 
 
 
-
+""" 
 
 @main.route('/api/substation_forecast/<int:substation_id>')
 def get_substation_forecast(substation_id):
@@ -715,7 +715,7 @@ def calculate_substation_forecasts(substation):
     }
 
 
-
+ """
 
 
 
