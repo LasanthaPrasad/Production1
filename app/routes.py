@@ -1000,7 +1000,7 @@ def get_substation_forecast(substation_id):
     forecasts = calculate_substation_forecasts(substation)
     return jsonify(forecasts)
 
-@main.route('/api/check_forecasts_sub/<int:substation_id>')
+@main.route('/api/check_forecasts_sub/<int:substation>')
 def calculate_substation_forecasts(substation):
     now = datetime.now(timezone.utc)
     three_days_later = now + timedelta(days=1)
