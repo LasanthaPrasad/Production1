@@ -38,7 +38,7 @@
                 <form action="{{ url_for('main.generate_grid_substation_api_key', id=substation.id) }}" method="POST" style="display:inline;">
                     <button type="submit" class="btn btn-sm btn-info">New API Key</button>
                 </form>
-                <button onclick="showForecast({{ substation.id }})" class="btn btn-sm btn-primary">Show Forecast</button>
+                <button onclick="showForecast({{ substation.id }},'${{plant.title}}')" class="btn btn-sm btn-primary">Show Forecast</button>
             </td>
         </tr>
         {% endfor %}
@@ -120,7 +120,7 @@ function showSubstationInfo(substation, marker) {
     infowindow.open(map, marker);
 }
 
-function showForecast(substationId) {
+function showForecast(substationId, substationName) {
     $('#loadingSpinner').show();
     $('#forecastModal').modal('show');
     $('#downloadExcel').hide();
@@ -140,7 +140,7 @@ function showForecast(substationId) {
             };
 
             var layout = {
-                title: 'Grid Substation Generation Forecast',
+                title: 'Grid Substation Generation Forecast ${substationName}',
                 xaxis: {
                     title: 'Time',
                     tickformat: '%Y-%m-%d %H:%M'
