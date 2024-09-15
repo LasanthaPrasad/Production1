@@ -38,7 +38,7 @@
                 <form action="{{ url_for('main.generate_grid_substation_api_key', id=substation.id) }}" method="POST" style="display:inline;">
                     <button type="submit" class="btn btn-sm btn-info">New API Key</button>
                 </form>
-                <button onclick="showForecast({{ substation.id }},'${{plant.title}}')" class="btn btn-sm btn-primary">Show Forecast</button>
+                <button onclick="showForecast({{ substation.id }}, '{{ substation.name }}')" class="btn btn-sm btn-primary">Show Forecast</button>
             </td>
         </tr>
         {% endfor %}
@@ -105,13 +105,16 @@ function initMap() {
     });
 }
 
+
+
+
 function showSubstationInfo(substation, marker) {
     var content = '<h5>' + substation.name + '</h5>' +
-                  '<p>Code: ' + substation.code + '</p>' +
-                  '<p>Latitude: ' + substation.latitude + '</p>' +
-                  '<p>Longitude: ' + substation.longitude + '</p>' +
-                  '<p>Installed Solar Capacity: ' + substation.installed_solar_capacity + ' MW</p>' +
-                  '<button onclick="showForecast(' + substation.id + ')" class="btn btn-primary">Show Forecast</button>';
+              '<p>Code: ' + substation.code + '</p>' +
+              '<p>Latitude: ' + substation.latitude + '</p>' +
+              '<p>Longitude: ' + substation.longitude + '</p>' +
+              '<p>Installed Solar Capacity: ' + substation.installed_solar_capacity + ' MW</p>' +
+              '<button onclick="showForecast(' + substation.id + ', \'' + substation.name + '\')" class="btn btn-primary">Show Forecast</button>';
 
     var infowindow = new google.maps.InfoWindow({
         content: content
@@ -119,6 +122,7 @@ function showSubstationInfo(substation, marker) {
 
     infowindow.open(map, marker);
 }
+
 
 function showForecast(substationId, substationName) {
     $('#loadingSpinner').show();
@@ -140,7 +144,7 @@ function showForecast(substationId, substationName) {
             };
 
             var layout = {
-                title: 'Grid Substation Generation Forecast ${substationName}',
+                title: `Grid Substation Generation Forecast - ${substationName}`,
                 xaxis: {
                     title: 'Time',
                     tickformat: '%Y-%m-%d %H:%M'
@@ -157,6 +161,11 @@ function showForecast(substationId, substationName) {
             alert('An error occurred while fetching the forecast data.');
         });
 }
+
+
+
+
+
 
 function downloadExcel() {
     if (!currentForecastData) {
