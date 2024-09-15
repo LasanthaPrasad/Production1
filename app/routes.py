@@ -1023,7 +1023,7 @@ def calculate_substation_forecasts(substation):
         IrradiationForecast.timestamp <= three_days_later
     ).order_by(IrradiationForecast.timestamp).all()
 
-    print(f"FFFFF Locationdfgdfgdfgdfg {forecasts}")
+   # print(f"FFFFF Locationdfgdfgdfgdfg {forecasts}")
 
     if not forecasts:
         return {"error": "No forecast data available"}

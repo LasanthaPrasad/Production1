@@ -71,177 +71,43 @@
 {% endblock %}
 
 {% block extra_js %}
-<!-- <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY"></script>
-<script src="https://cdn.plot.ly/plotly-latest.min.js"></script> -->
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
 <script>
-
-
-
-
-let map;
-let markers = [];
-let currentInfoWindow = null;
-
-function initMap() {
-
-    console.log("Initializing map");
-    map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: 7.8731, lng: 80.7718 },  // Center of Sri Lanka
-        zoom: 8,
-    });
-
-    const solarPanelIcon = {
-        url: "{{ url_for('static', filename='images/solar-panel-icon.png') }}",
-        scaledSize: new google.maps.Size(32, 32),  // size of the icon
-        origin: new google.maps.Point(0, 0),       // origin of the image
-        anchor: new google.maps.Point(16, 32)      // anchor point of the icon (bottom middle)
-    };
-
-    const substations = [
-        {% for substation in substations %}
-        {
-            position: { lat: {{ substation.latitude }}, lng: {{ substation.longitude }} },
-            title: "{{ substation.name }}",
-            id: {{ substation.id }},
-            details: {
-                name: "{{ substation.name }}",
-                latitude: {{ substation.latitude }},
-                longitude: {{ substation.longitude }},
-                installedCapacity: {{ substation.installed_solar_capacity }},
-            }
-        },
-        {% endfor %}
-    ];
-
-    substations.forEach(substation => {
-        const marker = new google.maps.Marker({
-            position: substation.position,
-            map: map,
-            title: substation.title,
-            icon: solarPanelIcon
-        });
-
-        const infoWindow = new google.maps.InfoWindow({
-            content: `
-                <div>
-                    <h6>${substation.title}</h6>
-                    <p>Latitude: ${substation.details.latitude}</p>
-                    <p>Longitude: ${substation.details.longitude}</p>
-                    <p>Installed Capacity: ${substation.details.installedCapacity} MW</p>
-                    <button onclick="showForecast(${substation.id}, '${substation.title}')">Show Forecast</button>
-                </div>
-            `
-        });
-
-        marker.addListener("click", () => {
-            if (currentInfoWindow) {
-                currentInfoWindow.close();
-            }
-            infoWindow.open(map, marker);
-            currentInfoWindow = infoWindow;
-        });
-
-        markers.push(marker);
-    });
-}
-
-
-
-
-function showForecast(substationId, substationName) {
-
-    if (currentInfoWindow) {
-        currentInfoWindow.close();
-    }
-
-    console.log("Showing forecast for location:", substationId);
-    // Show modal with loading spinner
-    $('#forecastModal').modal('show');
+function showForecast(substationId) {
     $('#loadingSpinner').show();
-    $('#forecastChart').hide();
-
-
+    $('#forecastModal').modal('show');
 
     fetch(`/api/substation_forecast/${substationId}`)
         .then(response => response.json())
         .then(data => {
-            console.log("Received data:", data);  // Log the received data
-            
-            // Hide spinner and show chart
             $('#loadingSpinner').hide();
-            $('#forecastChart').show();
-
-
-
-            const ctx = document.getElementById('forecastChart').getContext('2d');
             
-            // Destroy existing chart if it exists
-            if (window.forecastChart instanceof Chart) {
-                window.forecastChart.destroy();
-            }
-            
-            window.forecastChart = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: data.map(d => new Date(d.timestamp).toLocaleString()),
-                    datasets: [{
-                        label: 'Forecasted MW',
-                        data: data.map(d => d.estimated_mw),
-                        borderColor: 'rgb(75, 192, 192)',
-                        tension: 0.1
-                    }]
+            var trace = {
+                x: data.map(item => new Date(item.timestamp)),
+                y: data.map(item => item.estimated_mw),
+                type: 'scatter',
+                mode: 'lines+markers',
+                name: 'Estimated MW'
+            };
+
+            var layout = {
+                title: 'Grid Substation Generation Forecast',
+                xaxis: {
+                    title: 'Time',
+                    tickformat: '%Y-%m-%d %H:%M'
                 },
-                options: {
-                    responsive: true,
-                    title: {
-                        display: true,
-                        text: `Forecast for ${substationName}`
-                    },
-                    scales: {
-                        x: {
-                            type: 'time',
-                            time: {
-                                unit: 'hour'
-                            },
-                            title: {
-                                display: true,
-                                text: 'Time'
-                            }
-                        },
-                        y: {
-                            title: {
-                                display: true,
-                                text: 'Estimated MW'
-                            }
-                        }
-                    }
-                }
-            });
-            
-            $('#forecastModal').modal('show');
+                yaxis: {title: 'Estimated MW'}
+            };
+
+            Plotly.newPlot('forecastChart', [trace], layout);
         })
         .catch(error => {
-            console.error('Error fetching forecast data:', error);
+            console.error('Error:', error);
             $('#loadingSpinner').hide();
-            $('#forecastChart').hide();
-            alert('Failed to fetch forecast data. Please check API key and try again.');
+            alert('An error occurred while fetching the forecast data.');
         });
 }
 
-document.addEventListener("DOMContentLoaded", initMap);
-document.addEventListener('click', function(event) {
-    // Check if the clicked element is a close button inside a modal
-    if (event.target.matches('.modal .btn-close') || event.target.matches('.modal .close')) {
-        var modal = event.target.closest('.modal');
-        var modalInstance = bootstrap.Modal.getInstance(modal);
-        if (modalInstance) {
-            modalInstance.hide();
-        }
-    }
-});
-
-
-
-
+// Add your map initialization code here if needed
 </script>
 {% endblock %}
