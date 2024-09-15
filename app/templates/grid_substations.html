@@ -63,6 +63,7 @@
                     </div>
                 </div>
                 <div id="forecastChart" style="width:100%; height:400px;"></div>
+                <button id="downloadExcel" class="btn btn-success mt-3" style="display: none;">Download Excel</button>
             </div>
         </div>
     </div>
@@ -71,16 +72,62 @@
 {% endblock %}
 
 {% block extra_js %}
+
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.16.9/xlsx.full.min.js"></script>
 <script>
+let currentForecastData = null;
+let map;
+let markers = [];
+
+function initMap() {
+    map = new google.maps.Map(document.getElementById('map'), {
+        zoom: 7,
+        center: {lat: 28.6139, lng: 77.2090}  // Centered on Delhi, India
+    });
+
+    var substations = {{ substations_data|tojson }};
+    
+    substations.forEach(function(substation) {
+        var marker = new google.maps.Marker({
+            position: {lat: substation.latitude, lng: substation.longitude},
+            map: map,
+            title: substation.name
+        });
+
+        marker.addListener('click', function() {
+            showSubstationInfo(substation, marker);
+        });
+
+        markers.push(marker);
+    });
+}
+
+function showSubstationInfo(substation, marker) {
+    var content = '<h5>' + substation.name + '</h5>' +
+                  '<p>Code: ' + substation.code + '</p>' +
+                  '<p>Latitude: ' + substation.latitude + '</p>' +
+                  '<p>Longitude: ' + substation.longitude + '</p>' +
+                  '<p>Installed Solar Capacity: ' + substation.installed_solar_capacity + ' MW</p>' +
+                  '<button onclick="showForecast(' + substation.id + ')" class="btn btn-primary">Show Forecast</button>';
+
+    var infowindow = new google.maps.InfoWindow({
+        content: content
+    });
+
+    infowindow.open(map, marker);
+}
+
 function showForecast(substationId) {
     $('#loadingSpinner').show();
     $('#forecastModal').modal('show');
+    $('#downloadExcel').hide();
 
     fetch(`/api/substation_forecast/${substationId}`)
         .then(response => response.json())
         .then(data => {
             $('#loadingSpinner').hide();
+            currentForecastData = data;
             
             var trace = {
                 x: data.map(item => new Date(item.timestamp)),
@@ -100,6 +147,7 @@ function showForecast(substationId) {
             };
 
             Plotly.newPlot('forecastChart', [trace], layout);
+            $('#downloadExcel').show();
         })
         .catch(error => {
             console.error('Error:', error);
@@ -108,81 +156,26 @@ function showForecast(substationId) {
         });
 }
 
-// Add your map initialization code here if needed
+function downloadExcel() {
+    if (!currentForecastData) {
+        alert('No forecast data available to download.');
+        return;
+    }
 
+    const worksheet = XLSX.utils.json_to_sheet(currentForecastData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Forecast Data");
+    
+    const date = new Date();
+    const filename = `forecast_data_${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}_${date.getHours().toString().padStart(2, '0')}${date.getMinutes().toString().padStart(2, '0')}.xlsx`;
 
-let map;
-let markers = [];
-let currentInfoWindow = null;
-
-function initMap() {
-
-    console.log("Initializing map");
-    map = new google.maps.Map(document.getElementById("map"), {
-        center: { lat: 7.8731, lng: 80.7718 },  // Center of Sri Lanka
-        zoom: 8,
-    });
-
-    const solarPanelIcon = {
-        url: "{{ url_for('static', filename='images/solar-panel-icon.png') }}",
-        scaledSize: new google.maps.Size(32, 32),  // size of the icon
-        origin: new google.maps.Point(0, 0),       // origin of the image
-        anchor: new google.maps.Point(16, 32)      // anchor point of the icon (bottom middle)
-    };
-
-    const substations = [
-        {% for substation in substations %}
-        {
-            position: { lat: {{ substation.latitude }}, lng: {{ substation.longitude }} },
-            title: "{{ substation.name }}",
-            id: {{ substation.id }},
-            details: {
-                name: "{{ substation.name }}",
-                latitude: {{ substation.latitude }},
-                longitude: {{ substation.longitude }},
-                installedCapacity: {{ substation.installed_solar_capacity }},
-            }
-        },
-        {% endfor %}
-    ];
-
-    substations.forEach(substation => {
-        const marker = new google.maps.Marker({
-            position: substation.position,
-            map: map,
-            title: substation.title,
-            icon: solarPanelIcon
-        });
-
-        const infoWindow = new google.maps.InfoWindow({
-            content: `
-                <div>
-                    <h6>${substation.title}</h6>
-                    <p>Latitude: ${substation.details.latitude}</p>
-                    <p>Longitude: ${substation.details.longitude}</p>
-                    <p>Installed Capacity: ${substation.details.installedCapacity} MW</p>
-                       
-                    <button onclick="showForecast(${substation.id}, '${substation.title}')">Show Forecast</button> 
-
-                    <button onclick="showForecast(${substation.id}, '${substation.title}')">Show Forecast</button>
-                </div>
-            `
-        });
-
-        marker.addListener("click", () => {
-            if (currentInfoWindow) {
-                currentInfoWindow.close();
-            }
-            infoWindow.open(map, marker);
-            currentInfoWindow = infoWindow;
-        });
-
-        markers.push(marker);
-    });
+    XLSX.writeFile(workbook, filename);
 }
 
+// Add event listener for the download button
+document.getElementById('downloadExcel').addEventListener('click', downloadExcel);
 
-
-
+// Initialize the map when the page loads
+google.maps.event.addDomListener(window, 'load', initMap);
 </script>
 {% endblock %}
