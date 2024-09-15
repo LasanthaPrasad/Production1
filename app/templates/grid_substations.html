@@ -81,6 +81,8 @@
 let currentForecastData = null;
 let map;
 let markers = [];
+let currentInfoWindow = null;
+
 
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
@@ -109,6 +111,11 @@ function initMap() {
 
 
 function showSubstationInfo(substation, marker) {
+    if (currentInfoWindow) {
+        currentInfoWindow.close();
+    }
+
+
     var content = '<h5>' + substation.name + '</h5>' +
               '<p>Code: ' + substation.code + '</p>' +
               '<p>Latitude: ' + substation.latitude + '</p>' +
@@ -121,6 +128,15 @@ function showSubstationInfo(substation, marker) {
     });
 
     infowindow.open(map, marker);
+
+        // Set the current info window to the newly opened one
+    currentInfoWindow = infowindow;
+
+    // Add a click event listener to the map to close the info window when clicking elsewhere on the map
+    google.maps.event.addListenerOnce(map, 'click', function() {
+    infowindow.close();
+    currentInfoWindow = null;
+    });
 }
 
 
