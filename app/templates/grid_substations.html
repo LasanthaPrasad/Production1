@@ -74,68 +74,118 @@
 <!-- <script src="https://maps.googleapis.com/maps/api/js?key=YOUR_GOOGLE_MAPS_API_KEY"></script>
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script> -->
 <script>
+
+
+
+
+let map;
+let markers = [];
+let currentInfoWindow = null;
+
 function initMap() {
-    var map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 7,
-        center: {lat: 28.6139, lng: 77.2090}  // Centered on Delhi, India
+
+    console.log("Initializing map");
+    map = new google.maps.Map(document.getElementById("map"), {
+        center: { lat: 7.8731, lng: 80.7718 },  // Center of Sri Lanka
+        zoom: 8,
     });
 
-    var substations = {{ substations_data|tojson }};
-    
-    substations.forEach(function(substation) {
-        var marker = new google.maps.Marker({
-            position: {lat: substation.latitude, lng: substation.longitude},
+    const solarPanelIcon = {
+        url: "{{ url_for('static', filename='images/solar-panel-icon.png') }}",
+        scaledSize: new google.maps.Size(32, 32),  // size of the icon
+        origin: new google.maps.Point(0, 0),       // origin of the image
+        anchor: new google.maps.Point(16, 32)      // anchor point of the icon (bottom middle)
+    };
+
+    const substations = [
+        {% for substation in substations %}
+        {
+            position: { lat: {{ substation.latitude }}, lng: {{ substation.longitude }} },
+            title: "{{ substation.name }}",
+            id: {{ substation.id }},
+            details: {
+                name: "{{ substation.name }}",
+                latitude: {{ substation.latitude }},
+                longitude: {{ substation.longitude }},
+                installedCapacity: {{ substation.installed_solar_capacity }},
+            }
+        },
+        {% endfor %}
+    ];
+
+    substations.forEach(substation => {
+        const marker = new google.maps.Marker({
+            position: substation.position,
             map: map,
-            title: substation.name
+            title: substation.title,
+            icon: solarPanelIcon
         });
 
-        marker.addListener('click', function() {
-            showSubstationInfo(substation, marker, map);
+        const infoWindow = new google.maps.InfoWindow({
+            content: `
+                <div>
+                    <h6>${substation.title}</h6>
+                    <p>Latitude: ${substation.details.latitude}</p>
+                    <p>Longitude: ${substation.details.longitude}</p>
+                    <p>Installed Capacity: ${substation.details.installedCapacity} MW</p>
+                    <button onclick="showForecast(${substation.id}, '${substation.title}')">Show Forecast</button>
+                </div>
+            `
         });
+
+        marker.addListener("click", () => {
+            if (currentInfoWindow) {
+                currentInfoWindow.close();
+            }
+            infoWindow.open(map, marker);
+            currentInfoWindow = infoWindow;
+        });
+
+        markers.push(marker);
     });
 }
 
-function showSubstationInfo(substation, marker, map) {
-    var content = '<h5>' + substation.name + '</h5>' +
-                  '<p>Code: ' + substation.code + '</p>' +
-                  '<p>Latitude: ' + substation.latitude + '</p>' +
-                  '<p>Longitude: ' + substation.longitude + '</p>' +
-                  '<p>Installed Solar Capacity: ' + substation.installed_solar_capacity + ' MW</p>' +
-                  '<button onclick="showForecast(' + substation.id + ')" class="btn btn-primary">Show Forecast</button>';
 
-    var infowindow = new google.maps.InfoWindow({
-        content: content
-    });
 
-    infowindow.open(map, marker);
-}
 
-function showForecast(substationId) {
-    $('#loadingSpinner').show();
+function showForecast(substationId, substationName) {
+
+    if (currentInfoWindow) {
+        currentInfoWindow.close();
+    }
+
+    console.log("Showing forecast for location:", substationId);
+    // Show modal with loading spinner
     $('#forecastModal').modal('show');
+    $('#loadingSpinner').show();
     $('#forecastChart').hide();
 
-    fetch('/api/substation_forecast/${substationId}')
+
+
+    fetch(`/api/substation_forecast/${substationId}`)
         .then(response => response.json())
         .then(data => {
+            console.log("Received data:", data);  // Log the received data
+            
+            // Hide spinner and show chart
             $('#loadingSpinner').hide();
             $('#forecastChart').show();
-                       
+
+
+
             const ctx = document.getElementById('forecastChart').getContext('2d');
             
             // Destroy existing chart if it exists
             if (window.forecastChart instanceof Chart) {
                 window.forecastChart.destroy();
             }
- 
-
-
+            
             window.forecastChart = new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: data.map(d => new Date(d.timestamp).toLocaleString()),
                     datasets: [{
-                        label: 'Grid Forecasted MW',
+                        label: 'Forecasted MW',
                         data: data.map(d => d.estimated_mw),
                         borderColor: 'rgb(75, 192, 192)',
                         tension: 0.1
@@ -145,7 +195,7 @@ function showForecast(substationId) {
                     responsive: true,
                     title: {
                         display: true,
-                        text: `Forecast for ${plantName}`
+                        text: `Forecast for ${substationName}`
                     },
                     scales: {
                         x: {
@@ -169,14 +219,6 @@ function showForecast(substationId) {
             });
             
             $('#forecastModal').modal('show');
-
-
-
-
-
-
-
-
         })
         .catch(error => {
             console.error('Error fetching forecast data:', error);
@@ -185,7 +227,6 @@ function showForecast(substationId) {
             alert('Failed to fetch forecast data. Please check API key and try again.');
         });
 }
-
 
 document.addEventListener("DOMContentLoaded", initMap);
 document.addEventListener('click', function(event) {
@@ -198,6 +239,7 @@ document.addEventListener('click', function(event) {
         }
     }
 });
+
 
 
 </script>
