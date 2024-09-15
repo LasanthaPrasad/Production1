@@ -84,8 +84,8 @@ let markers = [];
 
 function initMap() {
     map = new google.maps.Map(document.getElementById('map'), {
-        zoom: 7,
-        center: {lat: 28.6139, lng: 77.2090}  // Centered on Delhi, India
+        center: { lat: 7.8731, lng: 80.7718 },  // Center of Sri Lanka
+        zoom: 8,
     });
 
     var substations = {{ substations_data|tojson }};
