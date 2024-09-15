@@ -766,7 +766,7 @@ def calculate_plant_forecasts(plant):
             IrradiationForecast.timestamp <= three_days_later
         ).order_by(IrradiationForecast.timestamp).all()
 
-        print(f"FFFFF Plantdfgdfgdfgdfg {forecasts}")
+        #print(f"FFFFF Plantdfgdfgdfgdfg {forecasts}")
 
 
         if not forecasts:
@@ -1037,7 +1037,7 @@ def calculate_substation_forecasts(substation):
         'estimated_mw': estimated_mw
     })
 
-    print(f" return forecast  {substation_forecasts}")
+    #print(f" return forecast  {substation_forecasts}")
     return substation_forecasts
 
 
