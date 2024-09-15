@@ -997,10 +997,11 @@ def generate_grid_substation_api_key(id):
 @main.route('/api/substation_forecast/<int:substation_id>')
 def get_substation_forecast(substation_id):
     substation = GridSubstation.query.get_or_404(substation_id)
+    print(f"substation ID : {substation_id}")
     forecasts = calculate_substation_forecasts(substation)
     return jsonify(forecasts)
 
-@main.route('/api/check_forecasts_sub/<substation>')
+#@main.route('/api/check_forecasts_sub/<substation>')
 def calculate_substation_forecasts(substation):
     now = datetime.now(timezone.utc)
     three_days_later = now + timedelta(days=1)
@@ -1036,6 +1037,7 @@ def calculate_substation_forecasts(substation):
         'estimated_mw': estimated_mw
     })
 
+    print(f" return forecast  {substation_forecasts}")
     return substation_forecasts
 
 
