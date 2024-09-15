@@ -766,7 +766,7 @@ def calculate_plant_forecasts(plant):
             IrradiationForecast.timestamp <= three_days_later
         ).order_by(IrradiationForecast.timestamp).all()
 
-
+        print(f"FFFFF Plantdfgdfgdfgdfg {forecasts}")
 
 
         if not forecasts:
