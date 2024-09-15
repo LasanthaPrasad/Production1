@@ -109,5 +109,80 @@ function showForecast(substationId) {
 }
 
 // Add your map initialization code here if needed
+
+
+let map;
+let markers = [];
+let currentInfoWindow = null;
+
+function initMap() {
+
+    console.log("Initializing map");
+    map = new google.maps.Map(document.getElementById("map"), {
+        center: { lat: 7.8731, lng: 80.7718 },  // Center of Sri Lanka
+        zoom: 8,
+    });
+
+    const solarPanelIcon = {
+        url: "{{ url_for('static', filename='images/solar-panel-icon.png') }}",
+        scaledSize: new google.maps.Size(32, 32),  // size of the icon
+        origin: new google.maps.Point(0, 0),       // origin of the image
+        anchor: new google.maps.Point(16, 32)      // anchor point of the icon (bottom middle)
+    };
+
+    const substations = [
+        {% for substation in substations %}
+        {
+            position: { lat: {{ substation.latitude }}, lng: {{ substation.longitude }} },
+            title: "{{ substation.name }}",
+            id: {{ substation.id }},
+            details: {
+                name: "{{ substation.name }}",
+                latitude: {{ substation.latitude }},
+                longitude: {{ substation.longitude }},
+                installedCapacity: {{ substation.installed_solar_capacity }},
+            }
+        },
+        {% endfor %}
+    ];
+
+    substations.forEach(substation => {
+        const marker = new google.maps.Marker({
+            position: substation.position,
+            map: map,
+            title: substation.title,
+            icon: solarPanelIcon
+        });
+
+        const infoWindow = new google.maps.InfoWindow({
+            content: `
+                <div>
+                    <h6>${substation.title}</h6>
+                    <p>Latitude: ${substation.details.latitude}</p>
+                    <p>Longitude: ${substation.details.longitude}</p>
+                    <p>Installed Capacity: ${substation.details.installedCapacity} MW</p>
+                       
+                    <button onclick="showForecast(${substation.id}, '${substation.title}')">Show Forecast</button> 
+
+                    <button onclick="showForecast(${substation.id}, '${substation.title}')">Show Forecast</button>
+                </div>
+            `
+        });
+
+        marker.addListener("click", () => {
+            if (currentInfoWindow) {
+                currentInfoWindow.close();
+            }
+            infoWindow.open(map, marker);
+            currentInfoWindow = infoWindow;
+        });
+
+        markers.push(marker);
+    });
+}
+
+
+
+
 </script>
 {% endblock %}
