@@ -55,6 +55,7 @@ main = Blueprint('main', __name__)
 
 
 
+
 @main.route('/admin/bulk_upload', methods=['GET', 'POST'])
 @roles_required('admin')
 def admin_bulk_upload():
